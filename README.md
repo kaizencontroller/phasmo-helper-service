@@ -20,7 +20,7 @@ Recommended:
 ```text
 PHASMO_ADMIN_TOKEN=make-a-random-secret
 PHASMO_STATE_DIR=/tmp/phasmo_state
-PHASMO_ALLOW_BEHAVIOR_COMMANDS=false
+PHASMO_ALLOW_BEHAVIOR_COMMANDS=true
 ```
 
 `PHASMO_ADMIN_TOKEN` protects POST updates from the local Streamer.bot bridge.
