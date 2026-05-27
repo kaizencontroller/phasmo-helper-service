@@ -443,149 +443,147 @@ const CURSED_USE={
 const CURSED_LOCATIONS={
  "6 Tanglewood Drive": {
   "Music Box": "Nursery / purple baby room shelf by the light switch.",
-  "Voodoo Doll": "Garage corner, sitting on a garbage bin.",
-  "Haunted Mirror": "Living-room hallway alcove, outside the master bedroom door, on the wall.",
-  "Summoning Circle": "Basement, immediately at the bottom of the stairs.",
-  "Monkey Paw": "Dining room glass display cabinet, on a shelf.",
+  "Ouija Board": "Back of basement, on a small table.",
   "Tarot Cards": "Living room / foyer corner by the couch, on a side table.",
-  "Ouija Board": "Back of basement, on a small table."
+  "Summoning Circle": "Basement, immediately at the bottom of the stairs.",
+  "Haunted Mirror": "Living-room hall alcove outside the master bedroom door, on the wall.",
+  "Monkey Paw": "Dining room glass display cabinet, on a shelf.",
+  "Voodoo Doll": "Garage corner, sitting on a garbage bin."
  },
  "42 Edgefield Road": {
   "Music Box": "First room on the left, small table next to a lamp.",
-  "Voodoo Doll": "Upstairs blue bedroom, on top of the bed.",
-  "Haunted Mirror": "By front door, at the base of the stairs on the wall.",
-  "Summoning Circle": "Back of basement, next to the possible fuse box location.",
-  "Monkey Paw": "Upstairs kid/orange bedroom, on the baby changing table.",
+  "Ouija Board": "Kitchen-back laundry room, under shelves.",
   "Tarot Cards": "By front door, on a small table next to the key bowl.",
-  "Ouija Board": "Kitchen-back laundry room, under shelves."
+  "Summoning Circle": "Back of basement, next to the possible fuse box location.",
+  "Haunted Mirror": "By front door, at the base of the stairs on the wall.",
+  "Monkey Paw": "Upstairs kid/orange bedroom, on the baby changing table.",
+  "Voodoo Doll": "Upstairs blue bedroom, on top of the bed."
  },
  "10 Ridgeview Court": {
   "Music Box": "Upstairs purple bedroom, small table by the door.",
-  "Voodoo Doll": "Bench next to the piano.",
-  "Haunted Mirror": "Across from the basement staircase, on the wall.",
-  "Summoning Circle": "Basement, in the middle at the bottom of the staircase.",
-  "Monkey Paw": "Upstairs blue/teal bedroom, on the desk.",
+  "Ouija Board": "Down the left hall, laundry room shelves.",
   "Tarot Cards": "By front door, on a small table next to the key bowl.",
-  "Ouija Board": "Down the left hall, laundry room shelves."
+  "Summoning Circle": "Basement, in the middle at the bottom of the staircase.",
+  "Haunted Mirror": "Across from the basement staircase, on the wall.",
+  "Monkey Paw": "Upstairs blue/teal bedroom, on the desk.",
+  "Voodoo Doll": "Bench next to the piano."
  },
  "13 Willow Street": {
   "Music Box": "Next to the front door, on a small table.",
-  "Voodoo Doll": "Blue bedroom glass display cabinet; open the cabinet door.",
-  "Haunted Mirror": "Laundry room off garage, on the ground in the left corner.",
-  "Summoning Circle": "Basement, on the 90-degree turn.",
-  "Monkey Paw": "Dining room glass display cabinet, on a shelf.",
+  "Ouija Board": "Laundry room off garage, on the washing machine.",
   "Tarot Cards": "Living room / foyer side table next to the couch.",
-  "Ouija Board": "Laundry room off garage, on the washing machine."
+  "Summoning Circle": "Basement, on the 90-degree turn.",
+  "Haunted Mirror": "Laundry room off garage, on the ground in the left corner.",
+  "Monkey Paw": "Dining room glass display cabinet, on a shelf.",
+  "Voodoo Doll": "Blue bedroom glass display cabinet; open the cabinet door."
  },
  "Grafton Farmhouse": {
-  "Music Box": "Entryway right side under stairs, on a bookshelf.",
-  "Voodoo Doll": "Top floor room left of stairs, on a chest left of the bed.",
-  "Haunted Mirror": "Straight ahead of front door, on the left wall.",
-  "Summoning Circle": "Second floor back-right storage room.",
-  "Monkey Paw": "First-floor double bedroom, on the corner desk.",
-  "Tarot Cards": "Immediately left of front door, corner of dining table.",
-  "Ouija Board": "Back-right first-floor bedroom closet, on the floor."
+  "Music Box": "Second floor small bedroom, on an end table by the bed.",
+  "Ouija Board": "Third floor attic, on the ground near boxes / standing lamp.",
+  "Tarot Cards": "First floor library, on the desk.",
+  "Summoning Circle": "Second floor doll room, on the ground.",
+  "Haunted Mirror": "Second floor master bedroom, on a table.",
+  "Monkey Paw": "First floor dining room, on a side table.",
+  "Voodoo Doll": "First floor seamstress/work room, on a table."
  },
  "Bleasdale Farmhouse": {
-  "Music Box": "Left-hand / tea room cabinet or shelf shortly after entering.",
-  "Voodoo Doll": "Master bedroom, on the seat/ottoman at the end of the bed.",
+  "Music Box": "Tea room / left-hand room immediately after entering, on the china cabinet or shelf.",
+  "Ouija Board": "Living room, propped on the floor against a couch.",
+  "Tarot Cards": "Attic bedroom / crystal-ball room, on the table.",
+  "Summoning Circle": "Utility / storage room, near the back corner.",
   "Haunted Mirror": "Trophy room / display room, on the floor near a cabinet.",
-  "Summoning Circle": "Utility / storage room, in the corner.",
   "Monkey Paw": "Second-floor study, on the shelf behind the chair.",
-  "Tarot Cards": "Attic bedroom / occult room, on the table with the crystal ball.",
-  "Ouija Board": "Living room, propped near one of the couches."
+  "Voodoo Doll": "Second-floor bedroom, on the seat/bench at the end of the bed."
  },
  "Camp Woodwind": {
   "Music Box": "Inside yellow tent on the left side, small table by the entrance.",
-  "Voodoo Doll": "Left of bathrooms, near the red and teal tents.",
-  "Haunted Mirror": "Middle of map, base of the string-light tree.",
-  "Summoning Circle": "Straight back from truck, by folding activity tables.",
-  "Monkey Paw": "Back curved path, on a wooden table.",
+  "Ouija Board": "Right of fire pit, on the folding tables.",
   "Tarot Cards": "Left of front gate, on the second picnic table.",
-  "Ouija Board": "Right of fire pit, on the folding tables."
+  "Summoning Circle": "Straight back from the truck, by folding activity tables.",
+  "Haunted Mirror": "Middle of map, base of the string-light tree.",
+  "Monkey Paw": "Back curved path, on a wooden table.",
+  "Voodoo Doll": "Left of bathrooms, near the red and teal tents."
  },
  "Brownstone High School": {
   "Music Box": "Entry lobby, sitting on the right-side second bench.",
-  "Voodoo Doll": "Entry lobby, straight back on a bench by the wet floor sign.",
-  "Haunted Mirror": "Entry lobby, leaning against the back of the right pillar.",
-  "Summoning Circle": "Entry lobby, straight back by the wet floor sign.",
-  "Monkey Paw": "Entry lobby, on a box against the front of the right pillar.",
+  "Ouija Board": "Entry lobby, on the ground behind the left pillar.",
   "Tarot Cards": "Entry lobby, second bench on the left side.",
-  "Ouija Board": "Entry lobby, on the ground behind the left pillar."
+  "Summoning Circle": "Entry lobby, straight back by the wet floor sign.",
+  "Haunted Mirror": "Entry lobby, leaning against the back of the right pillar.",
+  "Monkey Paw": "Entry lobby, on a box against the front of the right pillar.",
+  "Voodoo Doll": "Entry lobby, straight back on a bench by the wet floor sign."
  },
  "Prison": {
   "Music Box": "Main entry room, immediately inside on the left table in the black bin/tub.",
-  "Voodoo Doll": "Main entry room, immediately inside on the left table in the open.",
-  "Haunted Mirror": "Main lobby, under center-right row of chairs farther into the room.",
-  "Summoning Circle": "Straight back from front door, back of first room.",
-  "Monkey Paw": "Immediately inside front door, left table by the metal detector.",
+  "Ouija Board": "Immediate left corner of first room, behind the table with other spawns.",
   "Tarot Cards": "Immediately inside front door, left table in a white bin/tub.",
-  "Ouija Board": "Immediate left corner of first room, behind the table with other spawns."
+  "Summoning Circle": "Straight back from front door, back of first room.",
+  "Haunted Mirror": "Main lobby, under center-right row of chairs farther into the room.",
+  "Monkey Paw": "Immediately inside front door, left table by the metal detector.",
+  "Voodoo Doll": "Main entry room, immediately inside on the left table in the open."
  },
  "Sunny Meadows Mental Institution": {
   "Music Box": "Chapel stage area, in one of the circle slots.",
-  "Voodoo Doll": "Chapel stage area, in one of the circle slots.",
-  "Haunted Mirror": "Chapel stage area, in one of the circle slots.",
-  "Summoning Circle": "Chapel stage itself; the circle is on the stage.",
-  "Monkey Paw": "Chapel stage, at the base of the cross near the circle.",
+  "Ouija Board": "Chapel stage area, in one of the circle slots.",
   "Tarot Cards": "Chapel stage area, in one of the circle slots.",
-  "Ouija Board": "Chapel stage area, in one of the circle slots."
+  "Summoning Circle": "Chapel stage itself; the circle is on the stage.",
+  "Haunted Mirror": "Chapel stage area, in one of the circle slots.",
+  "Monkey Paw": "Chapel stage, at the base of the cross near the circle.",
+  "Voodoo Doll": "Chapel stage area, in one of the circle slots."
  },
  "Sunny Meadows Restricted": {
   "Music Box": "Chapel stage area, in one of the circle slots.",
-  "Voodoo Doll": "Chapel stage area, in one of the circle slots.",
-  "Haunted Mirror": "Chapel stage area, in one of the circle slots.",
-  "Summoning Circle": "Chapel stage itself; the circle is on the stage.",
-  "Monkey Paw": "Chapel stage, at the base of the cross near the circle.",
+  "Ouija Board": "Chapel stage area, in one of the circle slots.",
   "Tarot Cards": "Chapel stage area, in one of the circle slots.",
-  "Ouija Board": "Chapel stage area, in one of the circle slots."
+  "Summoning Circle": "Chapel stage itself; the circle is on the stage.",
+  "Haunted Mirror": "Chapel stage area, in one of the circle slots.",
+  "Monkey Paw": "Chapel stage, at the base of the cross near the circle.",
+  "Voodoo Doll": "Chapel stage area, in one of the circle slots."
  },
  "Maple Lodge Campsite": {
   "Music Box": "Campfire by the totem pole, sitting on a stump through reception.",
-  "Voodoo Doll": "Left campsite from spawn, by logs around the campfire.",
-  "Haunted Mirror": "Immediate left side of reception building, above a couch.",
-  "Summoning Circle": "First floor of lake cabin, base of staircase; cabin key is under welcome mat.",
-  "Monkey Paw": "Right-hand area off spawn, past wood chopping, on barrel across from porta-potty.",
+  "Ouija Board": "Back-left restroom building alley/hallway shelf.",
   "Tarot Cards": "First picnic table outside the cabin by the lake.",
-  "Ouija Board": "Back-left restroom building alley/hallway shelf."
+  "Summoning Circle": "First floor of lake cabin, base of staircase; cabin key is under welcome mat.",
+  "Haunted Mirror": "Immediate left side of reception building, above a couch.",
+  "Monkey Paw": "Right-hand area off spawn, past wood chopping, on barrel across from porta-potty.",
+  "Voodoo Doll": "Left campsite from spawn, by logs around the campfire."
  },
  "Point Hope": {
-  "Tarot Cards": "Floor 1, table near the green couches.",
-  "Haunted Mirror": "Floor 3, beside a cupboard / blue cabinet.",
-  "Ouija Board": "Floor 4, on a shelf.",
-  "Summoning Circle": "Floor 5, bathroom floor.",
-  "Music Box": "Floor 6, on the table / vanity in the master bedroom.",
-  "Voodoo Doll": "Floor 7, shelf in the blue child bedroom.",
-  "Monkey Paw": "Floor 8, desk with the wooden horse."
+  "Music Box": "Master bedroom near the top of the lighthouse.",
+  "Ouija Board": "Living room area, tucked away on a shelf.",
+  "Tarot Cards": "First room on the right / lower living area table.",
+  "Summoning Circle": "Upper bathroom floor near the top of the lighthouse.",
+  "Haunted Mirror": "Dining room, against a cupboard / cabinet.",
+  "Monkey Paw": "Workshop near the top of the lighthouse.",
+  "Voodoo Doll": "Kids bedroom, near the window."
  },
  "Nell's Diner": {
-  "Summoning Circle": "Men's Bathroom.",
-  "Ouija Board": "Janitor closet / storage room in the staff hallway.",
-  "Music Box": "Manager's Office.",
-  "Haunted Mirror": "Break Room, on/near a chair by the vending machine.",
-  "Tarot Cards": "Counter Area, behind the counter near the register.",
-  "Voodoo Doll": "Dining Area, on a booth/table seat on the left side.",
-  "Monkey Paw": "Kitchen, on the counter / cutting board."
+  "Music Box": "Manager's Office, next to the coffee machine.",
+  "Ouija Board": "Storage room opposite the staff bathroom / employee-only section.",
+  "Tarot Cards": "Counter area, behind the counter next to the till.",
+  "Summoning Circle": "Men's Bathroom, on the floor.",
+  "Haunted Mirror": "Staff room / break room, on a chair next to the vending machine.",
+  "Monkey Paw": "Kitchen, on the chopping board / countertop.",
+  "Voodoo Doll": "Dining Area, by a table at the back / far-left booth seat."
  }
 };
 const CURSED_HINTS={
- "6 Tanglewood Drive": "Small house sweep: nursery, garage, basement, dining display, living room side table.",
+ "6 Tanglewood Drive": "Small house sweep: nursery, garage, basement, dining display, living-room side table.",
  "42 Edgefield Road": "Three-floor sweep: entry/stairs, basement, orange/blue bedrooms, laundry.",
- "10 Ridgeview Court": "Check upstairs bedrooms, piano bench, basement stairs, laundry and entry table.",
+ "10 Ridgeview Court": "Check upstairs bedrooms, piano bench, basement stairs, laundry, and entry table.",
  "13 Willow Street": "Small house sweep: entry table, blue bedroom cabinet, garage laundry, basement turn.",
- "Grafton Farmhouse": "Two-floor farmhouse sweep: entry shelves, upstairs bedrooms/storage, dining and closet.",
- "Bleasdale Farmhouse": "Reworked farmhouse: living room, tea room, utility/storage, master bedroom, study, trophy room, attic.",
+ "Grafton Farmhouse": "Reworked farmhouse sweep: dining/library/work room on first floor; bedrooms/doll room on second; attic for Ouija.",
+ "Bleasdale Farmhouse": "Reworked farmhouse sweep: tea room, living room, utility/storage, trophy room, second-floor study/bedroom, attic crystal room.",
  "Camp Woodwind": "Outdoor sweep: tents, firepit, string-light tree, activity tables, picnic tables.",
- "Brownstone High School": "Large map shortcut: all cursed possessions are in the entry/lobby zone.",
- "Prison": "Large map shortcut: all cursed possessions are in the main entry/waiting room.",
- "Sunny Meadows Mental Institution": "Large map shortcut: all cursed possessions are in the chapel stage area.",
- "Sunny Meadows Restricted": "Large map shortcut: all cursed possessions are in the chapel stage area.",
- "Maple Lodge Campsite": "New Maple Lodge layout: reception, campfires, cabin, restroom back hallway, staff area.",
- "Point Hope": "Lighthouse sweep: cursed possessions are spread floor-by-floor from Floor 1 to Floor 8.",
- "Nell's Diner": "One-story diner sweep: counter, dining area, staff hallway, manager office, break room, kitchen, bathrooms."
+ "Brownstone High School": "Large map shortcut: all cursed items are in the entry lobby near benches/pillars/wet floor sign.",
+ "Prison": "Large map shortcut: all cursed items are in the main entry room/lobby near the left table, chairs, and metal detector.",
+ "Sunny Meadows Mental Institution": "Large map shortcut: chapel stage. Most items are in circle slots; Monkey Paw is by the cross.",
+ "Sunny Meadows Restricted": "Large map shortcut: chapel stage. Same cursed-item area as full Sunny Meadows.",
+ "Maple Lodge Campsite": "New Maple Lodge sweep: reception/campfire, restroom alley, lake cabin, picnic table, barrel/porta-potty area.",
+ "Point Hope": "Lighthouse sweep: lower living/dining first, then bedrooms/bathroom/workshop toward the top.",
+ "Nell's Diner": "Diner sweep: counter, manager office, staff/break room, storage, men's bathroom, dining area, kitchen."
 };
-const B=[{"id":"hantu-temperature-speed","cat":"Movement Speed","label":"Speed changes with room temperature","up":["Hantu"],"down":[],"w":48,"rel":"High"},{"id":"raiju-electronics-speed","cat":"Movement Speed","label":"Speeds up near active electronics","up":["Raiju"],"down":[],"w":48,"rel":"High"},{"id":"revenant-los-speed","cat":"Movement Speed","label":"Slow searching, extremely fast after detecting a player","up":["Revenant"],"down":[],"w":52,"rel":"High"},{"id":"deogen-distance-speed","cat":"Movement Speed","label":"Very fast far away, very slow when close","up":["Deogen"],"down":[],"w":56,"rel":"High"},{"id":"dayan-moving-speed","cat":"Movement Speed","label":"Fast when a nearby player is moving","up":["Dayan"],"down":[],"w":44,"rel":"High"},{"id":"dayan-still-slow","cat":"Movement Speed","label":"Slow when nearby player stands still","up":["Dayan"],"down":[],"w":40,"rel":"High"},{"id":"twins-speed-profiles","cat":"Movement Speed","label":"Two different hunt speed profiles","up":["The Twins"],"down":[],"w":38,"rel":"Med"},{"id":"thaye-aging-speed","cat":"Movement Speed","label":"Starts fast/hyperactive, calms and slows over time","up":["Thaye"],"down":[],"w":44,"rel":"High"},{"id":"obambo-state-speed","cat":"Movement Speed","label":"Alternates calm/aggressive speed and hunt behavior","up":["Obambo"],"down":[],"w":40,"rel":"Med"},{"id":"aswang-los-ramp","cat":"Movement Speed","label":"Lower base speed but faster line-of-sight acceleration","up":["Aswang"],"down":[],"w":34,"rel":"Med"},{"id":"wraith-no-salt","cat":"Salt / Ultraviolet","label":"Does not disturb salt at all","up":["Wraith"],"down":[],"w":58,"rel":"High"},{"id":"salt-footprints","cat":"Salt / Ultraviolet","label":"Salt disturbed and UV footprints appear","up":[],"down":["Wraith"],"w":45,"rel":"High"},{"id":"gallu-no-salt-enraged","cat":"Salt / Ultraviolet","label":"Cannot disturb salt while enraged","up":["Gallu"],"down":[],"w":36,"rel":"Med"},{"id":"obake-unique-print","cat":"Salt / Ultraviolet","label":"Unique UV print such as six fingers or double switch print","up":["Obake"],"down":[],"w":58,"rel":"High"},{"id":"obake-hides-prints","cat":"Salt / Ultraviolet","label":"Repeated valid UV interactions sometimes leave no print","up":["Obake"],"down":[],"w":32,"rel":"Med"},{"id":"breaker-off-direct","cat":"Electricity / Breaker / Lights","label":"Ghost turns breaker off directly","up":["Hantu","Mare"],"down":["Jinn"],"w":30,"rel":"Med"},{"id":"breaker-on-benefit","cat":"Electricity / Breaker / Lights","label":"Performs better with breaker on","up":["Jinn","Raiju"],"down":["Hantu"],"w":22,"rel":"Low"},{"id":"jinn-breaker-speed","cat":"Electricity / Breaker / Lights","label":"Fast with breaker on, line of sight, and target over 3m away","up":["Jinn"],"down":[],"w":46,"rel":"High"},{"id":"jinn-sanity-drain","cat":"Electricity / Breaker / Lights","label":"Nearby sanity drain with EMF at fuse box","up":["Jinn"],"down":[],"w":38,"rel":"Med"},{"id":"hantu-breath-breaker-off","cat":"Electricity / Breaker / Lights","label":"Freezing breath during hunts when breaker is off or broken","up":["Hantu"],"down":[],"w":48,"rel":"High"},{"id":"mare-lights-off","cat":"Electricity / Breaker / Lights","label":"More dangerous when current room lights are off or broken","up":["Mare"],"down":[],"w":32,"rel":"Med"},{"id":"mare-no-lights-on","cat":"Electricity / Breaker / Lights","label":"Never turns lights on and may immediately turn them off","up":["Mare"],"down":[],"w":34,"rel":"Med"},{"id":"light-shatter-event","cat":"Electricity / Breaker / Lights","label":"Prefers light-shattering events","up":["Mare"],"down":[],"w":24,"rel":"Low"},{"id":"raiju-wide-interference","cat":"Electricity / Breaker / Lights","label":"Electronic interference range feels larger than normal","up":["Raiju"],"down":[],"w":34,"rel":"Med"},{"id":"yokai-short-hearing","cat":"Electricity / Breaker / Lights","label":"During hunts, only hears voice/electronics very close","up":["Yokai"],"down":[],"w":42,"rel":"High"},{"id":"early-hunt","cat":"Hunt Timing / Threshold","label":"Hunts earlier than normal sanity threshold","up":["Demon","Mare","Onryo","Thaye","Raiju","Yokai","Dayan","Kormos","Gallu","Obambo"],"down":["Shade","Deogen"],"w":30,"rel":"Med"},{"id":"demon-ability-hunt","cat":"Hunt Timing / Threshold","label":"Very early hunt that may ignore sanity","up":["Demon"],"down":[],"w":46,"rel":"Med"},{"id":"shade-shy","cat":"Hunt Timing / Threshold","label":"Will not hunt or interact while players are in the same room","up":["Shade"],"down":["Demon","Oni"],"w":42,"rel":"Med"},{"id":"yokai-talking-hunt","cat":"Hunt Timing / Threshold","label":"Talking in same room appears to enable earlier hunt","up":["Yokai"],"down":[],"w":38,"rel":"Med"},{"id":"kormos-sprint-threshold","cat":"Hunt Timing / Threshold","label":"Player sprinting in same room appears to enable earlier hunt","up":["Kormos"],"down":[],"w":36,"rel":"Med"},{"id":"aswang-zero-grace","cat":"Hunt Timing / Threshold","label":"Hunt sometimes appears to start with no grace period","up":["Aswang"],"down":[],"w":36,"rel":"Med"},{"id":"gallu-state-thresholds","cat":"Hunt Timing / Threshold","label":"Hunt threshold changes with normal/enraged/weakened state","up":["Gallu"],"down":[],"w":32,"rel":"Med"},{"id":"obambo-aggressive-hunts","cat":"Hunt Timing / Threshold","label":"Aggressive state hunts earlier but may be shorter","up":["Obambo"],"down":[],"w":34,"rel":"Med"},{"id":"deogen-late-hunt","cat":"Hunt Timing / Threshold","label":"Does not hunt until lower sanity than normal","up":["Deogen"],"down":[],"w":26,"rel":"Low"},{"id":"onryo-flame-prevent","cat":"Fire / Incense / Crucifix","label":"Lit flame nearby prevents hunts like a crucifix","up":["Onryo"],"down":[],"w":48,"rel":"High"},{"id":"onryo-third-blowout","cat":"Fire / Incense / Crucifix","label":"Hunt attempt after third flame blowout with no nearby flame","up":["Onryo"],"down":[],"w":52,"rel":"High"},{"id":"spirit-long-incense","cat":"Fire / Incense / Crucifix","label":"Incense prevents hunts much longer than normal","up":["Spirit"],"down":["Demon"],"w":48,"rel":"High"},{"id":"demon-short-incense","cat":"Fire / Incense / Crucifix","label":"Incense protection seems shorter than normal","up":["Demon"],"down":["Spirit"],"w":46,"rel":"High"},{"id":"demon-crucifix-range","cat":"Fire / Incense / Crucifix","label":"Crucifix blocks hunt from farther away than expected","up":["Demon"],"down":[],"w":32,"rel":"Med"},{"id":"gallu-crucifix-enraged","cat":"Fire / Incense / Crucifix","label":"Crucifix burn causes enraged Gallu behavior","up":["Gallu"],"down":[],"w":38,"rel":"Med"},{"id":"yurei-incense-trap","cat":"Fire / Incense / Crucifix","label":"Non-hunt incense traps it in favorite room","up":["Yurei"],"down":[],"w":32,"rel":"Med"},{"id":"phantom-photo-disappear","cat":"Ghost Events / Manifestation","label":"Ghost disappears when photographed or filmed","up":["Phantom"],"down":[],"w":58,"rel":"High"},{"id":"photo-visible","cat":"Ghost Events / Manifestation","label":"Ghost remains visible in ghost photo","up":[],"down":["Phantom"],"w":32,"rel":"Med"},{"id":"oni-no-mist","cat":"Ghost Events / Manifestation","label":"No mist-form/airball events observed after many events","up":["Oni"],"down":[],"w":34,"rel":"Med"},{"id":"oni-full-visible","cat":"Ghost Events / Manifestation","label":"Very visible during hunts or strong full-form events","up":["Oni"],"down":["Phantom"],"w":35,"rel":"Med"},{"id":"kormos-no-mist-chase","cat":"Ghost Events / Manifestation","label":"Cannot perform mist-form or chasing ghost events","up":["Kormos"],"down":[],"w":32,"rel":"Med"},{"id":"banshee-singing","cat":"Ghost Events / Manifestation","label":"Frequent singing events or unusual singing sanity drain target","up":["Banshee"],"down":[],"w":34,"rel":"Med"},{"id":"phantom-sanity-look","cat":"Ghost Events / Manifestation","label":"Looking at manifestation drains sanity unusually fast","up":["Phantom"],"down":[],"w":30,"rel":"Low"},{"id":"myling-quiet-footsteps","cat":"Sound / Spirit Box","label":"Hunt footsteps/vocalizations only audible when close","up":["Myling"],"down":[],"w":46,"rel":"High"},{"id":"banshee-scream","cat":"Sound / Spirit Box","label":"Banshee scream on parabolic microphone","up":["Banshee"],"down":[],"w":48,"rel":"High"},{"id":"deogen-spiritbox-breath","cat":"Sound / Spirit Box","label":"Deogen breathing response on Spirit Box","up":["Deogen"],"down":[],"w":44,"rel":"High"},{"id":"moroi-curse","cat":"Sound / Spirit Box","label":"Cursed player drains sanity rapidly after paranormal audio/contact","up":["Moroi"],"down":[],"w":42,"rel":"Med"},{"id":"box-alone-mismatch","cat":"Sound / Spirit Box","label":"Spirit Box only works under correct alone/everyone condition","up":[],"down":[],"w":0,"rel":"Context"},{"id":"goryo-camera-dots","cat":"Room / Roaming / D.O.T.S","label":"D.O.T.S visible on camera only, not naked eye","up":["Goryo"],"down":[],"w":50,"rel":"High"},{"id":"goryo-room-stable","cat":"Room / Roaming / D.O.T.S","label":"Favorite room does not naturally change","up":["Goryo"],"down":[],"w":28,"rel":"Low"},{"id":"thaye-high-activity-early","cat":"Room / Roaming / D.O.T.S","label":"Very high activity early, lower activity later","up":["Thaye"],"down":[],"w":36,"rel":"Med"},{"id":"mare-long-roam-lights-on","cat":"Room / Roaming / D.O.T.S","label":"Seems to roam farther when lights are on","up":["Mare"],"down":[],"w":20,"rel":"Low"},{"id":"yurei-door-room","cat":"Room / Roaming / D.O.T.S","label":"Strong door ability or favorite-room trapping behavior","up":["Yurei"],"down":[],"w":38,"rel":"Med"},{"id":"banshee-target","cat":"Targeting / Awareness","label":"Only one player seems targeted during hunts","up":["Banshee"],"down":[],"w":42,"rel":"Med"},{"id":"deogen-knows-location","cat":"Targeting / Awareness","label":"Always knows where players are during hunts","up":["Deogen"],"down":[],"w":44,"rel":"High"},{"id":"kormos-no-los","cat":"Targeting / Awareness","label":"No visual line-of-sight; detects voice/electronics/footsteps instead","up":["Kormos"],"down":[],"w":50,"rel":"High"},{"id":"aswang-hidden-spares","cat":"Targeting / Awareness","label":"Reaches correctly hidden player and hunt ends instead of killing","up":["Aswang"],"down":[],"w":58,"rel":"High"},{"id":"wraith-teleport","cat":"Targeting / Awareness","label":"Teleports to player and leaves EMF at feet level","up":["Wraith"],"down":[],"w":32,"rel":"Med"},{"id":"phantom-travel","cat":"Targeting / Awareness","label":"Travels to random player and leaves EMF at head level","up":["Phantom"],"down":[],"w":28,"rel":"Low"},{"id":"polter-multi-throw","cat":"Object / Interaction","label":"Object pile explosion or many throws at once","up":["Poltergeist"],"down":[],"w":55,"rel":"High"},{"id":"polter-hunt-throw-rate","cat":"Object / Interaction","label":"Throws objects constantly during hunts","up":["Poltergeist"],"down":[],"w":44,"rel":"High"},{"id":"twins-double-interaction","cat":"Object / Interaction","label":"Near-simultaneous interactions in separate places","up":["The Twins"],"down":[],"w":42,"rel":"Med"},{"id":"shade-low-interaction","cat":"Object / Interaction","label":"Low interaction/events while players are near the ghost","up":["Shade"],"down":["Oni","Poltergeist"],"w":34,"rel":"Med"},{"id":"obake-shapeshift","cat":"Object / Interaction","label":"Brief shapeshift/model flicker during hunt","up":["Obake"],"down":[],"w":52,"rel":"High"},{"id":"mimic-fake-orbs","cat":"Mimic / Special Cases","label":"Ghost Orbs plus impossible evidence combo","up":["The Mimic"],"down":[],"w":60,"rel":"High"},{"id":"mimic-changing-tells","cat":"Mimic / Special Cases","label":"Behavior tells change between hunts or over time","up":["The Mimic"],"down":[],"w":44,"rel":"Med"}];
-let state={evidence:{},behaviors:{},votes:{},responds:'unknown',evidenceMode:'3'}; let expanded={}; let evidenceCollapsed=localStorage.getItem('phasmoEvidenceCollapsed')==='true'; let behaviorCollapsed=localStorage.getItem('phasmoBehaviorCollapsed')==='true'; let cursedCollapsed=localStorage.getItem('phasmoCursedCollapsed')==='true';
 function apiUrl(path){return `${API}${path}?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`}
 async function getState(){let r=await fetch(`${API}/state?room=${encodeURIComponent(room)}`);state=await r.json();render();}
 async function postState(patch){let r=await fetch(apiUrl('/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});if(!r.ok){showAuthError('Update blocked. If PHASMO_ADMIN_TOKEN is set, open the control URL with &token=YOUR_TOKEN once.');return;}let data=await r.json().catch(()=>null);if(data&&data.state){state=data.state;render();}else{await getState();}}
