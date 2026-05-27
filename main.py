@@ -390,6 +390,7 @@ HTML_TEMPLATE = r'''<!doctype html>
     </div>
   </div>
   <div class="panel" id="setupPanel"><div class="head"><div><strong>Run Setup</strong><div class="muted" id="setupSummaryLine">map, difficulty, weather, response, cursed item</div></div><span class="muted" id="setupStatus">not set</span></div><div class="body stack">
+    <div id="setupAuthMessage" class="error hidden"></div>
     <div class="setup-grid">
       <label>Map / Location<select id="setupMap"><option value="unknown">Unknown</option><option>6 Tanglewood Drive</option><option>10 Ridgeview Court</option><option>13 Willow Street</option><option>42 Edgefield Road</option><option>Nell's Diner</option><option>Grafton Farmhouse</option><option>Camp Woodwind</option><option>Point Hope</option><option>Bleasdale Farmhouse</option><option>Sunny Meadows Restricted</option><option>Prison</option><option>Maple Lodge Campsite</option><option>Brownstone High School</option><option>Sunny Meadows Mental Institution</option></select></label>
       <label>Game Level / Difficulty<select id="setupDifficulty"><option value="unknown">Unknown</option><option value="amateur">Amateur</option><option value="intermediate">Intermediate</option><option value="professional">Professional</option><option value="nightmare">Nightmare</option><option value="insanity">Insanity</option><option value="custom">Custom</option></select></label>
@@ -586,9 +587,31 @@ const CURSED_HINTS={
 };
 function apiUrl(path){return `${API}${path}?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`}
 async function getState(){let r=await fetch(`${API}/state?room=${encodeURIComponent(room)}`);state=await r.json();render();}
-async function postState(patch){let r=await fetch(apiUrl('/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});if(!r.ok){showAuthError('Update blocked. If PHASMO_ADMIN_TOKEN is set, open the control URL with &token=YOUR_TOKEN once.');return;}let data=await r.json().catch(()=>null);if(data&&data.state){state=data.state;render();}else{await getState();}}
-async function command(cmd,user='control'){let r=await fetch(apiUrl('/command'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:cmd,user:user})});if(!r.ok){showAuthError('Command blocked. Token missing or invalid.');return;}await getState();}
-function showAuthError(msg){let box=document.getElementById('authMessage'); if(box){box.textContent=msg;box.classList.remove('hidden');}}
+async function postState(patch){
+  let r=await fetch(apiUrl('/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});
+  if(!r.ok){
+    showAuthError('Update blocked. If PHASMO_ADMIN_TOKEN is set, open this page with &token=YOUR_TOKEN once.');
+    return false;
+  }
+  let data=await r.json().catch(()=>null);
+  if(data&&data.state){state=data.state;render();}else{await getState();}
+  return true;
+}
+async function command(cmd,user='control'){
+  let r=await fetch(apiUrl('/command'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:cmd,user:user})});
+  if(!r.ok){
+    showAuthError('Command blocked. Token missing or invalid.');
+    return false;
+  }
+  await getState();
+  return true;
+}
+function showAuthError(msg){
+  ['authMessage','setupAuthMessage'].forEach(id=>{
+    let box=document.getElementById(id);
+    if(box){box.textContent=msg;box.classList.remove('hidden');}
+  });
+}
 function impact(g){let s=0; for(const b of B){let v=state.behaviors?.[b.id]||'unknown'; if(v==='observed'){if(b.up.includes(g.name))s+=b.w;if(b.down.includes(g.name))s-=b.w} if(v==='contradicted'){if(b.up.includes(g.name))s-=Math.round(b.w*.65);if(b.down.includes(g.name))s+=Math.round(b.w*.45)}} return s}
 function candidates(){let manual=state.manualGhosts||{}, selected=manual.selected||null, excluded=new Set(manual.excluded||[]), yes=E.filter(k=>state.evidence[k]==='yes'), no=E.filter(k=>state.evidence[k]==='no'), mode=+state.evidenceMode; let pool=G.filter(g=>{if(selected)return g.name===selected; if(excluded.has(g.name))return false; if(mode===0&&!yes.length)return true; if(!yes.every(e=>g.ev.includes(e)||(g.name==='The Mimic'&&e==='orbs')))return false; if(mode===3&&no.some(e=>g.ev.includes(e)||(g.name==='The Mimic'&&e==='orbs')))return false; return true}); return pool.map(g=>({...g,impact:impact(g),score:(selected&&g.name===selected?999:0)+impact(g)+yes.filter(e=>g.ev.includes(e)).length*22+(g.name==='The Mimic'&&yes.includes('orbs')?12:0)})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name))}
 function status(){let c=candidates(), yes=E.filter(k=>state.evidence[k]==='yes'), mode=+state.evidenceMode, target=mode>0&&yes.length>=mode, mimic=c.some(g=>g.name==='The Mimic'); if(!c.length)return{kind:'conflict',name:'Retest',text:'No ghost matches. Recheck evidence.'}; if(target&&c.length===1)return{kind:'locked',name:`Final ID: ${c[0].name}`,text:'Evidence target reached. Behavior is sanity-check only.'}; if(target&&mimic)return{kind:'mimic',name:'Mimic Check',text:'Evidence target reached, but Mimic remains possible.'}; if(target)return{kind:'locked',name:`Likely: ${c[0].name}`,text:'Evidence target reached. Resolve contradictions only.'}; if(c.length===1)return{kind:'verify',name:`Verify ${c[0].name}`,text:'One candidate remains. Final disconfirming check.'}; return{kind:'open',name:'Investigating',text:'Continue evidence collection.'}}
@@ -780,8 +803,11 @@ function renderOverlay(){
   document.getElementById('ovNotes').innerHTML=bits.join(' • ');
 }
 document.addEventListener('click',e=>{let r=e.target.dataset.responds;if(r)postState({responds:r}); let tc=e.target.dataset.timerCmd;if(tc)command(tc,'control')});
-document.getElementById('saveSetup')?.addEventListener('click',async()=>{await postState({setupComplete:true,map:document.getElementById('setupMap').value,difficulty:document.getElementById('setupDifficulty').value,weather:document.getElementById('setupWeather').value,responds:document.getElementById('setupResponds').value}); if(MODE==='setup') location.href=`/phasmo/control?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;});
-document.getElementById('mode')?.addEventListener('change',e=>postState({evidenceMode:e.target.value}));document.getElementById('changeResponds')?.addEventListener('click',()=>document.getElementById('respondsChoices').classList.toggle('hidden'));document.getElementById('reset')?.addEventListener('click',async()=>{await postState({reset:true}); location.href=`/phasmo/setup?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;});document.getElementById('copyOverlay')?.addEventListener('click',()=>navigator.clipboard?.writeText(`${location.origin}/phasmo/overlay?room=${encodeURIComponent(room)}`));document.getElementById('behaviorFilter')?.addEventListener('input',renderBehaviors);
+document.getElementById('saveSetup')?.addEventListener('click',async()=>{
+  const ok=await postState({setupComplete:true,map:document.getElementById('setupMap').value,difficulty:document.getElementById('setupDifficulty').value,weather:document.getElementById('setupWeather').value,responds:document.getElementById('setupResponds').value});
+  if(ok && MODE==='setup') location.href=`/phasmo/control?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;
+});
+document.getElementById('mode')?.addEventListener('change',e=>postState({evidenceMode:e.target.value}));document.getElementById('changeResponds')?.addEventListener('click',()=>document.getElementById('respondsChoices').classList.toggle('hidden'));document.getElementById('reset')?.addEventListener('click',async()=>{const ok=await postState({reset:true}); if(ok) location.href=`/phasmo/setup?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;});document.getElementById('copyOverlay')?.addEventListener('click',()=>navigator.clipboard?.writeText(`${location.origin}/phasmo/overlay?room=${encodeURIComponent(room)}`));document.getElementById('behaviorFilter')?.addEventListener('input',renderBehaviors);
 document.getElementById('toggleEvidence')?.addEventListener('click',()=>{evidenceCollapsed=!evidenceCollapsed;localStorage.setItem('phasmoEvidenceCollapsed',evidenceCollapsed);renderControl();});
 document.getElementById('toggleBehavior')?.addEventListener('click',()=>{behaviorCollapsed=!behaviorCollapsed;localStorage.setItem('phasmoBehaviorCollapsed',behaviorCollapsed);renderControl();});
 document.getElementById('toggleCursed')?.addEventListener('click',()=>{cursedCollapsed=!cursedCollapsed;localStorage.setItem('phasmoCursedCollapsed',cursedCollapsed);renderControl();});
