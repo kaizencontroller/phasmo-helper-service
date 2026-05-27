@@ -375,7 +375,7 @@ HTML_TEMPLATE = r'''<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kaizen Phasmophobia Helper</title>
 <style>
-:root{--bg:#000;--panel:#172235ee;--soft:#213149;--text:#f8fafc;--muted:#94a3b8;--line:#334155;--orange:#f97316;--green:#22c55e;--red:#ef4444;--blue:#38bdf8;--grey:#64748b}*{box-sizing:border-box}body{margin:0;background:#000;color:var(--text);font-family:Inter,system-ui,Segoe UI,sans-serif}.app{width:min(460px,100vw);height:100vh;overflow:auto;padding:10px;background:#000}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;box-shadow:0 16px 40px #0007}.head{padding:12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}.body{padding:10px}.muted{color:var(--muted);font-size:12px}.badge,.chip{border:1px solid var(--line);background:#0f172a;border-radius:999px;padding:5px 8px;font-size:12px}button,select,input{background:#0f172a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit}button{cursor:pointer;touch-action:manipulation;user-select:none}button:disabled{opacity:.45;cursor:not-allowed}.green{background:#14532d;border-color:#22c55e}.red{background:#5b2329;border-color:#ef4444}.blue{background:#123247;border-color:#38bdf8}.orange{background:#432919;border-color:#f97316}.grey{background:#273244;border-color:#64748b;color:#cbd5e1}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.spread{display:flex;justify-content:space-between;align-items:center;gap:8px}.next{border-color:#f97316;background:#2a2330}.big{font-weight:950;font-size:28px;line-height:1}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.setup-grid label{display:grid;gap:4px;font-size:12px;color:var(--muted)}.setup-grid select,.setup-grid input{width:100%}.setup-summary{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.top-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.top-summary{font-size:12px;color:#cbd5e1;line-height:1.35;margin-bottom:8px}.top-summary strong{color:#fff}.setup-mode .panel{display:none}.setup-mode #setupPanel{display:block}.setup-mode #setupPanel .body{display:grid}.control-mode #setupPanel{display:none}.control-mode #setupPanel.setup-complete .body{display:none}.control-mode #setupPanel.setup-complete{margin-bottom:10px}.control-mode #setupPanel.setup-complete .head{border-bottom:0}.evidence-panel.collapsed .body{display:none}.behavior-panel.collapsed .body{display:none}.cursed-panel.collapsed .body{display:none}.cursed-grid{display:grid;gap:7px}.cursed-row{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;border:1px solid #334155;border-radius:12px;background:#0f172a;padding:8px}.cursed-row.found{border-color:#22c55e;background:#123d29}.cursed-row.out{opacity:.62;background:#1f2937}.cursed-row.compact{grid-template-columns:1fr auto}.cursed-row.found-card{grid-template-columns:1fr auto;border-color:#22c55e;background:#123d29}.cursed-name{font-weight:900}.cursed-hint{font-size:11px;color:#94a3b8;line-height:1.25}.cursed-row button{padding:7px 8px;font-size:11px}.warnbox{border:1px solid #eab30888;background:#3b2f12;color:#fde68a;border-radius:12px;padding:8px;font-size:12px;line-height:1.35}.quick-timers{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}.quick-timers button{padding:8px 6px;font-size:12px}.setup-chip{border:1px solid #334155;background:#0f172a;border-radius:999px;padding:4px 7px;font-size:11px;color:#cbd5e1}.evrow{display:grid;grid-template-columns:1fr 48px 48px 48px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #33415588}.evrow:last-child{border-bottom:0}.evname{font-weight:850;font-size:15px}.state{height:46px;padding:0;font-size:24px;font-weight:900}.state.active.yes{background:#14532d;border-color:#22c55e;box-shadow:0 0 0 2px #22c55e66}.state.active.no{background:#5b2329;border-color:#ef4444;box-shadow:0 0 0 2px #ef444466}.state.active.unk{background:#374151;border-color:#9ca3af;color:#f8fafc;box-shadow:0 0 0 2px #9ca3af66}.state.inactive{background:#1f2937;border-color:#475569;color:#94a3b8;opacity:.55}.ghosts{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:260px;overflow:auto}.ghost{border:1px solid var(--line);border-radius:12px;padding:8px;background:#111a2b}.ghost.top{border-color:#22c55e;background:#132a24}.ghost h4{margin:0 0 5px;font-size:14px}.tags{display:flex;gap:4px;flex-wrap:wrap}.chip{font-size:10px;padding:3px 5px}.vote-grid{display:grid;gap:7px}.vote-row{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;background:#0f172a;padding:8px}.vote-name{font-weight:900}.vote-users{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.timer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.timer-tile{border:1px solid var(--line);border-radius:12px;background:#0f172a;padding:8px}.timer-name{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:900}.timer-val{font-size:20px;font-weight:950}.timer-val.done{color:#22c55e}.manual-list{display:flex;gap:5px;flex-wrap:wrap}.manual-chip{border:1px solid #ef444477;background:#3a1d24;border-radius:999px;padding:4px 7px;font-size:11px}.branch{border:1px solid var(--line);border-radius:13px;overflow:hidden;margin-bottom:8px;background:#111a2b}.branch-title{width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;display:flex;justify-content:space-between}.branch-body{padding:8px;display:grid;gap:7px}.option{border:1px solid #334155;border-radius:11px;padding:8px;background:#0f172a}.option-label{font-weight:800;font-size:13px;margin-bottom:5px}.selected{padding:8px;background:#163425}.selected.bad{background:#3a1d24}.error{border-color:#ef4444;color:#fecaca;background:#3a1d24;padding:8px;border-radius:10px}.overlay{width:560px;height:210px;display:flex;align-items:flex-start;justify-content:flex-start;padding:8px;background:#000;overflow:hidden}.ov-card{width:544px;height:194px;background:linear-gradient(180deg,#172235f7,#0f172af2);border:2px solid #f9731688;border-radius:18px;padding:12px 14px;overflow:hidden;box-shadow:0 14px 32px #000b;transition:background .25s ease,border-color .25s ease,box-shadow .25s ease}.ov-card.final{background:linear-gradient(180deg,#14532df7,#0f2f1ef2);border-color:#22c55ecc;box-shadow:0 14px 32px #000b,0 0 22px #22c55e33}.ov-card.final .ov-kicker{color:#bbf7d0}.ov-card.final .ov-ghosts .badge{border-color:#22c55e99;background:#052e1a;color:#dcfce7}.ov-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px}.ov-kicker{font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);font-weight:950}.ov-ghosts{display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap;max-width:245px;max-height:44px;overflow:hidden}.ov-ghosts .badge{font-size:12px;padding:4px 8px;background:#0b1220;border-color:#334155}.ov-step{font-size:46px;font-weight:950;line-height:.96;letter-spacing:-.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:1px 0 8px}.ov-step.small{font-size:39px}.ov-step.xsmall{font-size:32px}.ov-sub{font-size:15px;color:#dbeafe;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:19px;margin:0 0 10px}.ov-bottom{display:grid;grid-template-columns:386px 1fr;gap:12px;margin-top:0;align-items:end}.ov-evidence{display:flex;gap:6px}.ev-dot{width:50px;height:48px;border-radius:11px;border:1px solid #475569;background:#1d293a;color:#cbd5e1;display:grid;place-items:center;font-size:31px;font-weight:900;line-height:1;overflow:hidden}.ev-dot .ev-mark{font-size:31px;line-height:1}.ev-dot.yes{background:#123d29;border-color:#22c55e;color:#dcfce7}.ev-dot.no{background:#4a1f26;border-color:#ef4444;color:#fee2e2}.ov-notes{border-left:1px solid #334155aa;padding-left:10px;min-width:0;align-self:stretch;display:flex;flex-direction:column;justify-content:center}.ov-notes-title{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:950;margin-bottom:4px}.ov-note-text{font-size:13px;color:#cbd5e1;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.ov-note-good{color:#bbf7d0}.ov-note-bad{color:#fecaca}.ov-note-vote{color:#dbeafe}.ov-card.pregame{position:relative;overflow:hidden}.ov-card.pregame:before{content:"";position:absolute;inset:-70px -90px auto auto;width:230px;height:230px;border-radius:999px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 64%);pointer-events:none}.ov-card.pregame:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#38bdf8,#a78bfa,#f97316);opacity:.82}.ov-card.pregame .ov-top{margin-bottom:2px;position:relative;z-index:1}.ov-card.pregame .ov-kicker{font-size:11px;letter-spacing:.18em;color:#cbd5e1}.ov-card.pregame .ov-step{font-size:29px;line-height:1;letter-spacing:-.025em;margin:2px 0 5px;white-space:normal;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}.ov-card.pregame .ov-step.small{font-size:26px}.ov-card.pregame .ov-step.xsmall{font-size:22px}.ov-card.pregame .ov-sub{font-size:13px;line-height:1.22;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:32px;margin:0 0 7px;color:#e2e8f0}.ov-card.pregame .ov-bottom{display:block;margin-top:0;position:relative;z-index:1}.ov-card.pregame .ov-evidence{display:block;min-height:62px;color:#f8fafc}.ov-card.pregame .ov-notes{display:none!important}.ov-card.pregame-brief{border-color:#38bdf899;background:linear-gradient(135deg,#13243bf7 0%,#0b1628f2 64%)}.ov-card.pregame-chat{border-color:#a78bfa99;background:linear-gradient(135deg,#24173ff7 0%,#11162bf2 64%)}.ov-card.pregame-comms{border-color:#f59e0b99;background:linear-gradient(135deg,#2d2111f7 0%,#101827f2 64%)}.ov-card.pregame-tip{border-color:#22c55e99;background:linear-gradient(135deg,#123320f7 0%,#0b1e1bf2 64%)}.ov-card.pregame-legacy{border-color:#ef444499;background:linear-gradient(135deg,#311722f7 0%,#14111df2 64%)}.pg-headerline{display:flex;align-items:center;gap:8px;margin-bottom:6px}.pg-emblem{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-size:20px;font-weight:950;background:#020617aa;border:1px solid #64748b66;box-shadow:inset 0 0 18px #ffffff0d}.pg-mini{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:#94a3b8;font-weight:900}.pg-main{font-size:15px;line-height:1.18;font-weight:900;color:#f8fafc}.pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pg-tile{border:1px solid #47556977;background:#02061766;border-radius:10px;padding:6px 7px;min-width:0}.pg-tile .label{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}.pg-tile .value{font-size:13px;color:#f8fafc;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-pillrow{display:flex;gap:6px;flex-wrap:wrap}.pg-pill{border:1px solid #475569;background:#0f172acc;border-radius:999px;padding:5px 8px;font-size:12px;font-weight:850;color:#dbeafe;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pg-pill.hot{border-color:#f97316;color:#fed7aa}.pg-pill.good{border-color:#22c55e;color:#bbf7d0}.pg-pill.vote{border-color:#a78bfa;color:#ddd6fe}.pg-command{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pg-command .cmd{border:1px solid #47556977;background:#02061766;border-radius:10px;padding:7px}.pg-command code{display:block;color:#f8fafc;font-size:13px;font-weight:950;margin-bottom:2px}.pg-command span{font-size:11px;color:#cbd5e1;line-height:1.15}.pg-quote{border-left:4px solid currentColor;padding-left:10px;font-size:14px;line-height:1.22;font-weight:850;color:#f8fafc;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.pg-source{font-size:11px;color:#cbd5e1;margin-top:5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-cardline{font-size:14px;line-height:1.25;font-weight:850;color:#e2e8f0}.pg-warning{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fecaca;font-weight:950;margin-bottom:4px}.hidden{display:none!important}@media(max-width:700px){.app{width:100vw}.ghosts{grid-template-columns:1fr}.evrow{grid-template-columns:1fr 52px 52px 52px}.state{height:50px}}
+:root{--bg:#000;--panel:#172235ee;--soft:#213149;--text:#f8fafc;--muted:#94a3b8;--line:#334155;--orange:#f97316;--green:#22c55e;--red:#ef4444;--blue:#38bdf8;--grey:#64748b}*{box-sizing:border-box}body{margin:0;background:#000;color:var(--text);font-family:Inter,system-ui,Segoe UI,sans-serif}.app{width:min(460px,100vw);height:100vh;overflow:auto;padding:10px;background:#000}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;box-shadow:0 16px 40px #0007}.head{padding:12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}.body{padding:10px}.muted{color:var(--muted);font-size:12px}.badge,.chip{border:1px solid var(--line);background:#0f172a;border-radius:999px;padding:5px 8px;font-size:12px}button,select,input{background:#0f172a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit}button{cursor:pointer;touch-action:manipulation;user-select:none}button:disabled{opacity:.45;cursor:not-allowed}.green{background:#14532d;border-color:#22c55e}.red{background:#5b2329;border-color:#ef4444}.blue{background:#123247;border-color:#38bdf8}.orange{background:#432919;border-color:#f97316}.grey{background:#273244;border-color:#64748b;color:#cbd5e1}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.spread{display:flex;justify-content:space-between;align-items:center;gap:8px}.next{border-color:#f97316;background:#2a2330}.big{font-weight:950;font-size:28px;line-height:1}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.setup-grid label{display:grid;gap:4px;font-size:12px;color:var(--muted)}.setup-grid select,.setup-grid input{width:100%}.setup-summary{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.top-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.top-summary{font-size:12px;color:#cbd5e1;line-height:1.35;margin-bottom:8px}.top-summary strong{color:#fff}.setup-mode .panel{display:none}.setup-mode #setupPanel{display:block}.setup-mode #setupPanel .body{display:grid}.control-mode #setupPanel{display:none}.control-mode #setupPanel.setup-complete .body{display:none}.control-mode #setupPanel.setup-complete{margin-bottom:10px}.control-mode #setupPanel.setup-complete .head{border-bottom:0}.evidence-panel.collapsed .body{display:none}.behavior-panel.collapsed .body{display:none}.cursed-panel.collapsed .body{display:none}.cursed-grid{display:grid;gap:7px}.cursed-row{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;border:1px solid #334155;border-radius:12px;background:#0f172a;padding:8px}.cursed-row.found{border-color:#22c55e;background:#123d29}.cursed-row.out{opacity:.62;background:#1f2937}.cursed-row.compact{grid-template-columns:1fr auto}.cursed-row.found-card{grid-template-columns:1fr auto;border-color:#22c55e;background:#123d29}.cursed-name{font-weight:900}.cursed-hint{font-size:11px;color:#94a3b8;line-height:1.25}.cursed-row button{padding:7px 8px;font-size:11px}.warnbox{border:1px solid #eab30888;background:#3b2f12;color:#fde68a;border-radius:12px;padding:8px;font-size:12px;line-height:1.35}.quick-timers{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}.quick-timers button{padding:8px 6px;font-size:12px}.setup-chip{border:1px solid #334155;background:#0f172a;border-radius:999px;padding:4px 7px;font-size:11px;color:#cbd5e1}.evrow{display:grid;grid-template-columns:1fr 48px 48px 48px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #33415588}.evrow:last-child{border-bottom:0}.evname{font-weight:850;font-size:15px}.state{height:46px;padding:0;font-size:24px;font-weight:900}.state.active.yes{background:#14532d;border-color:#22c55e;box-shadow:0 0 0 2px #22c55e66}.state.active.no{background:#5b2329;border-color:#ef4444;box-shadow:0 0 0 2px #ef444466}.state.active.unk{background:#374151;border-color:#9ca3af;color:#f8fafc;box-shadow:0 0 0 2px #9ca3af66}.state.inactive{background:#1f2937;border-color:#475569;color:#94a3b8;opacity:.55}.ghosts{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:260px;overflow:auto}.ghost{border:1px solid var(--line);border-radius:12px;padding:8px;background:#111a2b}.ghost.top{border-color:#22c55e;background:#132a24}.ghost h4{margin:0 0 5px;font-size:14px}.tags{display:flex;gap:4px;flex-wrap:wrap}.chip{font-size:10px;padding:3px 5px}.vote-grid{display:grid;gap:7px}.vote-row{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;background:#0f172a;padding:8px}.vote-name{font-weight:900}.vote-users{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.timer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.timer-tile{border:1px solid var(--line);border-radius:12px;background:#0f172a;padding:8px}.timer-name{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:900}.timer-val{font-size:20px;font-weight:950}.timer-val.done{color:#22c55e}.manual-list{display:flex;gap:5px;flex-wrap:wrap}.manual-chip{border:1px solid #ef444477;background:#3a1d24;border-radius:999px;padding:4px 7px;font-size:11px}.branch{border:1px solid var(--line);border-radius:13px;overflow:hidden;margin-bottom:8px;background:#111a2b}.branch-title{width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;display:flex;justify-content:space-between}.branch-body{padding:8px;display:grid;gap:7px}.option{border:1px solid #334155;border-radius:11px;padding:8px;background:#0f172a}.option-label{font-weight:800;font-size:13px;margin-bottom:5px}.selected{padding:8px;background:#163425}.selected.bad{background:#3a1d24}.error{border-color:#ef4444;color:#fecaca;background:#3a1d24;padding:8px;border-radius:10px}.overlay{width:560px;height:210px;display:flex;align-items:flex-start;justify-content:flex-start;padding:8px;background:#000;overflow:hidden}.ov-card{width:544px;height:194px;background:linear-gradient(180deg,#172235f7,#0f172af2);border:2px solid #f9731688;border-radius:18px;padding:12px 14px;overflow:hidden;box-shadow:0 14px 32px #000b;transition:background .25s ease,border-color .25s ease,box-shadow .25s ease}.ov-card.final{background:linear-gradient(180deg,#14532df7,#0f2f1ef2);border-color:#22c55ecc;box-shadow:0 14px 32px #000b,0 0 22px #22c55e33}.ov-card.final .ov-kicker{color:#bbf7d0}.ov-card.final .ov-ghosts .badge{border-color:#22c55e99;background:#052e1a;color:#dcfce7}.ov-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px}.ov-kicker{font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);font-weight:950}.ov-ghosts{display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap;max-width:245px;max-height:44px;overflow:hidden}.ov-ghosts .badge{font-size:12px;padding:4px 8px;background:#0b1220;border-color:#334155}.ov-step{font-size:46px;font-weight:950;line-height:.96;letter-spacing:-.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:1px 0 8px}.ov-step.small{font-size:39px}.ov-step.xsmall{font-size:32px}.ov-sub{font-size:15px;color:#dbeafe;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:19px;margin:0 0 10px}.ov-bottom{display:grid;grid-template-columns:386px 1fr;gap:12px;margin-top:0;align-items:end}.ov-evidence{display:flex;gap:6px}.ev-dot{width:50px;height:48px;border-radius:11px;border:1px solid #475569;background:#1d293a;color:#cbd5e1;display:grid;place-items:center;font-size:31px;font-weight:900;line-height:1;overflow:hidden}.ev-dot .ev-mark{font-size:31px;line-height:1}.ev-dot.yes{background:#123d29;border-color:#22c55e;color:#dcfce7}.ev-dot.no{background:#4a1f26;border-color:#ef4444;color:#fee2e2}.ov-notes{border-left:1px solid #334155aa;padding-left:10px;min-width:0;align-self:stretch;display:flex;flex-direction:column;justify-content:center}.ov-notes-title{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:950;margin-bottom:4px}.ov-note-text{font-size:13px;color:#cbd5e1;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.ov-note-good{color:#bbf7d0}.ov-note-bad{color:#fecaca}.ov-note-vote{color:#dbeafe}.ov-card.pregame{position:relative;overflow:hidden}.ov-card.pregame:before{content:"";position:absolute;inset:-70px -90px auto auto;width:230px;height:230px;border-radius:999px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 64%);pointer-events:none}.ov-card.pregame:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#38bdf8,#a78bfa,#f97316);opacity:.82}.ov-card.pregame .ov-top{margin-bottom:2px;position:relative;z-index:1}.ov-card.pregame .ov-kicker{font-size:11px;letter-spacing:.18em;color:#cbd5e1}.ov-card.pregame .ov-step{font-size:29px;line-height:1;letter-spacing:-.025em;margin:2px 0 5px;white-space:normal;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}.ov-card.pregame .ov-step.small{font-size:26px}.ov-card.pregame .ov-step.xsmall{font-size:22px}.ov-card.pregame .ov-sub{font-size:13px;line-height:1.22;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:32px;margin:0 0 7px;color:#e2e8f0}.ov-card.pregame .ov-bottom{display:block;margin-top:0;position:relative;z-index:1}.ov-card.pregame .ov-evidence{display:block;min-height:62px;color:#f8fafc}.ov-card.pregame .ov-notes{display:none!important}.ov-card.pregame-brief{border-color:#38bdf899;background:linear-gradient(135deg,#13243bf7 0%,#0b1628f2 64%)}.ov-card.pregame-chat{border-color:#a78bfa99;background:linear-gradient(135deg,#24173ff7 0%,#11162bf2 64%)}.ov-card.pregame-comms{border-color:#f59e0b99;background:linear-gradient(135deg,#2d2111f7 0%,#101827f2 64%)}.ov-card.pregame-tip{border-color:#22c55e99;background:linear-gradient(135deg,#123320f7 0%,#0b1e1bf2 64%)}.ov-card.pregame-legacy{border-color:#ef444499;background:linear-gradient(135deg,#311722f7 0%,#14111df2 64%)}.pg-headerline{display:flex;align-items:center;gap:8px;margin-bottom:6px}.pg-emblem{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-size:20px;font-weight:950;background:#020617aa;border:1px solid #64748b66;box-shadow:inset 0 0 18px #ffffff0d}.pg-mini{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:#94a3b8;font-weight:900}.pg-main{font-size:15px;line-height:1.18;font-weight:900;color:#f8fafc}.pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pg-tile{border:1px solid #47556977;background:#02061766;border-radius:10px;padding:6px 7px;min-width:0}.pg-tile .label{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}.pg-tile .value{font-size:13px;color:#f8fafc;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-pillrow{display:flex;gap:6px;flex-wrap:wrap}.pg-pill{border:1px solid #475569;background:#0f172acc;border-radius:999px;padding:5px 8px;font-size:12px;font-weight:850;color:#dbeafe;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pg-pill.hot{border-color:#f97316;color:#fed7aa}.pg-pill.good{border-color:#22c55e;color:#bbf7d0}.pg-pill.vote{border-color:#a78bfa;color:#ddd6fe}.pg-command{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:4px}.pg-command .cmd{border:1px solid #47556977;background:#02061766;border-radius:12px;padding:8px 7px;min-height:58px;display:flex;flex-direction:column;justify-content:center}.pg-command code{display:block;color:#f8fafc;font-size:14px;font-weight:950;margin-bottom:3px;letter-spacing:.01em}.pg-command span{font-size:10px;color:#cbd5e1;line-height:1.12}.pg-quote{border-left:4px solid currentColor;padding-left:10px;font-size:14px;line-height:1.22;font-weight:850;color:#f8fafc;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.pg-source{font-size:11px;color:#cbd5e1;margin-top:5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-cardline{font-size:14px;line-height:1.25;font-weight:850;color:#e2e8f0}.pg-warning{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fecaca;font-weight:950;margin-bottom:4px}.hidden{display:none!important}@media(max-width:700px){.app{width:100vw}.ghosts{grid-template-columns:1fr}.evrow{grid-template-columns:1fr 52px 52px 52px}.state{height:50px}}
 </style>
 </head>
 <body>
@@ -725,9 +725,15 @@ function renderManualGhosts(){let box=document.getElementById('manualGhostSummar
 function renderVotes(){let box=document.getElementById('votes');let votes=voteSummary('votes'), guesses=voteSummary('guesses'); let html=''; html+=`<div class='muted' style='margin-bottom:6px'><strong>Votes</strong> are useful decision input when we ask chat to help choose. <strong>Guesses</strong> are lucky predictions.</div>`; if(votes.length){html+=`<div class='vote-section'><div class='muted' style='margin:6px 0'>Decision Votes — !vote GhostName</div>${votes.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No decision votes yet. Use !vote when we need chat's help choosing.</p>`; if(guesses.length){html+=`<div class='vote-section'><div class='muted' style='margin:10px 0 6px'>Lucky Guesses — !guess GhostName</div>${guesses.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No lucky guesses yet. Use !guess before evidence comes in.</p>`; box.innerHTML=html}
 function renderBehaviors(){let box=document.getElementById('behaviors'), q=(document.getElementById('behaviorFilter').value||'').toLowerCase(), cset=new Set(candidates().map(g=>g.name)), st=status(); box.innerHTML=''; let groups={}; for(const b of B){let logged=(state.behaviors?.[b.id]||'unknown')!=='unknown'; if(q && !(b.label+' '+b.cat+' '+b.up.join(' ')+b.down.join(' ')).toLowerCase().includes(q))continue; let relevant=b.up.some(g=>cset.has(g))||b.down.some(g=>cset.has(g)); if(!relevant&&!logged)continue; if(st.kind==='mimic'&&!logged&&!b.up.includes('The Mimic')&&!b.down.includes('The Mimic'))continue; if(['locked','verify'].includes(st.kind)&&!logged)continue; (groups[b.cat]??=[]).push(b)} for(const cat of Object.keys(groups)){let rows=groups[cat], selected=rows.find(b=>(state.behaviors?.[b.id]||'unknown')!=='unknown'), open=expanded[cat]===true; let el=document.createElement('div');el.className='branch'; let title=document.createElement('button');title.className='branch-title';title.innerHTML=`<span>${open?'▼':'▶'} ${cat}</span><span class='badge'>${selected?'logged':rows.length+' options'}</span>`;title.onclick=()=>{expanded[cat]=!open;renderBehaviors()};el.appendChild(title); if(selected){let v=state.behaviors[selected.id], div=document.createElement('div');div.className='selected '+(v==='contradicted'?'bad':'');div.innerHTML=`<strong>${v==='observed'?'✓':'×'} ${selected.label}</strong><div class='tags'>${selected.up.map(g=>`<span class='chip'>↑ ${g}</span>`).join('')}${selected.down.map(g=>`<span class='chip'>↓ ${g}</span>`).join('')}<span class='chip'>${selected.rel}</span></div><div class='row'><button data-clear='${selected.id}'>Clear</button><button class='blue' data-change='${cat}'>Change</button></div>`;el.appendChild(div)} if(open){let body=document.createElement('div');body.className='branch-body'; for(const b of rows){let opt=document.createElement('div');opt.className='option';opt.innerHTML=`<div class='option-label'>${b.label}</div><div class='tags'>${b.up.map(g=>`<span class='chip'>↑ ${g}</span>`).join('')}${b.down.map(g=>`<span class='chip'>↓ ${g}</span>`).join('')}<span class='chip'>${b.rel}</span></div><div class='grid2'><button class='green' data-beh='${b.id}' data-cat='${cat}' data-val='observed'>Observed</button><button class='red' data-beh='${b.id}' data-cat='${cat}' data-val='contradicted'>No / False</button></div>`;body.appendChild(opt)} el.appendChild(body)} box.appendChild(el)} document.querySelectorAll('[data-clear]').forEach(btn=>btn.onclick=()=>postState({behaviors:{[btn.dataset.clear]:'unknown'}}));document.querySelectorAll('[data-change]').forEach(btn=>{btn.onclick=()=>{expanded[btn.dataset.change]=true;renderBehaviors()}});document.querySelectorAll('[data-beh]').forEach(btn=>btn.onclick=()=>{let rows=B.filter(x=>x.cat===btn.dataset.cat), patch={behaviors:{}}; for(const sib of rows)patch.behaviors[sib.id]='unknown'; patch.behaviors[btn.dataset.beh]=btn.dataset.val; expanded[btn.dataset.cat]=false; postState(patch)})}
 function setupOverlay(){
-  const phase=Math.floor(Date.now()/6000)%7;
+  const CARD_MS=10000;
+  const tick=Math.floor(Date.now()/CARD_MS);
+  const phase=tick%6;
   const guesses=voteSummary('guesses').slice(0,3);
   const votes=voteSummary('votes').slice(0,3);
+
+  function pick(list, salt=0){
+    return list[Math.abs((tick*37 + salt*17 + 11) % list.length)];
+  }
 
   const fieldTips=[
     {
@@ -759,6 +765,126 @@ function setupOverlay(){
       sub:'Bad angles create bad conclusions.',
       body:'Sweep slowly, adjust height, and check from more than one angle before ruling Ghost Orbs out.',
       note:'One bad camera angle is not a data set.'
+    },
+    {
+      title:'D.O.T.S Watch',
+      sub:'Do not stare at one corner forever.',
+      body:'Move the projector, change your angle, and watch from the camera if the room layout is messy.',
+      note:'Coverage matters more than optimism.'
+    },
+    {
+      title:'EMF Discipline',
+      sub:'EMF 5 is not every angry beep.',
+      body:'Wait for the actual level 5 reading. Interaction spam is not a signed confession.',
+      note:'Confirm the signal before logging the evidence.'
+    },
+    {
+      title:'Writing Check',
+      sub:'The book cannot help from your inventory.',
+      body:'Place books early, put them where the ghost is active, and stop carrying the process improvement opportunity.',
+      note:'Deployment before diagnosis.'
+    },
+    {
+      title:'UV Timing',
+      sub:'Fresh interactions are better data.',
+      body:'Check doors, switches, coolers, and windows quickly after interaction. Waiting makes the test worse.',
+      note:'Latency is a defect.'
+    },
+    {
+      title:'Hunt Test',
+      sub:'Speed tells need a plan.',
+      body:'Listen from safety, call out line-of-sight changes, and do not confuse panic footsteps with ghost speed.',
+      note:'Observe from a controlled condition.'
+    },
+    {
+      title:'Cursed Object Sweep',
+      sub:'Fixed spawns are free information.',
+      body:'Check the known spawn area, mark items off, and avoid turning the search into a haunted scavenger meltdown.',
+      note:'Use the checklist. Save the chaos for later.'
+    },
+    {
+      title:'Role Clarity',
+      sub:'One caller beats four half-callers.',
+      body:'Decide who updates evidence, who watches behavior, and who is allowed to scream productively.',
+      note:'Reduce process noise.'
+    },
+    {
+      title:'Camera Setup',
+      sub:'The van is only useful if it sees something.',
+      body:'Set camera angles intentionally. A beautiful shot of a wall is still a wall.',
+      note:'Pretty footage is not evidence.'
+    },
+    {
+      title:'Room Change',
+      sub:'Do not marry the first ghost room.',
+      body:'If evidence stalls and activity migrates, recheck location assumptions before blaming the ghost.',
+      note:'The process moved. Follow it.'
+    },
+    {
+      title:'Sanity Watch',
+      sub:'Hunt timing is evidence-adjacent.',
+      body:'Early hunts, late hunts, and chain pressure all tell a story. Write down the pattern before memory lies.',
+      note:'Your brain is not a calibrated instrument.'
+    },
+    {
+      title:'Loop Safety',
+      sub:'A loop is not a personality test.',
+      body:'Know the exit before the hunt starts. Improvised bravery has a short half-life.',
+      note:'Plan the escape route first.'
+    },
+    {
+      title:'Sound Check',
+      sub:'Audio cues need context.',
+      body:'Rain, distance, floors, and panic all distort what you think you heard. Confirm before calling Myling.',
+      note:'Separate signal from noise.'
+    },
+    {
+      title:'Interaction Pile',
+      sub:'Throws are clues, not just drama.',
+      body:'Clusters of throws, door touches, and electronics can point toward behavior tells if you track them cleanly.',
+      note:'Pattern beats anecdote.'
+    },
+    {
+      title:'Photo Moment',
+      sub:'Do not die for a three-star spoon.',
+      body:'Take the safe objective when it is available. Greed is how the ghost gets promoted.',
+      note:'Value added, not value buried.'
+    },
+    {
+      title:'Mimic Warning',
+      sub:'Ghost Orbs plus weirdness deserves suspicion.',
+      body:'If behavior keeps changing and the evidence math feels illegal, keep The Mimic in the conversation.',
+      note:'Contradiction is data.'
+    },
+    {
+      title:'Objective Flow',
+      sub:'Finish easy objectives early.',
+      body:'Do the safe setup work before sanity collapses and every trip inside becomes a workplace incident.',
+      note:'Front-load low-risk work.'
+    },
+    {
+      title:'Door Discipline',
+      sub:'Open doors are information.',
+      body:'Track what you opened. If nobody knows the baseline, every door becomes a ghost rumor.',
+      note:'Baseline before inspection.'
+    },
+    {
+      title:'Evidence Reset',
+      sub:'Unknown is a valid state.',
+      body:'If a test was bad, mark it unknown. A weak no is worse than no answer.',
+      note:'Bad data is more dangerous than missing data.'
+    },
+    {
+      title:'Final Call',
+      sub:'One ghost remaining is not always the end.',
+      body:'When the tool lands on one ghost, do one sanity-check behavior pass before leaving.',
+      note:'Verification prevents victory laps into walls.'
+    },
+    {
+      title:'Kaizen Rule',
+      sub:'Make the next test the best test.',
+      body:'Do the check that eliminates the most confusion with the least risk. That is the whole game.',
+      note:'Smarter, not louder.'
     }
   ];
 
@@ -786,6 +912,132 @@ function setupOverlay(){
       sub:'Kevin No-Clip, Ghost Hunter, 1994–2025',
       body:'“If you hear footsteps, stand perfectly still and negotiate. Ghosts respect confident middle management.”',
       note:'Negotiation failed during the first counteroffer.'
+    },
+    {
+      title:'Thermo Confidence',
+      sub:'Gus “One Degree” Feldman, Ghost Hunter, 1994–2025',
+      body:'“If the room feels cold emotionally, mark Freezing. Instruments only slow down intuition.”',
+      note:'His thermometer was later found unopened.'
+    },
+    {
+      title:'Door Science',
+      sub:'Linda Latchley, Ghost Hunter, 1994–2025',
+      body:'“Open every door immediately. That way the ghost has more options and feels respected.”',
+      note:'A model example of uncontrolled variables.'
+    },
+    {
+      title:'Van Strategy',
+      sub:'Terry “Base Camp” Doyle, Ghost Hunter, 1994–2025',
+      body:'“The safest investigator is the one providing moral support from the van forever.”',
+      note:'Technically survived, professionally disputed.'
+    },
+    {
+      title:'Orb Certainty',
+      sub:'Mick Lenscap, Ghost Hunter, 1994–2025',
+      body:'“If you do not see orbs in five seconds, throw the camera away and accuse the ghost of hiding evidence.”',
+      note:'Recovered beside twelve poorly aimed tripods.'
+    },
+    {
+      title:'Candle Logic',
+      sub:'Evelyn Matchstick, Ghost Hunter, 1994–2025',
+      body:'“Fire is calming. Bring more candles into the murder room until morale improves.”',
+      note:'Morale did not improve.'
+    },
+    {
+      title:'EMF Shortcut',
+      sub:'Barry Beepman, Ghost Hunter, 1994–2025',
+      body:'“If the EMF reader makes any noise at all, call EMF 5. The ghost clearly has electrical opinions.”',
+      note:'The committee rejected his certification.'
+    },
+    {
+      title:'Loop Commitment',
+      sub:'Nate “No Exit” Granger, Ghost Hunter, 1994–2025',
+      body:'“Never learn hiding spots. Confidence is the only hiding spot you need.”',
+      note:'Confidence was not line-of-sight proof.'
+    },
+    {
+      title:'Photo Greed',
+      sub:'Polly Snapshot, Ghost Hunter, 1994–2025',
+      body:'“A perfect ghost photo is worth one teammate. Maybe two if the lighting is good.”',
+      note:'Her portfolio was excellent. Brief, but excellent.'
+    },
+    {
+      title:'Spirit Box Etiquette',
+      sub:'Ronnie Radio, Ghost Hunter, 1994–2025',
+      body:'“Ask the Spirit Box personal finance questions. Ghosts love diversified portfolios.”',
+      note:'The ghost declined to comment.'
+    },
+    {
+      title:'Sanity Economy',
+      sub:'Carl Candlewick, Ghost Hunter, 1994–2025',
+      body:'“Pills are for quitters. Real hunters experience the content at full sanity loss.”',
+      note:'Content was experienced.'
+    },
+    {
+      title:'Basement Policy',
+      sub:'Franklin Downstairs, Ghost Hunter, 1994–2025',
+      body:'“If the breaker is in the basement, send everyone. Basements are safer in groups of panicking adults.”',
+      note:'OSHA has questions.'
+    },
+    {
+      title:'Mimic Theory',
+      sub:'Janet Maybe, Ghost Hunter, 1994–2025',
+      body:'“Every ghost is The Mimic if you argue long enough.”',
+      note:'Technically unfalsifiable. Operationally useless.'
+    },
+    {
+      title:'Evidence Minimalism',
+      sub:'Art “Gut Check” Malone, Ghost Hunter, 1994–2025',
+      body:'“Tools are a crutch. I identify ghosts by room aura and whether my knees feel cursed.”',
+      note:'Knees were inconclusive.'
+    },
+    {
+      title:'Hunt Callout',
+      sub:'Sally Siren, Ghost Hunter, 1994–2025',
+      body:'“During hunts, narrate everything loudly. The ghost appreciates accessibility.”',
+      note:'The ghost found the captions helpful.'
+    },
+    {
+      title:'Cursed Roulette',
+      sub:'Vince Token, Ghost Hunter, 1994–2025',
+      body:'“If you find Tarot Cards, draw until the problem becomes obvious.”',
+      note:'The problem became obvious.'
+    },
+    {
+      title:'UV Patience',
+      sub:'Mabel Glowstick, Ghost Hunter, 1994–2025',
+      body:'“Check fingerprints tomorrow. The ghost should respect your schedule.”',
+      note:'The prints did not.'
+    },
+    {
+      title:'Equipment Respect',
+      sub:'Doug Tripod, Ghost Hunter, 1994–2025',
+      body:'“Place all equipment in one majestic pile. If the ghost wants to talk, it knows where to find us.”',
+      note:'The pile achieved nothing with dignity.'
+    },
+    {
+      title:'Objective Planning',
+      sub:'Harold Bonus, Ghost Hunter, 1994–2025',
+      body:'“Optional objectives are mandatory if chat says so. This is basic governance.”',
+      note:'The motion passed. Harold did not.'
+    },
+    {
+      title:'Weather Read',
+      sub:'June Forecast, Ghost Hunter, 1994–2025',
+      body:'“If it is snowing, all ghosts are cold. Mark Freezing and enjoy the efficiency.”',
+      note:'Fast is not the same as correct.'
+    },
+    {
+      title:'Smudge Timing',
+      sub:'Owen Incense, Ghost Hunter, 1994–2025',
+      body:'“Use incense immediately upon entering. It establishes dominance and wastes everyone’s safety net.”',
+      note:'Dominance remained unconfirmed.'
+    },
+    {
+      title:'Final Answer',
+      sub:'Victor Victory, Ghost Hunter, 1994–2025',
+      body:'“Lock the ghost as soon as someone sounds confident. Confidence is evidence with better posture.”',
+      note:'A bold framework with poor survivability.'
     }
   ];
 
@@ -807,27 +1059,20 @@ function setupOverlay(){
   }
 
   if(phase===0){
-    setCard('CONTRACT BRIEFING','Case File',(state.map&&state.map!=='unknown')?'Review the setup before entering.':'Select the contract setup to begin.','pregame-brief');
-    const map=(state.map&&state.map!=='unknown')?state.map:'Not selected';
-    const diff=(state.difficulty&&state.difficulty!=='unknown')?titleCase(state.difficulty):'Difficulty?';
-    const weather=(state.weather&&state.weather!=='unknown')?titleCase(state.weather):'Weather?';
-    const resp=(state.responds&&state.responds!=='unknown')?titleCase(state.responds):'Unknown';
-    document.getElementById('ovEvidence').innerHTML=`<div class='pg-grid'><div class='pg-tile'><div class='label'>Map</div><div class='value'>${map}</div></div><div class='pg-tile'><div class='label'>Difficulty</div><div class='value'>${diff}</div></div><div class='pg-tile'><div class='label'>Weather</div><div class='value'>${weather}</div></div><div class='pg-tile'><div class='label'>Responds</div><div class='value'>${resp}</div></div></div>`;
-  } else if(phase===1){
     setCard('CHAT BOARD','Lucky Guesses','Bragging rights only. Make your call before evidence ruins the fun.','pregame-chat');
     document.getElementById('ovEvidence').innerHTML=guesses.length?`<div class='pg-pillrow'>${guesses.map(v=>`<span class='pg-pill vote'>${v.ghost}: ${v.count}</span>`).join('')}</div>`:"<div class='pg-headerline'><div class='pg-emblem'>🎲</div><div><div class='pg-mini'>Viewer command</div><div class='pg-main'>Type !guess GhostName</div></div></div>";
-  } else if(phase===2){
+  } else if(phase===1){
     setCard('CHAT BOARD','Decision Vote','Use when evidence is thin and chat is being asked to help choose.','pregame-chat');
     document.getElementById('ovEvidence').innerHTML=votes.length?`<div class='pg-pillrow'>${votes.map(v=>`<span class='pg-pill vote'>${v.ghost}: ${v.count}</span>`).join('')}</div>`:"<div class='pg-headerline'><div class='pg-emblem'>☑</div><div><div class='pg-mini'>When asked</div><div class='pg-main'>Vote with !vote GhostName</div></div></div>";
-  } else if(phase===3){
-    setCard('FIELD COMMS','Commands','Useful chat commands for the investigation.','pregame-comms');
-    document.getElementById('ovEvidence').innerHTML="<div class='pg-command'><div class='cmd'><code>!guess</code><span>lucky prediction</span></div><div class='cmd'><code>!vote</code><span>decision input</span></div><div class='cmd'><code>!votes</code><span>decision board</span></div><div class='cmd'><code>!guesses</code><span>lucky board</span></div></div>";
-  } else if(phase===4 || phase===5){
-    const tip=fieldTips[Math.floor(Date.now()/6000)%fieldTips.length];
+  } else if(phase===2){
+    setCard('FIELD COMMS','Viewer Commands','Chat can play along without touching the evidence log.','pregame-comms');
+    document.getElementById('ovEvidence').innerHTML="<div class='pg-command'><div class='cmd'><code>!guess</code><span>bragging rights</span></div><div class='cmd'><code>!vote</code><span>when asked</span></div><div class='cmd'><code>!votes</code><span>decision board</span></div><div class='cmd'><code>!guesses</code><span>lucky board</span></div></div>";
+  } else if(phase===3 || phase===4){
+    const tip=pick(fieldTips, phase);
     setCard('LOADING TIP',tip.title,tip.sub,'pregame-tip');
     document.getElementById('ovEvidence').innerHTML=`<div class='pg-quote'>${tip.body}</div><div class='pg-source'>${tip.note}</div>`;
   } else {
-    const tip=legacyTips[Math.floor(Date.now()/6000)%legacyTips.length];
+    const tip=pick(legacyTips, phase);
     setCard('ARCHIVED FIELD NOTE',tip.title,tip.sub,'pregame-legacy');
     document.getElementById('ovEvidence').innerHTML=`<div class='pg-warning'>Recovered advice — not recommended</div><div class='pg-quote'>${tip.body}</div><div class='pg-source'>${tip.note}</div>`;
   }
