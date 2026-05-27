@@ -723,7 +723,7 @@ function renderTimers(){let box=document.getElementById('timerGrid'); if(!box)re
 function renderManualGhosts(){let box=document.getElementById('manualGhostSummary'); if(!box)return; let manual=state.manualGhosts||{}, bits=[]; if(manual.selected)bits.push(`<span class='chip green'>Selected: ${manual.selected}</span>`); for(const g of (manual.excluded||[]))bits.push(`<span class='manual-chip'>Out: ${g}</span>`); box.innerHTML=bits.length?`<div class='manual-list'>${bits.join('')}</div>`:'No manual overrides.'}
 
 function renderVotes(){let box=document.getElementById('votes');let votes=voteSummary('votes'), guesses=voteSummary('guesses'); let html=''; html+=`<div class='muted' style='margin-bottom:6px'><strong>Votes</strong> are useful decision input when we ask chat to help choose. <strong>Guesses</strong> are lucky predictions.</div>`; if(votes.length){html+=`<div class='vote-section'><div class='muted' style='margin:6px 0'>Decision Votes — !vote GhostName</div>${votes.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No decision votes yet. Use !vote when we need chat's help choosing.</p>`; if(guesses.length){html+=`<div class='vote-section'><div class='muted' style='margin:10px 0 6px'>Lucky Guesses — !guess GhostName</div>${guesses.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No lucky guesses yet. Use !guess before evidence comes in.</p>`; box.innerHTML=html}
-function renderBehaviors(){let box=document.getElementById('behaviors'), q=(document.getElementById('behaviorFilter').value||'').toLowerCase(), cset=new Set(candidates().map(g=>g.name)), st=status(); box.innerHTML=''; let groups={}; for(const b of B){let logged=(state.behaviors?.[b.id]||'unknown')!=='unknown'; if(q && !(b.label+' '+b.cat+' '+b.up.join(' ')+b.down.join(' ')).toLowerCase().includes(q))continue; let relevant=b.up.some(g=>cset.has(g))||b.down.some(g=>cset.has(g)); if(!relevant&&!logged)continue; if(st.kind==='mimic'&&!logged&&!b.up.includes('The Mimic')&&!b.down.includes('The Mimic'))continue; if(['locked','verify'].includes(st.kind)&&!logged)continue; (groups[b.cat]??=[]).push(b)} for(const cat of Object.keys(groups)){let rows=groups[cat], selected=rows.find(b=>(state.behaviors?.[b.id]||'unknown')!=='unknown'), open=expanded[cat]===true; let el=document.createElement('div');el.className='branch'; let title=document.createElement('button');title.className='branch-title';title.innerHTML=`<span>${open?'▼':'▶'} ${cat}</span><span class='badge'>${selected?'logged':rows.length+' options'}</span>`;title.onclick=()=>{expanded[cat]=!open;renderBehaviors()};el.appendChild(title); if(selected){let v=state.behaviors[selected.id], div=document.createElement('div');div.className='selected '+(v==='contradicted'?'bad':'');div.innerHTML=`<strong>${v==='observed'?'✓':'×'} ${selected.label}</strong><div class='tags'>${selected.up.map(g=>`<span class='chip'>↑ ${g}</span>`).join('')}${selected.down.map(g=>`<span class='chip'>↓ ${g}</span>`).join('')}<span class='chip'>${selected.rel}</span></div><div class='row'><button data-clear='${selected.id}'>Clear</button><button class='blue' data-change='${cat}'>Change</button></div>`;el.appendChild(div)} if(open){let body=document.createElement('div');body.className='branch-body'; for(const b of rows){let opt=document.createElement('div');opt.className='option';opt.innerHTML=`<div class='option-label'>${b.label}</div><div class='tags'>${b.up.map(g=>`<span class='chip'>↑ ${g}</span>`).join('')}${b.down.map(g=>`<span class='chip'>↓ ${g}</span>`).join('')}<span class='chip'>${b.rel}</span></div><div class='grid2'><button class='green' data-beh='${b.id}' data-cat='${cat}' data-val='observed'>Observed</button><button class='red' data-beh='${b.id}' data-cat='${cat}' data-val='contradicted'>No / False</button></div>`;body.appendChild(opt)} el.appendChild(body)} box.appendChild(el)} document.querySelectorAll('[data-clear]').forEach(btn=>btn.onclick=()=>postState({behaviors:{[btn.dataset.clear]:'unknown'}}));document.querySelectorAll('[data-change]').forEach(btn=>{btn.onclick=()=>{expanded[btn.dataset.change]=true;renderBehaviors()}});document.querySelectorAll('[data-beh]').forEach(btn=>btn.onclick=()=>{let rows=B.filter(x=>x.cat===btn.dataset.cat), patch={behaviors:{}}; for(const sib of rows)patch.behaviors[sib.id]='unknown'; patch.behaviors[btn.dataset.beh]=btn.dataset.val; expanded[btn.dataset.cat]=false; postState(patch)})}
+function renderBehaviors(){let box=document.getElementById('behaviors'), q=(document.getElementById('behaviorFilter').value||'').toLowerCase(), cset=new Set(candidates().map(g=>g.name)), st=status(); box.innerHTML=''; let groups={}; for(const b of B){let logged=(state.behaviors?.[b.id]||'unknown')!=='unknown'; if(q && !(b.label+' '+b.cat+' '+b.up.join(' ')+b.down.join(' ')).toLowerCase().includes(q))continue; let relevant=b.up.some(g=>cset.has(g))||b.down.some(g=>cset.has(g)); if(!relevant&&!logged)continue; if(st.kind==='mimic'&&!logged&&!b.up.includes('The Mimic')&&!b.down.includes('The Mimic'))continue; if(['locked','verify'].includes(st.kind)&&!logged)continue; (groups[b.cat]??=[]).push(b)} for(const cat of Object.keys(groups)){let rows=groups[cat], selected=rows.find(b=>(state.behaviors?.[b.id]||'unknown')!=='unknown'), open=expanded[cat]===true; let el=document.createElement('div');el.className='branch'; let title=document.createElement('button');title.className='branch-title';title.innerHTML=`<span>${open?'▼':'▶'} ${cat}</span><span class='badge'>${selected?'logged':rows.length+' options'}</span>`;title.onclick=()=>{expanded[cat]=!open;renderBehaviors()};el.appendChild(title); if(selected){let v=state.behaviors[selected.id], div=document.createElement('div');div.className='selected '+(v==='contradicted'?'bad':'');let sn=B.findIndex(x=>x.id===selected.id)+1;div.innerHTML=`<strong>#${sn} ${v==='observed'?'✓':'×'} ${selected.label}</strong><div class='tags'>${selected.up.map(g=>`<span class='chip'>↑ ${g}</span>`).join('')}${selected.down.map(g=>`<span class='chip'>↓ ${g}</span>`).join('')}<span class='chip'>${selected.rel}</span></div><div class='row'><button data-clear='${selected.id}'>Clear</button><button class='blue' data-change='${cat}'>Change</button></div>`;el.appendChild(div)} if(open){let body=document.createElement('div');body.className='branch-body'; for(const b of rows){let opt=document.createElement('div');opt.className='option';let bn=B.findIndex(x=>x.id===b.id)+1;opt.innerHTML=`<div class='option-label'>#${bn} ${b.label}</div><div class='tags'>${b.up.map(g=>`<span class='chip'>↑ ${g}</span>`).join('')}${b.down.map(g=>`<span class='chip'>↓ ${g}</span>`).join('')}<span class='chip'>${b.rel}</span></div><div class='grid2'><button class='green' data-beh='${b.id}' data-cat='${cat}' data-val='observed'>Observed</button><button class='red' data-beh='${b.id}' data-cat='${cat}' data-val='contradicted'>No / False</button></div>`;body.appendChild(opt)} el.appendChild(body)} box.appendChild(el)} document.querySelectorAll('[data-clear]').forEach(btn=>btn.onclick=()=>postState({behaviors:{[btn.dataset.clear]:'unknown'}}));document.querySelectorAll('[data-change]').forEach(btn=>{btn.onclick=()=>{expanded[btn.dataset.change]=true;renderBehaviors()}});document.querySelectorAll('[data-beh]').forEach(btn=>btn.onclick=()=>{let rows=B.filter(x=>x.cat===btn.dataset.cat), patch={behaviors:{}}; for(const sib of rows)patch.behaviors[sib.id]='unknown'; patch.behaviors[btn.dataset.beh]=btn.dataset.val; expanded[btn.dataset.cat]=false; postState(patch)})}
 function setupOverlay(){
   const CARD_MS=10000;
   const tick=Math.floor(Date.now()/CARD_MS);
@@ -736,310 +736,424 @@ function setupOverlay(){
   }
 
   const fieldTips=[
-    {
-      title:'Evidence First',
-      sub:'Evidence narrows the list. Behavior verifies the answer.',
-      body:'A clean call usually comes from one good test, not seven people yelling ghost names at once.',
-      note:'Recommended process: evidence → behavior → final call.'
-    },
-    {
-      title:'Temperature Read',
-      sub:'Weather can make early room reads noisy.',
-      body:'Watch the trend and use the thermometer. Do not let Sunrise, Snow, or vibes run the investigation.',
-      note:'Trust measured change over first impressions.'
-    },
-    {
-      title:'Salt Check',
-      sub:'A fast way to challenge Wraith.',
-      body:'If salt gets disturbed, Wraith is basically off the menu. If it never steps in salt, start asking better questions.',
-      note:'Simple tests first. Fancy theories later.'
-    },
-    {
-      title:'Spirit Box',
-      sub:'Read the board before blaming the tool.',
-      body:'If it responds to Alone, clear the room. If it responds to Everyone, stop making the solo guy do all the work.',
-      note:'Standard work prevents haunted nonsense.'
-    },
-    {
-      title:'Orb Sweep',
-      sub:'Bad angles create bad conclusions.',
-      body:'Sweep slowly, adjust height, and check from more than one angle before ruling Ghost Orbs out.',
-      note:'One bad camera angle is not a data set.'
-    },
-    {
-      title:'D.O.T.S Watch',
-      sub:'Do not stare at one corner forever.',
-      body:'Move the projector, change your angle, and watch from the camera if the room layout is messy.',
-      note:'Coverage matters more than optimism.'
-    },
-    {
-      title:'EMF Discipline',
-      sub:'EMF 5 is not every angry beep.',
-      body:'Wait for the actual level 5 reading. Interaction spam is not a signed confession.',
-      note:'Confirm the signal before logging the evidence.'
-    },
-    {
-      title:'Writing Check',
-      sub:'The book cannot help from your inventory.',
-      body:'Place books early, put them where the ghost is active, and stop carrying the process improvement opportunity.',
-      note:'Deployment before diagnosis.'
-    },
-    {
-      title:'UV Timing',
-      sub:'Fresh interactions are better data.',
-      body:'Check doors, switches, coolers, and windows quickly after interaction. Waiting makes the test worse.',
-      note:'Latency is a defect.'
-    },
-    {
-      title:'Hunt Test',
-      sub:'Speed tells need a plan.',
-      body:'Listen from safety, call out line-of-sight changes, and do not confuse panic footsteps with ghost speed.',
-      note:'Observe from a controlled condition.'
-    },
-    {
-      title:'Cursed Object Sweep',
-      sub:'Fixed spawns are free information.',
-      body:'Check the known spawn area, mark items off, and avoid turning the search into a haunted scavenger meltdown.',
-      note:'Use the checklist. Save the chaos for later.'
-    },
-    {
-      title:'Role Clarity',
-      sub:'One caller beats four half-callers.',
-      body:'Decide who updates evidence, who watches behavior, and who is allowed to scream productively.',
-      note:'Reduce process noise.'
-    },
-    {
-      title:'Camera Setup',
-      sub:'The van is only useful if it sees something.',
-      body:'Set camera angles intentionally. A beautiful shot of a wall is still a wall.',
-      note:'Pretty footage is not evidence.'
-    },
-    {
-      title:'Room Change',
-      sub:'Do not marry the first ghost room.',
-      body:'If evidence stalls and activity migrates, recheck location assumptions before blaming the ghost.',
-      note:'The process moved. Follow it.'
-    },
-    {
-      title:'Sanity Watch',
-      sub:'Hunt timing is evidence-adjacent.',
-      body:'Early hunts, late hunts, and chain pressure all tell a story. Write down the pattern before memory lies.',
-      note:'Your brain is not a calibrated instrument.'
-    },
-    {
-      title:'Loop Safety',
-      sub:'A loop is not a personality test.',
-      body:'Know the exit before the hunt starts. Improvised bravery has a short half-life.',
-      note:'Plan the escape route first.'
-    },
-    {
-      title:'Sound Check',
-      sub:'Audio cues need context.',
-      body:'Rain, distance, floors, and panic all distort what you think you heard. Confirm before calling Myling.',
-      note:'Separate signal from noise.'
-    },
-    {
-      title:'Interaction Pile',
-      sub:'Throws are clues, not just drama.',
-      body:'Clusters of throws, door touches, and electronics can point toward behavior tells if you track them cleanly.',
-      note:'Pattern beats anecdote.'
-    },
-    {
-      title:'Photo Moment',
-      sub:'Do not die for a three-star spoon.',
-      body:'Take the safe objective when it is available. Greed is how the ghost gets promoted.',
-      note:'Value added, not value buried.'
-    },
-    {
-      title:'Mimic Warning',
-      sub:'Ghost Orbs plus weirdness deserves suspicion.',
-      body:'If behavior keeps changing and the evidence math feels illegal, keep The Mimic in the conversation.',
-      note:'Contradiction is data.'
-    },
-    {
-      title:'Objective Flow',
-      sub:'Finish easy objectives early.',
-      body:'Do the safe setup work before sanity collapses and every trip inside becomes a workplace incident.',
-      note:'Front-load low-risk work.'
-    },
-    {
-      title:'Door Discipline',
-      sub:'Open doors are information.',
-      body:'Track what you opened. If nobody knows the baseline, every door becomes a ghost rumor.',
-      note:'Baseline before inspection.'
-    },
-    {
-      title:'Evidence Reset',
-      sub:'Unknown is a valid state.',
-      body:'If a test was bad, mark it unknown. A weak no is worse than no answer.',
-      note:'Bad data is more dangerous than missing data.'
-    },
-    {
-      title:'Final Call',
-      sub:'One ghost remaining is not always the end.',
-      body:'When the tool lands on one ghost, do one sanity-check behavior pass before leaving.',
-      note:'Verification prevents victory laps into walls.'
-    },
-    {
-      title:'Kaizen Rule',
-      sub:'Make the next test the best test.',
-      body:'Do the check that eliminates the most confusion with the least risk. That is the whole game.',
-      note:'Smarter, not louder.'
-    }
-  ];
+  {
+    "title": "Evidence First",
+    "sub": "Evidence narrows the list. Behavior verifies the answer.",
+    "body": "A clean call usually comes from one good test, not seven people yelling ghost names at once.",
+    "note": "Recommended process: evidence → behavior → final call."
+  },
+  {
+    "title": "Van Wisdom",
+    "sub": "The van is not cowardice. It is remote operations.",
+    "body": "Someone watching cameras, sanity, and activity is useful. Someone hiding in the van with snacks is logistics-adjacent.",
+    "note": "Respect the support function."
+  },
+  {
+    "title": "Movie Rule",
+    "sub": "If the hallway lights flicker, do not monologue.",
+    "body": "Horror movies are full of people explaining their feelings to empty rooms. Those people rarely make it to the sequel.",
+    "note": "Short callouts. Long feelings later."
+  },
+  {
+    "title": "Ghostbusters Clause",
+    "sub": "Specialized equipment beats confident yelling.",
+    "body": "Before asking who to call, maybe place the tools correctly and stop standing in front of the camera.",
+    "note": "The proton-pack energy is appreciated. The blocked tripod is not."
+  },
+  {
+    "title": "Scooby Protocol",
+    "sub": "Running in groups is valid if the group knows where the door is.",
+    "body": "A chase montage is only charming when everyone survives it and the hallway layout makes physical sense.",
+    "note": "Know the loop before committing to the bit."
+  },
+  {
+    "title": "Found Footage Rule",
+    "sub": "If the camera angle is bad, the evidence is bad.",
+    "body": "A beautiful shot of a cabinet does not become Ghost Orbs just because we believe in cinema.",
+    "note": "Frame the evidence, not the furniture."
+  },
+  {
+    "title": "Spirit Box Manners",
+    "sub": "Ask clear questions and give the ghost space to answer.",
+    "body": "Six investigators yelling at the box is not teamwork. It is a haunted conference call.",
+    "note": "Mute the meeting. Run the test."
+  },
+  {
+    "title": "Thermometer Truth",
+    "sub": "Do not let the weather gaslight you.",
+    "body": "Cold visuals are spooky. Temperature trends are data. Use the tool, not your goosebumps.",
+    "note": "Vibes are not calibrated."
+  },
+  {
+    "title": "Salt Economy",
+    "sub": "Salt is cheap. False certainty is expensive.",
+    "body": "Use salt to challenge Wraith early and move on. The floor can be seasoned; the investigation should not be.",
+    "note": "Fast test, clean decision."
+  },
+  {
+    "title": "Door Baseline",
+    "sub": "If everyone opens doors, nobody owns the baseline.",
+    "body": "A door cannot be suspicious if three teammates have already treated it like a saloon entrance.",
+    "note": "Control the starting condition."
+  },
+  {
+    "title": "Cursed Object Etiquette",
+    "sub": "Finding the cursed object is information. Using it is a business decision.",
+    "body": "Touching the haunted item without telling the team is not leadership. It is surprise project scope expansion.",
+    "note": "Announce before activating chaos."
+  },
+  {
+    "title": "Ghost Adventures Rule",
+    "sub": "Taunting is a method, not a personality.",
+    "body": "If you provoke the ghost, have a reason, a hiding plan, and preferably someone else holding the camera.",
+    "note": "Drama with controls beats drama with casualties."
+  },
+  {
+    "title": "The Exorcist Rule",
+    "sub": "When furniture gets theatrical, collect evidence from a distance.",
+    "body": "If the room starts acting like it has a union grievance, maybe stop admiring the set design up close.",
+    "note": "Observe, do not audition."
+  },
+  {
+    "title": "Poltergeist Pile",
+    "sub": "Object piles are tests, not interior decorating.",
+    "body": "If you make a throw pile, say so. Otherwise it is just clutter with a theory degree.",
+    "note": "Intentional setup prevents mystery garbage."
+  },
+  {
+    "title": "Myling Check",
+    "sub": "Footstep audio needs context.",
+    "body": "Rain, floors, distance, and panic all lie. Compare sound to equipment range before making the call.",
+    "note": "Signal beats spooky acoustics."
+  },
+  {
+    "title": "Camera Crew Note",
+    "sub": "If you are filming the investigation, film the investigation.",
+    "body": "Viewers can forgive fear. They cannot forgive seven minutes of staring at the underside of a shelf.",
+    "note": "Aim with purpose."
+  },
+  {
+    "title": "Paranormal HR",
+    "sub": "The ghost room is a workplace hazard.",
+    "body": "Before entering, know who is testing, who is watching sanity, and who is legally just screaming for morale.",
+    "note": "Role clarity saves lives and content."
+  },
+  {
+    "title": "Objective Discipline",
+    "sub": "Optional objectives are optional until someone says content.",
+    "body": "Do the safe objectives early. Do not wait until the ghost has become a sprinting lawsuit.",
+    "note": "Front-load low-risk work."
+  },
+  {
+    "title": "Mimic Clause",
+    "sub": "Contradiction is not always confusion.",
+    "body": "If Ghost Orbs appear with behavior that keeps changing, keep The Mimic in the meeting agenda.",
+    "note": "Weirdness can be a clue."
+  },
+  {
+    "title": "Paranormal Budgeting",
+    "sub": "Smudges are safety inventory.",
+    "body": "Do not spend every incense charge proving you are brave. Bravery has a cooldown and a receipt.",
+    "note": "Use resources intentionally."
+  },
+  {
+    "title": "Hiding Spot Audit",
+    "sub": "Before the hunt, know the shelter.",
+    "body": "Finding a hiding spot during a hunt is like writing the evacuation plan during the fire drill.",
+    "note": "Audit before emergency."
+  },
+  {
+    "title": "Final Call Check",
+    "sub": "One ghost remaining deserves a sanity pass.",
+    "body": "When the tool gives a final answer, verify one behavior if the run has been weird. Victory laps attract teeth.",
+    "note": "Trust, then verify."
+  },
+  {
+    "title": "D.O.T.S Patience",
+    "sub": "Some evidence is shy until the setup is decent.",
+    "body": "Move the projector, change the viewing angle, and stop judging the ghost through a doorway sliver.",
+    "note": "Coverage creates confidence."
+  },
+  {
+    "title": "UV Discipline",
+    "sub": "Check fresh interactions quickly.",
+    "body": "Fingerprints do not wait for your personal growth journey. Hit doors, windows, switches, and coolers fast.",
+    "note": "Timing matters."
+  },
+  {
+    "title": "Journal Hygiene",
+    "sub": "Unknown is better than fake certainty.",
+    "body": "If the test was sloppy, leave it unknown. A weak no can wreck the whole run.",
+    "note": "Bad data is worse than missing data."
+  },
+  {
+    "title": "Radio Voice",
+    "sub": "Clear callouts beat emotional weather reports.",
+    "body": "“Hunting, front hall, moving fast” is useful. “Oh no no no no” is relatable but low-resolution.",
+    "note": "Panic in HD, please."
+  },
+  {
+    "title": "Cryptid Crossover",
+    "sub": "Not every shadow is a new mechanic.",
+    "body": "Sometimes the monster is a ghost. Sometimes it is a teammate standing directly in front of the flashlight.",
+    "note": "Identify the mundane first."
+  },
+  {
+    "title": "Haunted Kaizen",
+    "sub": "Make the next test the best test.",
+    "body": "Choose the check that removes the most uncertainty with the least risk. Continuous improvement, but with screaming.",
+    "note": "Smarter, not louder."
+  },
+  {
+    "title": "Possession Sweep",
+    "sub": "Fixed spawns are free value.",
+    "body": "Check the known location, mark the item found or cleared, and stop turning the house into a scavenger opera.",
+    "note": "Standard work, spooky workplace."
+  },
+  {
+    "title": "Evidence Ownership",
+    "sub": "One person updates the log.",
+    "body": "If everyone owns the journal, the journal belongs to the ghost now.",
+    "note": "Single source of truth."
+  }
+];
 
   const legacyTips=[
-    {
-      title:'Tripwire Doctrine',
-      sub:'Dale “Tripwire” Mullins, Ghost Hunter, 1994–2025',
-      body:'“If it responds to Alone, send in the least emotionally stable teammate. They create the cleanest data.”',
-      note:'Archived field note. Do not treat as current best practice.'
-    },
-    {
-      title:'Engagement Theory',
-      sub:'Marcy Bell, Ghost Hunter, 1994–2025',
-      body:'“When in doubt, touch the cursed object. The insurance company loves engagement.”',
-      note:'Recovered from a van with no surviving clipboard.'
-    },
-    {
-      title:'Split-Up Protocol',
-      sub:'Coach Harlan, Ghost Hunter, 1994–2025',
-      body:'“Always split up. Horror movies have proven this creates the most efficient paperwork.”',
-      note:'His team later standardized on not doing that.'
-    },
-    {
-      title:'Negotiation Method',
-      sub:'Kevin No-Clip, Ghost Hunter, 1994–2025',
-      body:'“If you hear footsteps, stand perfectly still and negotiate. Ghosts respect confident middle management.”',
-      note:'Negotiation failed during the first counteroffer.'
-    },
-    {
-      title:'Thermo Confidence',
-      sub:'Gus “One Degree” Feldman, Ghost Hunter, 1994–2025',
-      body:'“If the room feels cold emotionally, mark Freezing. Instruments only slow down intuition.”',
-      note:'His thermometer was later found unopened.'
-    },
-    {
-      title:'Door Science',
-      sub:'Linda Latchley, Ghost Hunter, 1994–2025',
-      body:'“Open every door immediately. That way the ghost has more options and feels respected.”',
-      note:'A model example of uncontrolled variables.'
-    },
-    {
-      title:'Van Strategy',
-      sub:'Terry “Base Camp” Doyle, Ghost Hunter, 1994–2025',
-      body:'“The safest investigator is the one providing moral support from the van forever.”',
-      note:'Technically survived, professionally disputed.'
-    },
-    {
-      title:'Orb Certainty',
-      sub:'Mick Lenscap, Ghost Hunter, 1994–2025',
-      body:'“If you do not see orbs in five seconds, throw the camera away and accuse the ghost of hiding evidence.”',
-      note:'Recovered beside twelve poorly aimed tripods.'
-    },
-    {
-      title:'Candle Logic',
-      sub:'Evelyn Matchstick, Ghost Hunter, 1994–2025',
-      body:'“Fire is calming. Bring more candles into the murder room until morale improves.”',
-      note:'Morale did not improve.'
-    },
-    {
-      title:'EMF Shortcut',
-      sub:'Barry Beepman, Ghost Hunter, 1994–2025',
-      body:'“If the EMF reader makes any noise at all, call EMF 5. The ghost clearly has electrical opinions.”',
-      note:'The committee rejected his certification.'
-    },
-    {
-      title:'Loop Commitment',
-      sub:'Nate “No Exit” Granger, Ghost Hunter, 1994–2025',
-      body:'“Never learn hiding spots. Confidence is the only hiding spot you need.”',
-      note:'Confidence was not line-of-sight proof.'
-    },
-    {
-      title:'Photo Greed',
-      sub:'Polly Snapshot, Ghost Hunter, 1994–2025',
-      body:'“A perfect ghost photo is worth one teammate. Maybe two if the lighting is good.”',
-      note:'Her portfolio was excellent. Brief, but excellent.'
-    },
-    {
-      title:'Spirit Box Etiquette',
-      sub:'Ronnie Radio, Ghost Hunter, 1994–2025',
-      body:'“Ask the Spirit Box personal finance questions. Ghosts love diversified portfolios.”',
-      note:'The ghost declined to comment.'
-    },
-    {
-      title:'Sanity Economy',
-      sub:'Carl Candlewick, Ghost Hunter, 1994–2025',
-      body:'“Pills are for quitters. Real hunters experience the content at full sanity loss.”',
-      note:'Content was experienced.'
-    },
-    {
-      title:'Basement Policy',
-      sub:'Franklin Downstairs, Ghost Hunter, 1994–2025',
-      body:'“If the breaker is in the basement, send everyone. Basements are safer in groups of panicking adults.”',
-      note:'OSHA has questions.'
-    },
-    {
-      title:'Mimic Theory',
-      sub:'Janet Maybe, Ghost Hunter, 1994–2025',
-      body:'“Every ghost is The Mimic if you argue long enough.”',
-      note:'Technically unfalsifiable. Operationally useless.'
-    },
-    {
-      title:'Evidence Minimalism',
-      sub:'Art “Gut Check” Malone, Ghost Hunter, 1994–2025',
-      body:'“Tools are a crutch. I identify ghosts by room aura and whether my knees feel cursed.”',
-      note:'Knees were inconclusive.'
-    },
-    {
-      title:'Hunt Callout',
-      sub:'Sally Siren, Ghost Hunter, 1994–2025',
-      body:'“During hunts, narrate everything loudly. The ghost appreciates accessibility.”',
-      note:'The ghost found the captions helpful.'
-    },
-    {
-      title:'Cursed Roulette',
-      sub:'Vince Token, Ghost Hunter, 1994–2025',
-      body:'“If you find Tarot Cards, draw until the problem becomes obvious.”',
-      note:'The problem became obvious.'
-    },
-    {
-      title:'UV Patience',
-      sub:'Mabel Glowstick, Ghost Hunter, 1994–2025',
-      body:'“Check fingerprints tomorrow. The ghost should respect your schedule.”',
-      note:'The prints did not.'
-    },
-    {
-      title:'Equipment Respect',
-      sub:'Doug Tripod, Ghost Hunter, 1994–2025',
-      body:'“Place all equipment in one majestic pile. If the ghost wants to talk, it knows where to find us.”',
-      note:'The pile achieved nothing with dignity.'
-    },
-    {
-      title:'Objective Planning',
-      sub:'Harold Bonus, Ghost Hunter, 1994–2025',
-      body:'“Optional objectives are mandatory if chat says so. This is basic governance.”',
-      note:'The motion passed. Harold did not.'
-    },
-    {
-      title:'Weather Read',
-      sub:'June Forecast, Ghost Hunter, 1994–2025',
-      body:'“If it is snowing, all ghosts are cold. Mark Freezing and enjoy the efficiency.”',
-      note:'Fast is not the same as correct.'
-    },
-    {
-      title:'Smudge Timing',
-      sub:'Owen Incense, Ghost Hunter, 1994–2025',
-      body:'“Use incense immediately upon entering. It establishes dominance and wastes everyone’s safety net.”',
-      note:'Dominance remained unconfirmed.'
-    },
-    {
-      title:'Final Answer',
-      sub:'Victor Victory, Ghost Hunter, 1994–2025',
-      body:'“Lock the ghost as soon as someone sounds confident. Confidence is evidence with better posture.”',
-      note:'A bold framework with poor survivability.'
-    }
-  ];
+  {
+    "title": "Tripwire Doctrine",
+    "sub": "Dale “Tripwire” Mullins, Ghost Hunter, 1968–2025",
+    "body": "“If it responds to Alone, send in the least emotionally stable teammate. They create the cleanest data.”",
+    "note": "Cause of death: entered alone; emotionally unstable teammate declined the assignment."
+  },
+  {
+    "title": "Engagement Theory",
+    "sub": "Marcy Bell, Ghost Hunter, 1974–2023",
+    "body": "“When in doubt, touch the cursed object. The insurance company loves engagement.”",
+    "note": "Cause of death: high engagement, low risk assessment."
+  },
+  {
+    "title": "Split-Up Protocol",
+    "sub": "Coach Harlan Pike, Ghost Hunter, 1959–2007",
+    "body": "“Always split up. Horror movies have proven this creates the most efficient paperwork.”",
+    "note": "Cause of death: paperwork was indeed efficient."
+  },
+  {
+    "title": "Negotiation Method",
+    "sub": "Kevin No-Clip Park, Ghost Hunter, 1988–2024",
+    "body": "“If you hear footsteps, stand perfectly still and negotiate. Ghosts respect confident middle management.”",
+    "note": "Cause of death: negotiation failed during the first counteroffer."
+  },
+  {
+    "title": "Thermo Confidence",
+    "sub": "Gus “One Degree” Feldman, Ghost Hunter, 1947–1999",
+    "body": "“If the room feels cold emotionally, mark Freezing. Instruments only slow down intuition.”",
+    "note": "Cause of death: vibes-based metrology."
+  },
+  {
+    "title": "Door Science",
+    "sub": "Linda Latchley, Ghost Hunter, 1979–2026",
+    "body": "“Open every door immediately. That way the ghost has more options and feels respected.”",
+    "note": "Cause of death: uncontrolled variables achieved consciousness."
+  },
+  {
+    "title": "Van Strategy",
+    "sub": "Terry “Base Camp” Doyle, Ghost Hunter, 1962–2021",
+    "body": "“The safest investigator is the one providing moral support from the van forever.”",
+    "note": "Cause of death: technically natural causes; reputation died earlier."
+  },
+  {
+    "title": "Orb Certainty",
+    "sub": "Mick Lenscap, Ghost Hunter, 1991–2025",
+    "body": "“If you do not see orbs in five seconds, accuse the ghost of hiding evidence from the camera.”",
+    "note": "Cause of death: tripod placed facing a tasteful section of drywall."
+  },
+  {
+    "title": "Candle Logic",
+    "sub": "Evelyn Matchstick, Ghost Hunter, 1938–1986",
+    "body": "“Fire is calming. Bring more candles into the murder room until morale improves.”",
+    "note": "Cause of death: morale did not improve."
+  },
+  {
+    "title": "EMF Shortcut",
+    "sub": "Barry Beepman, Ghost Hunter, 1982–2022",
+    "body": "“If the EMF reader makes any noise at all, call EMF 5. The ghost clearly has electrical opinions.”",
+    "note": "Cause of death: overconfidence with a two-star reading."
+  },
+  {
+    "title": "Loop Commitment",
+    "sub": "Nate “No Exit” Granger, Ghost Hunter, 1971–2014",
+    "body": "“Never learn hiding spots. Confidence is the only hiding spot you need.”",
+    "note": "Cause of death: confidence was not line-of-sight proof."
+  },
+  {
+    "title": "Photo Greed",
+    "sub": "Polly Snapshot, Ghost Hunter, 1995–2025",
+    "body": "“A perfect ghost photo is worth one teammate. Maybe two if the lighting is good.”",
+    "note": "Cause of death: exposure triangle became a triangle of regret."
+  },
+  {
+    "title": "Spirit Box Etiquette",
+    "sub": "Ronnie Radio Alvarez, Ghost Hunter, 1969–2019",
+    "body": "“Ask the Spirit Box personal finance questions. Ghosts love diversified portfolios.”",
+    "note": "Cause of death: received aggressive investment advice."
+  },
+  {
+    "title": "Sanity Economy",
+    "sub": "Carl Candlewick, Ghost Hunter, 1954–2002",
+    "body": "“Pills are for quitters. Real hunters experience the content at full sanity loss.”",
+    "note": "Cause of death: content was experienced."
+  },
+  {
+    "title": "Basement Policy",
+    "sub": "Franklin Downstairs, Ghost Hunter, 1980–2020",
+    "body": "“If the breaker is in the basement, send everyone. Basements are safer in groups of panicking adults.”",
+    "note": "Cause of death: group panic exceeded basement capacity."
+  },
+  {
+    "title": "Mimic Theory",
+    "sub": "Janet Maybe, Ghost Hunter, 1977–2024",
+    "body": "“Every ghost is The Mimic if you argue long enough.”",
+    "note": "Cause of death: hypothesis remained unfalsifiable."
+  },
+  {
+    "title": "Evidence Minimalism",
+    "sub": "Art “Gut Check” Malone, Ghost Hunter, 1942–1991",
+    "body": "“Tools are a crutch. I identify ghosts by room aura and whether my knees feel cursed.”",
+    "note": "Cause of death: knees were inconclusive."
+  },
+  {
+    "title": "Hunt Callout",
+    "sub": "Sally Siren Okafor, Ghost Hunter, 1986–2026",
+    "body": "“During hunts, narrate everything loudly. The ghost appreciates accessibility.”",
+    "note": "Cause of death: accessible location data."
+  },
+  {
+    "title": "Cursed Roulette",
+    "sub": "Vince Token, Ghost Hunter, 1990–2025",
+    "body": "“If you find Tarot Cards, draw until the problem becomes obvious.”",
+    "note": "Cause of death: the problem became obvious."
+  },
+  {
+    "title": "UV Patience",
+    "sub": "Mabel Glowstick, Ghost Hunter, 1965–2016",
+    "body": "“Check fingerprints tomorrow. The ghost should respect your schedule.”",
+    "note": "Cause of death: missed the print window."
+  },
+  {
+    "title": "Equipment Respect",
+    "sub": "Doug Tripod Mercer, Ghost Hunter, 1951–2008",
+    "body": "“Place all equipment in one majestic pile. If the ghost wants to talk, it knows where to find us.”",
+    "note": "Cause of death: the pile achieved nothing with dignity."
+  },
+  {
+    "title": "Objective Planning",
+    "sub": "Harold Bonus, Ghost Hunter, 1973–2022",
+    "body": "“Optional objectives are mandatory if chat says so. This is basic governance.”",
+    "note": "Cause of death: motion passed, Harold did not."
+  },
+  {
+    "title": "Weather Read",
+    "sub": "June Forecast, Ghost Hunter, 1984–2024",
+    "body": "“If it is snowing, all ghosts are cold. Mark Freezing and enjoy the efficiency.”",
+    "note": "Cause of death: fast conclusion, slow correction."
+  },
+  {
+    "title": "Smudge Timing",
+    "sub": "Owen Incense Reed, Ghost Hunter, 1949–1997",
+    "body": "“Use incense immediately upon entering. It establishes dominance and wastes everyone’s safety net.”",
+    "note": "Cause of death: dominance remained unconfirmed."
+  },
+  {
+    "title": "Final Answer",
+    "sub": "Victor Victory Chen, Ghost Hunter, 1992–2025",
+    "body": "“Lock the ghost as soon as someone sounds confident. Confidence is evidence with better posture.”",
+    "note": "Cause of death: persuasive teammate."
+  },
+  {
+    "title": "Containment Plan",
+    "sub": "Egon-adjacent intern, Ghost Hunter, 1970–1998",
+    "body": "“If the ghost looks angry, describe it as focused and offer it a storage solution.”",
+    "note": "Cause of death: unauthorized backpack prototype."
+  },
+  {
+    "title": "Paranormal Influencer",
+    "sub": "Zane “Full Spectrum” Braddock, Ghost Hunter, 1989–2026",
+    "body": "“If the room gets quiet, ask the ghost to like and subscribe. Entities respect the algorithm.”",
+    "note": "Cause of death: demonetized during a hunt."
+  },
+  {
+    "title": "Old House Rule",
+    "sub": "Lorraine-ish Mallory, Ghost Hunter, 1940–2004",
+    "body": "“If the doll moves, politely move closer and ask what it wants.”",
+    "note": "Cause of death: doll wanted follow-up questions."
+  },
+  {
+    "title": "Haunted Hotel Tip",
+    "sub": "Jackie Torrance, Ghost Hunter, 1961–2001",
+    "body": "“Long empty hallways are excellent places to split the party and practice dramatic whispers.”",
+    "note": "Cause of death: hallway had notes."
+  },
+  {
+    "title": "Television Method",
+    "sub": "Grant Nightvision, Ghost Hunter, 1976–2025",
+    "body": "“If nothing happens, yell ‘did you hear that?’ and wait for the editor to solve it.”",
+    "note": "Cause of death: editor refused the assignment."
+  },
+  {
+    "title": "Containment Budget",
+    "sub": "Ray “Invoice” Stantzwell, Ghost Hunter, 1956–2012",
+    "body": "“Never worry about property damage. If the ghost is real, accounting becomes a later-season problem.”",
+    "note": "Cause of death: invoice approved by nobody."
+  },
+  {
+    "title": "Mirror Logic",
+    "sub": "Candace Reflection, Ghost Hunter, 1993–2024",
+    "body": "“If a mirror shows you the ghost room, stare longer. The ghost appreciates eye contact.”",
+    "note": "Cause of death: eye contact was accepted."
+  },
+  {
+    "title": "Doll Friendship",
+    "sub": "Chucky “No Relation” Mills, Ghost Hunter, 1981–2021",
+    "body": "“If the doll looks cursed, give it a nickname. Nicknames build trust.”",
+    "note": "Cause of death: trust-building workshop failure."
+  },
+  {
+    "title": "Basement Confidence",
+    "sub": "Nancy Flashlight, Ghost Hunter, 1966–1995",
+    "body": "“When the basement door opens by itself, walk down slowly and say ‘hello’ like payroll sent you.”",
+    "note": "Cause of death: payroll denied involvement."
+  },
+  {
+    "title": "Museum Policy",
+    "sub": "Edwin Glasscase, Ghost Hunter, 1932–1982",
+    "body": "“Never remove a haunted artifact. Just relocate it to a more photogenic shelf.”",
+    "note": "Cause of death: artifact disliked the shelf."
+  },
+  {
+    "title": "Possession Etiquette",
+    "sub": "Father Gary Paperwork, Ghost Hunter, 1958–2010",
+    "body": "“If someone sounds possessed, ask them to submit a ticket so the team can prioritize it.”",
+    "note": "Cause of death: ticket remained pending."
+  },
+  {
+    "title": "Science Corner",
+    "sub": "Dr. Bunsen Noakes, Ghost Hunter, 1972–2023",
+    "body": "“If the ghost violates physics, politely remind it of the posted lab rules.”",
+    "note": "Cause of death: physics declined to enforce."
+  },
+  {
+    "title": "Campfire Rule",
+    "sub": "Blair Woodson, Ghost Hunter, 1975–1999",
+    "body": "“If lost in the woods, film an apology instead of checking the map.”",
+    "note": "Cause of death: poor navigation and worse framing."
+  },
+  {
+    "title": "Cryptid Outreach",
+    "sub": "Mothman Steve, Ghost Hunter, 1983–2020",
+    "body": "“If you see glowing eyes, compliment the creature’s brand identity.”",
+    "note": "Cause of death: brand engagement exceeded forecast."
+  }
+];
 
   const card=document.getElementById('ovCard');
   card?.classList.remove('final','pregame-brief','pregame-chat','pregame-comms','pregame-tip','pregame-legacy');
@@ -1065,8 +1179,8 @@ function setupOverlay(){
     setCard('CHAT BOARD','Decision Vote','Use when evidence is thin and chat is being asked to help choose.','pregame-chat');
     document.getElementById('ovEvidence').innerHTML=votes.length?`<div class='pg-pillrow'>${votes.map(v=>`<span class='pg-pill vote'>${v.ghost}: ${v.count}</span>`).join('')}</div>`:"<div class='pg-headerline'><div class='pg-emblem'>☑</div><div><div class='pg-mini'>When asked</div><div class='pg-main'>Vote with !vote GhostName</div></div></div>";
   } else if(phase===2){
-    setCard('FIELD COMMS','Viewer Commands','Chat can play along without touching the evidence log.','pregame-comms');
-    document.getElementById('ovEvidence').innerHTML="<div class='pg-command'><div class='cmd'><code>!guess</code><span>bragging rights</span></div><div class='cmd'><code>!vote</code><span>when asked</span></div><div class='cmd'><code>!votes</code><span>decision board</span></div><div class='cmd'><code>!guesses</code><span>lucky board</span></div></div>";
+    setCard('FIELD COMMS','Command Cheats','Chat and mods can help without opening the control panel.','pregame-comms');
+    document.getElementById('ovEvidence').innerHTML="<div class='pg-command'><div class='cmd'><code>!ev orb no</code><span>set evidence yes/no</span></div><div class='cmd'><code>!be 12 yes</code><span>set behavior line</span></div><div class='cmd'><code>!guess ghost</code><span>lucky prediction</span></div><div class='cmd'><code>!vote ghost</code><span>when chat is asked</span></div></div>";
   } else if(phase===3 || phase===4){
     const tip=pick(fieldTips, phase);
     setCard('LOADING TIP',tip.title,tip.sub,'pregame-tip');
@@ -1260,6 +1374,8 @@ TIMER_ALIASES = {
     "cooldown": "cooldown",
     "cd": "cooldown",
 }
+
+BEHAVIOR_INDEX_IDS = ['hantu-temperature-speed', 'raiju-electronics-speed', 'revenant-los-speed', 'deogen-distance-speed', 'dayan-moving-speed', 'dayan-still-slow', 'twins-speed-profiles', 'thaye-aging-speed', 'obambo-state-speed', 'aswang-los-ramp', 'wraith-no-salt', 'salt-footprints', 'gallu-no-salt-enraged', 'obake-unique-print', 'obake-hides-prints', 'breaker-off-direct', 'breaker-on-benefit', 'jinn-breaker-speed', 'jinn-sanity-drain', 'hantu-breath-breaker-off', 'mare-lights-off', 'mare-no-lights-on', 'light-shatter-event', 'raiju-wide-interference', 'yokai-short-hearing', 'early-hunt', 'demon-ability-hunt', 'shade-shy', 'yokai-talking-hunt', 'kormos-sprint-threshold', 'aswang-zero-grace', 'gallu-state-thresholds', 'obambo-aggressive-hunts', 'deogen-late-hunt', 'onryo-flame-prevent', 'onryo-third-blowout', 'spirit-long-incense', 'demon-short-incense', 'demon-crucifix-range', 'gallu-crucifix-enraged', 'yurei-incense-trap', 'phantom-photo-disappear', 'photo-visible', 'oni-no-mist', 'oni-full-visible', 'kormos-no-mist-chase', 'banshee-singing', 'phantom-sanity-look', 'myling-quiet-footsteps', 'banshee-scream', 'deogen-spiritbox-breath', 'moroi-curse', 'box-alone-mismatch', 'goryo-camera-dots', 'goryo-room-stable', 'thaye-high-activity-early', 'mare-long-roam-lights-on', 'yurei-door-room', 'banshee-target', 'deogen-knows-location', 'kormos-no-los', 'aswang-hidden-spares', 'wraith-teleport', 'phantom-travel', 'polter-multi-throw', 'polter-hunt-throw-rate', 'twins-double-interaction', 'shade-low-interaction', 'obake-shapeshift', 'mimic-fake-orbs', 'mimic-changing-tells']
 
 GHOST_TESTS = {
     "Deogen": ["Hunt test: very fast far away, very slow when close.", "It always knows player location during hunts.", "Spirit Box breathing response can confirm it."],
@@ -1503,6 +1619,19 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         summary = ", ".join(f"{ghost}: {count}" for ghost, count in sorted(counts.items(), key=lambda item: (-item[1], item[0])))
         return state, f"Lucky guesses: {summary}."
 
+    if cmd in {"!be", "!behaviorentry", "!behaviorline"}:
+        if not _ALLOW_BEHAVIOR_COMMANDS:
+            return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable !be commands."
+        if len(lower_parts) < 3 or not lower_parts[1].isdigit():
+            return state, "Use !be [number] [yes/no]. Example: !be 12 yes."
+        entry_num = int(lower_parts[1])
+        if entry_num < 1 or entry_num > len(BEHAVIOR_INDEX_IDS):
+            return state, f"Behavior number must be between 1 and {len(BEHAVIOR_INDEX_IDS)}."
+        key = BEHAVIOR_INDEX_IDS[entry_num - 1]
+        value = _normalize_value(lower_parts[2], "behavior")
+        state.setdefault("behaviors", {})[key] = value
+        return state, f"Behavior #{entry_num} set to {value}."
+
     if cmd in {"!b", "!beh", "!behavior"}:
         if not _ALLOW_BEHAVIOR_COMMANDS:
             return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable !b commands."
@@ -1513,7 +1642,7 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         state.setdefault("behaviors", {})[key] = value
         return state, f"{key} set to {value}."
 
-    return state, "Command not recognized. Try !ev emf yes, !b deogen observed, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
+    return state, "Command not recognized. Try !ev emf yes, !be 12 yes, !b deogen observed, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
 
 
 @app.get("/")
