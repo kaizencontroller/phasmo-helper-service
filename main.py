@@ -1552,5 +1552,512 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
             except Exception:
                 vals.append(None)
         if not vals:
-            ret
-Preview truncated for large file
+            return state, "Use !sanity 90 85 80 75."
+        state["sanityValues"] = vals + [None] * max(0, 4 - len(vals))
+        active = [v for v in state["sanityValues"][: int(state.get("playerCount") or 4)] if v is not None]
+        avg = round(sum(active) / len(active)) if active else None
+        return state, f"Sanity updated. Average: {avg if avg is not None else 'unknown'}%."
+
+    if cmd in {"!huntat", "!huntsanity"}:
+        try:
+            state["huntSanity"] = max(0, min(100, int(round(float(lower_parts[1])))))
+            return state, f"Hunt sanity logged at {state['huntSanity']}%."
+        except Exception:
+            return state, "Use !huntat 65."
+
+    if cmd in {"!huntnow", "!loghunt"}:
+        vals = state.get("sanityValues") or []
+        active = [v for v in vals[: int(state.get("playerCount") or 4)] if isinstance(v, (int, float))]
+        if not active:
+            return state, "No sanity values saved. Use !sanity first."
+        state["huntSanity"] = round(sum(active) / len(active))
+        return state, f"Hunt logged at {state['huntSanity']}% average sanity."
+
+    if cmd in {"!manifest", "!presentation", "!gender"}:
+        value = lower_parts[1] if len(lower_parts) > 1 else "unknown"
+        if value in {"female", "f", "woman", "girl"}:
+            state["presentation"] = "female"
+        elif value in {"male", "m", "man", "boy"}:
+            state["presentation"] = "male"
+        else:
+            state["presentation"] = "unknown"
+        return state, f"Presentation clue set to {state['presentation']}."
+
+    if cmd in {"!ev", "!evidence"}:
+        key = EVIDENCE_ALIASES.get(lower_parts[1], "") if len(lower_parts) > 1 else ""
+        if not key:
+            return state, f"Unknown evidence: {parts[1] if len(parts) > 1 else 'blank'}."
+        value = _normalize_value(lower_parts[2] if len(lower_parts) > 2 else "unknown", "evidence")
+        state.setdefault("evidence", {})[key] = value
+        return state, f"{EVIDENCE_LABELS[key]} set to {value}."
+
+    if cmd in {"!timer", "!timers"}:
+        if len(lower_parts) == 1:
+            return state, "Use !timer incense start, !timer hunt start, !timer cooldown start, or !timer clear."
+        if lower_parts[1] in {"clear", "reset", "stopall"}:
+            _clear_timers(state)
+            return state, "All timers cleared."
+        key = TIMER_ALIASES.get(lower_parts[1])
+        if not key:
+            return state, f"Unknown timer: {parts[1]}. Use incense, hunt, or cooldown."
+        action = lower_parts[2] if len(lower_parts) > 2 else "start"
+        custom_seconds = None
+        if len(lower_parts) > 3 and lower_parts[3].isdigit():
+            custom_seconds = int(lower_parts[3])
+        if action in {"start", "go", "begin", "restart"}:
+            _start_timer(state, key, custom_seconds)
+            return state, f"{key.title()} timer started."
+        if action in {"stop", "clear", "reset", "done"}:
+            _stop_timer(state, key)
+            return state, f"{key.title()} timer cleared."
+        if action.isdigit():
+            _start_timer(state, key, int(action))
+            return state, f"{key.title()} timer started for {action} seconds."
+        return state, "Use start, stop, clear, or a duration in seconds."
+
+    if cmd in {"!incense", "!smudge"}:
+        _start_timer(state, "incense")
+        return state, "Incense timer started."
+
+    if cmd in {"!hunt"}:
+        _start_timer(state, "hunt")
+        return state, "Hunt timer started."
+
+    if cmd in {"!cooldown", "!cd"}:
+        _start_timer(state, "cooldown")
+        return state, "Cooldown timer started."
+
+    if cmd in {"!tests", "!test"}:
+        ghost_text = " ".join(parts[1:]) if len(parts) > 1 else ""
+        ghost = _normal_ghost(ghost_text)
+        if not ghost:
+            return state, f"Unknown ghost for quick tests: {ghost_text or 'blank'}."
+        return state, _ghost_test_summary(ghost)
+
+    if cmd in {"!ghost", "!select", "!notghost", "!restoreghost"}:
+        action = lower_parts[1] if len(lower_parts) > 1 else ""
+        manual = state.setdefault("manualGhosts", {"selected": None, "excluded": []})
+        manual.setdefault("excluded", [])
+
+        if cmd == "!notghost":
+            action = "not"
+            ghost_text = " ".join(parts[1:])
+        elif cmd == "!restoreghost":
+            action = "restore"
+            ghost_text = " ".join(parts[1:])
+        elif cmd == "!select":
+            action = "select"
+            ghost_text = " ".join(parts[1:])
+        else:
+            ghost_text = " ".join(parts[2:]) if action in {"not", "exclude", "out", "restore", "select", "force", "clear"} else " ".join(parts[1:])
+
+        if action in {"clear", "reset"}:
+            state["manualGhosts"] = {"selected": None, "excluded": []}
+            return state, "Manual ghost overrides cleared."
+
+        if action in {"not", "exclude", "out"}:
+            ghost = _normal_ghost(ghost_text)
+            if not ghost:
+                return state, f"Unknown ghost to exclude: {ghost_text or 'blank'}."
+            if ghost not in manual["excluded"]:
+                manual["excluded"].append(ghost)
+            if manual.get("selected") == ghost:
+                manual["selected"] = None
+            return state, f"{ghost} manually excluded."
+
+        if action == "restore":
+            ghost = _normal_ghost(ghost_text)
+            if not ghost:
+                return state, f"Unknown ghost to restore: {ghost_text or 'blank'}."
+            manual["excluded"] = [g for g in manual.get("excluded", []) if g != ghost]
+            return state, f"{ghost} restored to the candidate pool."
+
+        if action in {"select", "force"}:
+            ghost = _normal_ghost(ghost_text)
+            if not ghost:
+                return state, f"Unknown ghost to select: {ghost_text or 'blank'}."
+            manual["selected"] = ghost
+            manual["excluded"] = [g for g in manual.get("excluded", []) if g != ghost]
+            return state, f"{ghost} manually selected."
+
+        # If !ghost is not being used as an override, treat it as a viewer guess.
+        ghost = _normal_ghost(ghost_text)
+        if not ghost:
+            return state, f"Unknown ghost guess: {ghost_text or 'blank'}."
+        voter = _normal_user(user)
+        state.setdefault("votes", {})[voter] = ghost
+        return state, f"{voter} voted for {ghost}."
+
+    if cmd in {"!guess"}:
+        ghost_text = " ".join(parts[1:]) if len(parts) > 1 else ""
+        ghost = _normal_ghost(ghost_text)
+        if not ghost:
+            return state, f"Unknown lucky guess: {ghost_text or 'blank'}."
+        voter = _normal_user(user)
+        state.setdefault("guesses", {})[voter] = ghost
+        return state, f"{voter} locked in a lucky guess for {ghost}."
+
+    if cmd in {"!vote"}:
+        ghost_text = " ".join(parts[1:]) if len(parts) > 1 else ""
+        ghost = _normal_ghost(ghost_text)
+        if not ghost:
+            return state, f"Unknown decision vote: {ghost_text or 'blank'}."
+        voter = _normal_user(user)
+        state.setdefault("votes", {})[voter] = ghost
+        return state, f"{voter} voted for {ghost} as decision input."
+
+    if cmd in {"!unvote", "!clearvote"}:
+        voter = _normal_user(user)
+        state.setdefault("votes", {}).pop(voter, None)
+        return state, f"{voter}'s decision vote was cleared."
+
+    if cmd in {"!unguess", "!clearguess"}:
+        voter = _normal_user(user)
+        state.setdefault("guesses", {}).pop(voter, None)
+        return state, f"{voter}'s lucky guess was cleared."
+
+    if cmd in {"!votes"}:
+        votes = state.get("votes", {}) or {}
+        if not votes:
+            return state, "No decision votes yet."
+        counts: dict[str, int] = {}
+        for ghost in votes.values():
+            counts[ghost] = counts.get(ghost, 0) + 1
+        summary = ", ".join(f"{ghost}: {count}" for ghost, count in sorted(counts.items(), key=lambda item: (-item[1], item[0])))
+        return state, f"Decision votes: {summary}."
+
+    if cmd in {"!guesses"}:
+        guesses = state.get("guesses", {}) or {}
+        if not guesses:
+            return state, "No lucky guesses yet."
+        counts: dict[str, int] = {}
+        for ghost in guesses.values():
+            counts[ghost] = counts.get(ghost, 0) + 1
+        summary = ", ".join(f"{ghost}: {count}" for ghost, count in sorted(counts.items(), key=lambda item: (-item[1], item[0])))
+        return state, f"Lucky guesses: {summary}."
+
+    if cmd in {"!be", "!behaviorentry", "!behaviorline"}:
+        if not _ALLOW_BEHAVIOR_COMMANDS:
+            return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable !be commands."
+        if len(lower_parts) < 3 or not lower_parts[1].isdigit():
+            return state, "Use !be [number] [yes/no]. Example: !be 12 yes."
+        entry_num = int(lower_parts[1])
+        if entry_num < 1 or entry_num > len(BEHAVIOR_INDEX_IDS):
+            return state, f"Behavior number must be between 1 and {len(BEHAVIOR_INDEX_IDS)}."
+        key = BEHAVIOR_INDEX_IDS[entry_num - 1]
+        value = _normalize_value(lower_parts[2], "behavior")
+        state.setdefault("behaviors", {})[key] = value
+        return state, f"Behavior #{entry_num} set to {value}."
+
+    if cmd in {"!b", "!beh", "!behavior"}:
+        if not _ALLOW_BEHAVIOR_COMMANDS:
+            return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable !b commands."
+        key = BEHAVIOR_ALIASES.get(lower_parts[1], "") if len(lower_parts) > 1 else ""
+        if not key:
+            return state, f"Unknown behavior: {parts[1] if len(parts) > 1 else 'blank'}."
+        value = _normalize_value(lower_parts[2] if len(lower_parts) > 2 else "observed", "behavior")
+        state.setdefault("behaviors", {})[key] = value
+        return state, f"{key} set to {value}."
+
+    return state, "Command not recognized. Try !ev emf yes, !be 12 yes, !b deogen observed, !sanity 90 85 80 75, !huntat 65, !manifest male, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
+
+
+@app.get("/")
+def root():
+    return {
+        "ok": True,
+        "service": "Kaizen Phasmophobia Helper",
+        "control": "/phasmo/control?room=kaizen",
+        "overlay": "/phasmo/overlay?room=kaizen",
+        "state": "/api/phasmo/state?room=kaizen",
+        "command": "/api/phasmo/command?room=kaizen",
+    }
+
+
+@app.get("/phasmo")
+def phasmo_index(room: str | None = None):
+    safe_room = _room_name(room)
+    return RedirectResponse(f"/phasmo/control?room={safe_room}")
+
+
+
+def _simple_info_page(title: str, body: str) -> HTMLResponse:
+    html = f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<style>
+body{{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI,sans-serif}}
+main{{width:min(860px,100vw);padding:18px;margin:0 auto}}
+.card{{background:#172235ee;border:1px solid #334155;border-radius:18px;box-shadow:0 18px 50px #0008;overflow:hidden}}
+.head{{padding:18px;border-bottom:1px solid #334155}}
+.body{{padding:18px;line-height:1.55}}
+h1{{margin:0;font-size:28px}}
+h2{{margin:22px 0 8px;font-size:18px}}
+p{{color:#cbd5e1}}
+ul{{color:#cbd5e1}}
+a{{color:#93c5fd}}
+.small{{color:#94a3b8;font-size:12px}}
+.badge{{display:inline-block;border:1px solid #334155;border-radius:999px;padding:4px 8px;background:#0f172a;color:#cbd5e1;font-size:12px;margin-right:6px}}
+</style>
+</head>
+<body>
+<main>
+<section class="card">
+<div class="head"><h1>{title}</h1><div class="small">Kaizen Controller Phasmophobia Helper</div></div>
+<div class="body">{body}</div>
+</section>
+</main>
+</body>
+</html>"""
+    return HTMLResponse(html)
+
+
+@app.get("/phasmo/release-notes")
+def phasmo_release_notes():
+    body = """
+<p class="small">This page is intentionally simple so updates can be edited directly in <code>main.py</code>.</p>
+<h2>Current Development Notes</h2>
+<ul>
+  <li>Added multi-room/session support for parallel groups.</li>
+  <li>Added setup fields for room/session name and number of players.</li>
+  <li>Changed Quick Timers into Quick Trackers.</li>
+  <li>Added team sanity tracking and hunt-trigger logging.</li>
+  <li>Added manifestation/name clue tracking for gender/model-style ghost constraints.</li>
+  <li>Added separate <span class="badge">!guess</span> and <span class="badge">!vote</span> boards.</li>
+  <li>Added numbered behavior entries with <span class="badge">!be # yes/no</span> support.</li>
+  <li>Expanded loading-screen cards with useful investigation tips and archived questionable field notes.</li>
+  <li>Expanded cursed possession helper and location hints.</li>
+</ul>
+<h2>Contributor Notes</h2>
+<p>Future updates can call out play-testers, correction submissions, map/location corrections, command ideas, and feature requests here.</p>
+<p><a href="/phasmo/acknowledgements">View acknowledgements</a></p>
+"""
+    return _simple_info_page("Release Notes", body)
+
+
+@app.get("/phasmo/acknowledgements")
+def phasmo_acknowledgements():
+    body = """
+<p>This tool exists because people test it, break it, correct it, and suggest better ways to make it useful during real play.</p>
+<h2>Acknowledgements</h2>
+<ul>
+  <li><strong>KaizenController</strong> — project owner, streamer workflow, testing, and design direction.</li>
+  <li><strong>Play-testers and chat users</strong> — command testing, usability feedback, and chaos validation.</li>
+  <li><strong>Community contributors</strong> — corrections to cursed possession locations, ghost behavior logic, and overlay readability.</li>
+</ul>
+<h2>Want to Support Development?</h2>
+<p>This helper is happily provided free for the Phasmophobia community. Optional donations help cover hosting and support further development.</p>
+<p><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support KaizenController on Ko-fi</a></p>
+"""
+    return _simple_info_page("Acknowledgements", body)
+
+
+@app.get("/phasmo/setup")
+def phasmo_setup():
+    return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "setup"))
+
+
+@app.get("/phasmo/control")
+def phasmo_control(room: str | None = Query(default=None), token: str | None = Query(default=None)):
+    safe_room = _room_name(room)
+    state = read_state(safe_room)
+    if not state.get("setupComplete"):
+        suffix = f"?room={safe_room}"
+        if token:
+            suffix += f"&token={token}"
+        return RedirectResponse(f"/phasmo/setup{suffix}")
+    return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "control"))
+
+
+@app.get("/phasmo/overlay")
+def phasmo_overlay():
+    return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "overlay"))
+
+
+
+
+@app.get("/phasmo/leaderboard")
+def phasmo_leaderboard(room: str | None = Query(default=None), token: str | None = Query(default=None)):
+    safe_room = _room_name(room)
+    state = read_state(safe_room)
+
+    def make_rows(source: dict[str, str], empty_text: str) -> str:
+        counts: dict[str, list[str]] = {}
+        for user, ghost in (source or {}).items():
+            counts.setdefault(str(ghost), []).append(str(user))
+        rows = ""
+        for ghost, users in sorted(counts.items(), key=lambda item: (-len(item[1]), item[0])):
+            user_list = ", ".join(sorted(users))
+            rows += f"<tr><td>{ghost}</td><td>{len(users)}</td><td>{user_list}</td></tr>"
+        if not rows:
+            rows = f"<tr><td colspan='3'>{empty_text}</td></tr>"
+        return rows
+
+    guess_rows = make_rows(state.get("guesses", {}) or {}, "No lucky guesses yet. Viewers can use <strong>!guess GhostName</strong>.")
+    vote_rows = make_rows(state.get("votes", {}) or {}, "No decision votes yet. Use <strong>!vote GhostName</strong> when chat is helping make a call.")
+
+    token_suffix = f"&token={token}" if token else ""
+    control_url = f"/phasmo/control?room={safe_room}{token_suffix}"
+    overlay_url = f"/phasmo/overlay?room={safe_room}"
+    html = f"""
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Phasmo Chat Board</title>
+        <style>
+          body {{ margin:0; background:#000; color:#f8fafc; font-family:Inter,system-ui,Segoe UI,sans-serif; }}
+          .app {{ width:min(820px,100vw); padding:14px; display:grid; gap:14px; }}
+          .panel {{ background:#172235ee; border:1px solid #334155; border-radius:16px; overflow:hidden; box-shadow:0 16px 40px #0007; }}
+          .head {{ padding:14px; border-bottom:1px solid #334155; display:flex; justify-content:space-between; gap:8px; align-items:center; }}
+          .body {{ padding:14px; }}
+          a {{ color:#38bdf8; }}
+          .muted {{ color:#94a3b8; font-size:12px; }}
+          table {{ width:100%; border-collapse:collapse; }}
+          th,td {{ border-bottom:1px solid #334155; padding:10px; text-align:left; vertical-align:top; }}
+          th {{ color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:.12em; }}
+          .badge {{ border:1px solid #334155; background:#0f172a; border-radius:999px; padding:6px 9px; font-size:12px; display:inline-block; margin-left:6px; }}
+        </style>
+      </head>
+      <body>
+        <main class="app">
+          <section class="panel">
+            <div class="head">
+              <div>
+                <strong>Phasmo Chat Board</strong>
+                <div class="muted">room: {safe_room}</div>
+              </div>
+              <div>
+                <a class="badge" href="{control_url}">Control</a>
+                <a class="badge" href="{overlay_url}">Overlay</a>
+              </div>
+            </div>
+            <div class="body">
+              <p class="muted"><strong>!guess</strong> is the lucky prediction board. <strong>!vote</strong> is decision input when evidence is thin and chat is helping choose.</p>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="head"><strong>Lucky Guesses</strong><span class="muted">!guess GhostName</span></div>
+            <div class="body"><table><thead><tr><th>Ghost</th><th>Guesses</th><th>Users</th></tr></thead><tbody>{guess_rows}</tbody></table></div>
+          </section>
+          <section class="panel">
+            <div class="head"><strong>Decision Votes</strong><span class="muted">!vote GhostName</span></div>
+            <div class="body"><table><thead><tr><th>Ghost</th><th>Votes</th><th>Users</th></tr></thead><tbody>{vote_rows}</tbody></table></div>
+          </section>
+        </main>
+      </body>
+    </html>
+    """
+    return HTMLResponse(html)
+
+
+@app.get("/api/phasmo/state")
+def api_get_state(room: str | None = Query(default=None)):
+    safe_room = _room_name(room)
+    with _STATE_LOCK:
+        return read_state(safe_room)
+
+
+@app.post("/api/phasmo/state")
+async def api_post_state(
+    request: Request,
+    room: str | None = Query(default=None),
+    token: str | None = Query(default=None),
+    x_phasmo_token: str | None = Header(default=None),
+):
+    if not _auth_ok(x_phasmo_token, token):
+        raise HTTPException(status_code=401, detail="unauthorized")
+    safe_room = _room_name(room)
+    body = await request.json()
+    with _STATE_LOCK:
+        current = read_state(safe_room)
+        if body.get("reset") is True:
+            current = default_state(safe_room)
+        else:
+            if "evidence" in body and isinstance(body["evidence"], dict):
+                current["evidence"].update({k: v for k, v in body["evidence"].items() if k in EVIDENCE and v in {"yes", "no", "unknown"}})
+            if "behaviors" in body and isinstance(body["behaviors"], dict):
+                current["behaviors"].update(body["behaviors"] or {})
+            if "votes" in body and isinstance(body["votes"], dict):
+                current["votes"].update(body["votes"] or {})
+            if "guesses" in body and isinstance(body["guesses"], dict):
+                current.setdefault("guesses", {}).update(body["guesses"] or {})
+            if "timers" in body and isinstance(body["timers"], dict):
+                current["timers"].update(body["timers"] or {})
+            if "manualGhosts" in body and isinstance(body["manualGhosts"], dict):
+                manual = body["manualGhosts"] or {}
+                current.setdefault("manualGhosts", {"selected": None, "excluded": []})
+                if "selected" in manual:
+                    current["manualGhosts"]["selected"] = manual["selected"] if manual["selected"] in GHOST_NAMES else None
+                if "excluded" in manual and isinstance(manual["excluded"], list):
+                    current["manualGhosts"]["excluded"] = [g for g in manual["excluded"] if g in GHOST_NAMES]
+            if "responds" in body:
+                current["responds"] = body["responds"] if body["responds"] in {"unknown", "alone", "everyone"} else "unknown"
+            if "evidenceMode" in body and str(body["evidenceMode"]) in {"0", "1", "2", "3"}:
+                current["evidenceMode"] = str(body["evidenceMode"])
+            if "setupComplete" in body:
+                current["setupComplete"] = bool(body["setupComplete"])
+            if "map" in body:
+                current["map"] = str(body.get("map") or "unknown")[:120]
+            if "difficulty" in body:
+                current["difficulty"] = str(body.get("difficulty") or "unknown")[:40]
+            if "weather" in body:
+                current["weather"] = str(body.get("weather") or "unknown")[:40]
+            if "playerCount" in body:
+                try:
+                    current["playerCount"] = max(1, min(4, int(body.get("playerCount") or 4)))
+                except Exception:
+                    current["playerCount"] = 4
+            if "sanityValues" in body and isinstance(body["sanityValues"], list):
+                vals = []
+                for item in body["sanityValues"][:4]:
+                    try:
+                        vals.append(max(0, min(100, int(round(float(item))))) if item not in {None, ""} else None)
+                    except Exception:
+                        vals.append(None)
+                current["sanityValues"] = vals + [None] * max(0, 4 - len(vals))
+            if "huntSanity" in body:
+                try:
+                    current["huntSanity"] = None if body.get("huntSanity") in {None, ""} else max(0, min(100, int(round(float(body.get("huntSanity"))))))
+                except Exception:
+                    current["huntSanity"] = None
+            if "presentation" in body:
+                current["presentation"] = body.get("presentation") if body.get("presentation") in {"unknown", "female", "male"} else "unknown"
+            if "cursedItems" in body and isinstance(body["cursedItems"], dict):
+                current.setdefault("cursedItems", {})
+                for k, v in body["cursedItems"].items():
+                    key = str(k).lower()[:80]
+                    if str(v) in {"found", "out", "unknown"}:
+                        current["cursedItems"][key] = str(v)
+        write_state(safe_room, current)
+    return {"ok": True, "state": current}
+
+
+@app.post("/api/phasmo/command")
+async def api_post_command(
+    request: Request,
+    room: str | None = Query(default=None),
+    token: str | None = Query(default=None),
+    x_phasmo_token: str | None = Header(default=None),
+):
+    if not _auth_ok(x_phasmo_token, token):
+        raise HTTPException(status_code=401, detail="unauthorized")
+    safe_room = _room_name(room)
+    try:
+        body = await request.json()
+    except Exception:
+        raw = (await request.body()).decode("utf-8", errors="ignore")
+        body = {"command": raw}
+    command = body.get("command") or body.get("rawInput") or body.get("message") or ""
+    user = body.get("user") or body.get("username") or body.get("displayName") or body.get("userName") or "anonymous"
+    with _STATE_LOCK:
+        state = read_state(safe_room)
+        state, result = apply_command(state, command, user=user)
+        state["lastCommand"] = command
+        state["lastCommandResult"] = result
+        write_state(safe_room, state)
+    return {"ok": True, "result": result, "state": state}
