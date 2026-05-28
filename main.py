@@ -375,7 +375,7 @@ HTML_TEMPLATE = r'''<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kaizen Phasmophobia Helper</title>
 <style>
-:root{--bg:#000;--panel:#172235ee;--soft:#213149;--text:#f8fafc;--muted:#94a3b8;--line:#334155;--orange:#f97316;--green:#22c55e;--red:#ef4444;--blue:#38bdf8;--grey:#64748b}*{box-sizing:border-box}body{margin:0;background:#000;color:var(--text);font-family:Inter,system-ui,Segoe UI,sans-serif}.app{width:min(460px,100vw);height:100vh;overflow:auto;padding:10px;background:#000}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;box-shadow:0 16px 40px #0007}.head{padding:12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}.body{padding:10px}.muted{color:var(--muted);font-size:12px}.badge,.chip{border:1px solid var(--line);background:#0f172a;border-radius:999px;padding:5px 8px;font-size:12px}button,select,input{background:#0f172a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit}button{cursor:pointer;touch-action:manipulation;user-select:none}button:disabled{opacity:.45;cursor:not-allowed}.green{background:#14532d;border-color:#22c55e}.red{background:#5b2329;border-color:#ef4444}.blue{background:#123247;border-color:#38bdf8}.orange{background:#432919;border-color:#f97316}.grey{background:#273244;border-color:#64748b;color:#cbd5e1}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.spread{display:flex;justify-content:space-between;align-items:center;gap:8px}.next{border-color:#f97316;background:#2a2330}.big{font-weight:950;font-size:28px;line-height:1}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.setup-grid label{display:grid;gap:4px;font-size:12px;color:var(--muted)}.setup-grid select,.setup-grid input{width:100%}.setup-summary{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.top-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.top-summary{font-size:12px;color:#cbd5e1;line-height:1.35;margin-bottom:8px}.top-summary strong{color:#fff}.setup-mode .panel{display:none}.setup-mode #setupPanel{display:block}.setup-mode #setupPanel .body{display:grid}.control-mode #setupPanel{display:none}.control-mode #setupPanel.setup-complete .body{display:none}.control-mode #setupPanel.setup-complete{margin-bottom:10px}.control-mode #setupPanel.setup-complete .head{border-bottom:0}.evidence-panel.collapsed .body{display:none}.behavior-panel.collapsed .body{display:none}.cursed-panel.collapsed .body{display:none}.cursed-grid{display:grid;gap:7px}.cursed-row{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;border:1px solid #334155;border-radius:12px;background:#0f172a;padding:8px}.cursed-row.found{border-color:#22c55e;background:#123d29}.cursed-row.out{opacity:.62;background:#1f2937}.cursed-row.compact{grid-template-columns:1fr auto}.cursed-row.found-card{grid-template-columns:1fr auto;border-color:#22c55e;background:#123d29}.cursed-name{font-weight:900}.cursed-hint{font-size:11px;color:#94a3b8;line-height:1.25}.cursed-row button{padding:7px 8px;font-size:11px}.warnbox{border:1px solid #eab30888;background:#3b2f12;color:#fde68a;border-radius:12px;padding:8px;font-size:12px;line-height:1.35}.quick-timers{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}.quick-timers button{padding:8px 6px;font-size:12px}.setup-chip{border:1px solid #334155;background:#0f172a;border-radius:999px;padding:4px 7px;font-size:11px;color:#cbd5e1}.evrow{display:grid;grid-template-columns:1fr 48px 48px 48px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #33415588}.evrow:last-child{border-bottom:0}.evname{font-weight:850;font-size:15px}.state{height:46px;padding:0;font-size:24px;font-weight:900}.state.active.yes{background:#14532d;border-color:#22c55e;box-shadow:0 0 0 2px #22c55e66}.state.active.no{background:#5b2329;border-color:#ef4444;box-shadow:0 0 0 2px #ef444466}.state.active.unk{background:#374151;border-color:#9ca3af;color:#f8fafc;box-shadow:0 0 0 2px #9ca3af66}.state.inactive{background:#1f2937;border-color:#475569;color:#94a3b8;opacity:.55}.ghosts{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:260px;overflow:auto}.ghost{border:1px solid var(--line);border-radius:12px;padding:8px;background:#111a2b}.ghost.top{border-color:#22c55e;background:#132a24}.ghost h4{margin:0 0 5px;font-size:14px}.tags{display:flex;gap:4px;flex-wrap:wrap}.chip{font-size:10px;padding:3px 5px}.vote-grid{display:grid;gap:7px}.vote-row{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;background:#0f172a;padding:8px}.vote-name{font-weight:900}.vote-users{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.timer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.timer-tile{border:1px solid var(--line);border-radius:12px;background:#0f172a;padding:8px}.timer-name{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:900}.timer-val{font-size:20px;font-weight:950}.timer-val.done{color:#22c55e}.manual-list{display:flex;gap:5px;flex-wrap:wrap}.manual-chip{border:1px solid #ef444477;background:#3a1d24;border-radius:999px;padding:4px 7px;font-size:11px}.branch{border:1px solid var(--line);border-radius:13px;overflow:hidden;margin-bottom:8px;background:#111a2b}.branch-title{width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;display:flex;justify-content:space-between}.branch-body{padding:8px;display:grid;gap:7px}.option{border:1px solid #334155;border-radius:11px;padding:8px;background:#0f172a}.option-label{font-weight:800;font-size:13px;margin-bottom:5px}.selected{padding:8px;background:#163425}.selected.bad{background:#3a1d24}.error{border-color:#ef4444;color:#fecaca;background:#3a1d24;padding:8px;border-radius:10px}.overlay{width:560px;height:210px;display:flex;align-items:flex-start;justify-content:flex-start;padding:8px;background:#000;overflow:hidden}.ov-card{width:544px;height:194px;background:linear-gradient(180deg,#172235f7,#0f172af2);border:2px solid #f9731688;border-radius:18px;padding:12px 14px;overflow:hidden;box-shadow:0 14px 32px #000b;transition:background .25s ease,border-color .25s ease,box-shadow .25s ease}.ov-card.final{background:linear-gradient(180deg,#14532df7,#0f2f1ef2);border-color:#22c55ecc;box-shadow:0 14px 32px #000b,0 0 22px #22c55e33}.ov-card.final .ov-kicker{color:#bbf7d0}.ov-card.final .ov-ghosts .badge{border-color:#22c55e99;background:#052e1a;color:#dcfce7}.ov-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px}.ov-kicker{font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);font-weight:950}.ov-ghosts{display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap;max-width:245px;max-height:44px;overflow:hidden}.ov-ghosts .badge{font-size:12px;padding:4px 8px;background:#0b1220;border-color:#334155}.ov-step{font-size:46px;font-weight:950;line-height:.96;letter-spacing:-.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:1px 0 8px}.ov-step.small{font-size:39px}.ov-step.xsmall{font-size:32px}.ov-sub{font-size:15px;color:#dbeafe;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:19px;margin:0 0 10px}.ov-bottom{display:grid;grid-template-columns:386px 1fr;gap:12px;margin-top:0;align-items:end}.ov-evidence{display:flex;gap:6px}.ev-dot{width:50px;height:48px;border-radius:11px;border:1px solid #475569;background:#1d293a;color:#cbd5e1;display:grid;place-items:center;font-size:31px;font-weight:900;line-height:1;overflow:hidden}.ev-dot .ev-mark{font-size:31px;line-height:1}.ev-dot.yes{background:#123d29;border-color:#22c55e;color:#dcfce7}.ev-dot.no{background:#4a1f26;border-color:#ef4444;color:#fee2e2}.ov-notes{border-left:1px solid #334155aa;padding-left:10px;min-width:0;align-self:stretch;display:flex;flex-direction:column;justify-content:center}.ov-notes-title{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:950;margin-bottom:4px}.ov-note-text{font-size:13px;color:#cbd5e1;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.ov-note-good{color:#bbf7d0}.ov-note-bad{color:#fecaca}.ov-note-vote{color:#dbeafe}.ov-card.pregame{position:relative;overflow:hidden}.ov-card.pregame:before{content:"";position:absolute;inset:-70px -90px auto auto;width:230px;height:230px;border-radius:999px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 64%);pointer-events:none}.ov-card.pregame:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#38bdf8,#a78bfa,#f97316);opacity:.82}.ov-card.pregame .ov-top{margin-bottom:2px;position:relative;z-index:1}.ov-card.pregame .ov-kicker{font-size:11px;letter-spacing:.18em;color:#cbd5e1}.ov-card.pregame .ov-step{font-size:29px;line-height:1;letter-spacing:-.025em;margin:2px 0 5px;white-space:normal;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}.ov-card.pregame .ov-step.small{font-size:26px}.ov-card.pregame .ov-step.xsmall{font-size:22px}.ov-card.pregame .ov-sub{font-size:13px;line-height:1.22;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:32px;margin:0 0 7px;color:#e2e8f0}.ov-card.pregame .ov-bottom{display:block;margin-top:0;position:relative;z-index:1}.ov-card.pregame .ov-evidence{display:block;min-height:62px;color:#f8fafc}.ov-card.pregame .ov-notes{display:none!important}.ov-card.pregame-brief{border-color:#38bdf899;background:linear-gradient(135deg,#13243bf7 0%,#0b1628f2 64%)}.ov-card.pregame-chat{border-color:#a78bfa99;background:linear-gradient(135deg,#24173ff7 0%,#11162bf2 64%)}.ov-card.pregame-comms{border-color:#f59e0b99;background:linear-gradient(135deg,#2d2111f7 0%,#101827f2 64%)}.ov-card.pregame-tip{border-color:#22c55e99;background:linear-gradient(135deg,#123320f7 0%,#0b1e1bf2 64%)}.ov-card.pregame-legacy{border-color:#ef444499;background:linear-gradient(135deg,#311722f7 0%,#14111df2 64%)}.pg-headerline{display:flex;align-items:center;gap:8px;margin-bottom:6px}.pg-emblem{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-size:20px;font-weight:950;background:#020617aa;border:1px solid #64748b66;box-shadow:inset 0 0 18px #ffffff0d}.pg-mini{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:#94a3b8;font-weight:900}.pg-main{font-size:15px;line-height:1.18;font-weight:900;color:#f8fafc}.pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pg-tile{border:1px solid #47556977;background:#02061766;border-radius:10px;padding:6px 7px;min-width:0}.pg-tile .label{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}.pg-tile .value{font-size:13px;color:#f8fafc;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-pillrow{display:flex;gap:6px;flex-wrap:wrap}.pg-pill{border:1px solid #475569;background:#0f172acc;border-radius:999px;padding:5px 8px;font-size:12px;font-weight:850;color:#dbeafe;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pg-pill.hot{border-color:#f97316;color:#fed7aa}.pg-pill.good{border-color:#22c55e;color:#bbf7d0}.pg-pill.vote{border-color:#a78bfa;color:#ddd6fe}.pg-command{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:4px}.pg-command .cmd{border:1px solid #47556977;background:#02061766;border-radius:12px;padding:8px 7px;min-height:58px;display:flex;flex-direction:column;justify-content:center}.pg-command code{display:block;color:#f8fafc;font-size:14px;font-weight:950;margin-bottom:3px;letter-spacing:.01em}.pg-command span{font-size:10px;color:#cbd5e1;line-height:1.12}.pg-quote{border-left:4px solid currentColor;padding-left:10px;font-size:14px;line-height:1.22;font-weight:850;color:#f8fafc;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.pg-source{font-size:11px;color:#cbd5e1;margin-top:5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-cardline{font-size:14px;line-height:1.25;font-weight:850;color:#e2e8f0}.pg-warning{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fecaca;font-weight:950;margin-bottom:4px}.hidden{display:none!important}@media(max-width:700px){.app{width:100vw}.ghosts{grid-template-columns:1fr}.evrow{grid-template-columns:1fr 52px 52px 52px}.state{height:50px}}
+:root{--bg:#000;--panel:#172235ee;--soft:#213149;--text:#f8fafc;--muted:#94a3b8;--line:#334155;--orange:#f97316;--green:#22c55e;--red:#ef4444;--blue:#38bdf8;--grey:#64748b}*{box-sizing:border-box}body{margin:0;background:#000;color:var(--text);font-family:Inter,system-ui,Segoe UI,sans-serif}.app{width:min(460px,100vw);height:100vh;overflow:auto;padding:10px;background:#000}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;box-shadow:0 16px 40px #0007}.head{padding:12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}.body{padding:10px}.muted{color:var(--muted);font-size:12px}.badge,.chip{border:1px solid var(--line);background:#0f172a;border-radius:999px;padding:5px 8px;font-size:12px}button,select,input{background:#0f172a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit}button{cursor:pointer;touch-action:manipulation;user-select:none}button:disabled{opacity:.45;cursor:not-allowed}.green{background:#14532d;border-color:#22c55e}.red{background:#5b2329;border-color:#ef4444}.blue{background:#123247;border-color:#38bdf8}.orange{background:#432919;border-color:#f97316}.grey{background:#273244;border-color:#64748b;color:#cbd5e1}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.spread{display:flex;justify-content:space-between;align-items:center;gap:8px}.next{border-color:#f97316;background:#2a2330}.big{font-weight:950;font-size:28px;line-height:1}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.setup-grid label{display:grid;gap:4px;font-size:12px;color:var(--muted)}.setup-grid select,.setup-grid input{width:100%}.setup-summary{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.top-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.support-footer{border-style:dashed;opacity:.72}.support-footer .body{font-size:11px;line-height:1.35;color:#94a3b8}.support-footer a{color:#93c5fd;text-decoration:none}.support-footer a:hover{text-decoration:underline}.support-links{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:5px}.support-note{max-width:62ch}.top-summary{font-size:12px;color:#cbd5e1;line-height:1.35;margin-bottom:8px}.top-summary strong{color:#fff}.setup-mode .panel{display:none}.setup-mode #setupPanel{display:block}.setup-mode #setupPanel .body{display:grid}.setup-mode #supportFooter{display:block}.control-mode #setupPanel{display:none}.control-mode #setupPanel.setup-complete .body{display:none}.control-mode #setupPanel.setup-complete{margin-bottom:10px}.control-mode #setupPanel.setup-complete .head{border-bottom:0}.evidence-panel.collapsed .body{display:none}.behavior-panel.collapsed .body{display:none}.cursed-panel.collapsed .body{display:none}.cursed-grid{display:grid;gap:7px}.cursed-row{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;border:1px solid #334155;border-radius:12px;background:#0f172a;padding:8px}.cursed-row.found{border-color:#22c55e;background:#123d29}.cursed-row.out{opacity:.62;background:#1f2937}.cursed-row.compact{grid-template-columns:1fr auto}.cursed-row.found-card{grid-template-columns:1fr auto;border-color:#22c55e;background:#123d29}.cursed-name{font-weight:900}.cursed-hint{font-size:11px;color:#94a3b8;line-height:1.25}.cursed-row button{padding:7px 8px;font-size:11px}.warnbox{border:1px solid #eab30888;background:#3b2f12;color:#fde68a;border-radius:12px;padding:8px;font-size:12px;line-height:1.35}.quick-timers{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}.quick-timers button{padding:8px 6px;font-size:12px}.tracker-section{border:1px solid #334155;background:#0f172a;border-radius:12px;padding:8px;margin-top:8px}.sanity-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}.sanity-grid input{width:100%;text-align:center;font-weight:900;padding:8px 4px}.tracker-readout{font-size:12px;color:#cbd5e1;line-height:1.35;margin-top:6px}.tracker-readout.warning{color:#fde68a}.tracker-title{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;font-weight:950}.manifest-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}.manifest-grid button{padding:8px 6px;font-size:12px}.setup-chip{border:1px solid #334155;background:#0f172a;border-radius:999px;padding:4px 7px;font-size:11px;color:#cbd5e1}.evrow{display:grid;grid-template-columns:1fr 48px 48px 48px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #33415588}.evrow:last-child{border-bottom:0}.evname{font-weight:850;font-size:15px}.state{height:46px;padding:0;font-size:24px;font-weight:900}.state.active.yes{background:#14532d;border-color:#22c55e;box-shadow:0 0 0 2px #22c55e66}.state.active.no{background:#5b2329;border-color:#ef4444;box-shadow:0 0 0 2px #ef444466}.state.active.unk{background:#374151;border-color:#9ca3af;color:#f8fafc;box-shadow:0 0 0 2px #9ca3af66}.state.inactive{background:#1f2937;border-color:#475569;color:#94a3b8;opacity:.55}.ghosts{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:260px;overflow:auto}.ghost{border:1px solid var(--line);border-radius:12px;padding:8px;background:#111a2b}.ghost.top{border-color:#22c55e;background:#132a24}.ghost h4{margin:0 0 5px;font-size:14px}.tags{display:flex;gap:4px;flex-wrap:wrap}.chip{font-size:10px;padding:3px 5px}.vote-grid{display:grid;gap:7px}.vote-row{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;background:#0f172a;padding:8px}.vote-name{font-weight:900}.vote-users{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.timer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.timer-tile{border:1px solid var(--line);border-radius:12px;background:#0f172a;padding:8px}.timer-name{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:900}.timer-val{font-size:20px;font-weight:950}.timer-val.done{color:#22c55e}.manual-list{display:flex;gap:5px;flex-wrap:wrap}.manual-chip{border:1px solid #ef444477;background:#3a1d24;border-radius:999px;padding:4px 7px;font-size:11px}.branch{border:1px solid var(--line);border-radius:13px;overflow:hidden;margin-bottom:8px;background:#111a2b}.branch-title{width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;display:flex;justify-content:space-between}.branch-body{padding:8px;display:grid;gap:7px}.option{border:1px solid #334155;border-radius:11px;padding:8px;background:#0f172a}.option-label{font-weight:800;font-size:13px;margin-bottom:5px}.selected{padding:8px;background:#163425}.selected.bad{background:#3a1d24}.error{border-color:#ef4444;color:#fecaca;background:#3a1d24;padding:8px;border-radius:10px}.overlay{width:560px;height:210px;display:flex;align-items:flex-start;justify-content:flex-start;padding:8px;background:#000;overflow:hidden}.ov-card{width:544px;height:194px;background:linear-gradient(180deg,#172235f7,#0f172af2);border:2px solid #f9731688;border-radius:18px;padding:12px 14px;overflow:hidden;box-shadow:0 14px 32px #000b;transition:background .25s ease,border-color .25s ease,box-shadow .25s ease}.ov-card.final{background:linear-gradient(180deg,#14532df7,#0f2f1ef2);border-color:#22c55ecc;box-shadow:0 14px 32px #000b,0 0 22px #22c55e33}.ov-card.final .ov-kicker{color:#bbf7d0}.ov-card.final .ov-ghosts .badge{border-color:#22c55e99;background:#052e1a;color:#dcfce7}.ov-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px}.ov-kicker{font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);font-weight:950}.ov-ghosts{display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap;max-width:245px;max-height:44px;overflow:hidden}.ov-ghosts .badge{font-size:12px;padding:4px 8px;background:#0b1220;border-color:#334155}.ov-step{font-size:46px;font-weight:950;line-height:.96;letter-spacing:-.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:1px 0 8px}.ov-step.small{font-size:39px}.ov-step.xsmall{font-size:32px}.ov-sub{font-size:15px;color:#dbeafe;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:19px;margin:0 0 10px}.ov-bottom{display:grid;grid-template-columns:386px 1fr;gap:12px;margin-top:0;align-items:end}.ov-evidence{display:flex;gap:6px}.ev-dot{width:50px;height:48px;border-radius:11px;border:1px solid #475569;background:#1d293a;color:#cbd5e1;display:grid;place-items:center;font-size:31px;font-weight:900;line-height:1;overflow:hidden}.ev-dot .ev-mark{font-size:31px;line-height:1}.ev-dot.yes{background:#123d29;border-color:#22c55e;color:#dcfce7}.ev-dot.no{background:#4a1f26;border-color:#ef4444;color:#fee2e2}.ov-notes{border-left:1px solid #334155aa;padding-left:10px;min-width:0;align-self:stretch;display:flex;flex-direction:column;justify-content:center}.ov-notes-title{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:950;margin-bottom:4px}.ov-note-text{font-size:13px;color:#cbd5e1;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.ov-note-good{color:#bbf7d0}.ov-note-bad{color:#fecaca}.ov-note-vote{color:#dbeafe}.ov-card.pregame{position:relative;overflow:hidden}.ov-card.pregame:before{content:"";position:absolute;inset:-70px -90px auto auto;width:230px;height:230px;border-radius:999px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 64%);pointer-events:none}.ov-card.pregame:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#38bdf8,#a78bfa,#f97316);opacity:.82}.ov-card.pregame .ov-top{margin-bottom:2px;position:relative;z-index:1}.ov-card.pregame .ov-kicker{font-size:11px;letter-spacing:.18em;color:#cbd5e1}.ov-card.pregame .ov-step{font-size:29px;line-height:1;letter-spacing:-.025em;margin:2px 0 5px;white-space:normal;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}.ov-card.pregame .ov-step.small{font-size:26px}.ov-card.pregame .ov-step.xsmall{font-size:22px}.ov-card.pregame .ov-sub{font-size:13px;line-height:1.22;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:32px;margin:0 0 7px;color:#e2e8f0}.ov-card.pregame .ov-bottom{display:block;margin-top:0;position:relative;z-index:1}.ov-card.pregame .ov-evidence{display:block;min-height:62px;color:#f8fafc}.ov-card.pregame .ov-notes{display:none!important}.ov-card.pregame-brief{border-color:#38bdf899;background:linear-gradient(135deg,#13243bf7 0%,#0b1628f2 64%)}.ov-card.pregame-chat{border-color:#a78bfa99;background:linear-gradient(135deg,#24173ff7 0%,#11162bf2 64%)}.ov-card.pregame-comms{border-color:#f59e0b99;background:linear-gradient(135deg,#2d2111f7 0%,#101827f2 64%)}.ov-card.pregame-tip{border-color:#22c55e99;background:linear-gradient(135deg,#123320f7 0%,#0b1e1bf2 64%)}.ov-card.pregame-legacy{border-color:#ef444499;background:linear-gradient(135deg,#311722f7 0%,#14111df2 64%)}.pg-headerline{display:flex;align-items:center;gap:8px;margin-bottom:6px}.pg-emblem{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-size:20px;font-weight:950;background:#020617aa;border:1px solid #64748b66;box-shadow:inset 0 0 18px #ffffff0d}.pg-mini{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:#94a3b8;font-weight:900}.pg-main{font-size:15px;line-height:1.18;font-weight:900;color:#f8fafc}.pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pg-tile{border:1px solid #47556977;background:#02061766;border-radius:10px;padding:6px 7px;min-width:0}.pg-tile .label{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}.pg-tile .value{font-size:13px;color:#f8fafc;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-pillrow{display:flex;gap:6px;flex-wrap:wrap}.pg-pill{border:1px solid #475569;background:#0f172acc;border-radius:999px;padding:5px 8px;font-size:12px;font-weight:850;color:#dbeafe;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pg-pill.hot{border-color:#f97316;color:#fed7aa}.pg-pill.good{border-color:#22c55e;color:#bbf7d0}.pg-pill.vote{border-color:#a78bfa;color:#ddd6fe}.pg-command{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:4px}.pg-command .cmd{border:1px solid #47556977;background:#02061766;border-radius:12px;padding:8px 7px;min-height:58px;display:flex;flex-direction:column;justify-content:center}.pg-command code{display:block;color:#f8fafc;font-size:14px;font-weight:950;margin-bottom:3px;letter-spacing:.01em}.pg-command span{font-size:10px;color:#cbd5e1;line-height:1.12}.pg-quote{border-left:4px solid currentColor;padding-left:10px;font-size:14px;line-height:1.22;font-weight:850;color:#f8fafc;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.pg-source{font-size:11px;color:#cbd5e1;margin-top:5px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-cardline{font-size:14px;line-height:1.25;font-weight:850;color:#e2e8f0}.pg-warning{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fecaca;font-weight:950;margin-bottom:4px}.hidden{display:none!important}@media(max-width:700px){.app{width:100vw}.ghosts{grid-template-columns:1fr}.evrow{grid-template-columns:1fr 52px 52px 52px}.state{height:50px}}
 </style>
 </head>
 <body>
@@ -392,15 +392,21 @@ HTML_TEMPLATE = r'''<!doctype html>
   <div class="panel" id="setupPanel"><div class="head"><div><strong>Run Setup</strong><div class="muted" id="setupSummaryLine">map, difficulty, weather, response, cursed item</div></div><span class="muted" id="setupStatus">not set</span></div><div class="body stack">
     <div id="setupAuthMessage" class="error hidden"></div>
     <div class="setup-grid">
+      <label>Room / Session Name<input id="setupRoom" placeholder="kaizen, lobby-2, solo-run"></label>
+      <label>Number of Players<select id="setupPlayers"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></label>
       <label>Map / Location<select id="setupMap"><option value="unknown">Unknown</option><option>6 Tanglewood Drive</option><option>10 Ridgeview Court</option><option>13 Willow Street</option><option>42 Edgefield Road</option><option>Nell's Diner</option><option>Grafton Farmhouse</option><option>Camp Woodwind</option><option>Point Hope</option><option>Bleasdale Farmhouse</option><option>Sunny Meadows Restricted</option><option>Prison</option><option>Maple Lodge Campsite</option><option>Brownstone High School</option><option>Sunny Meadows Mental Institution</option></select></label>
       <label>Game Level / Difficulty<select id="setupDifficulty"><option value="unknown">Unknown</option><option value="amateur">Amateur</option><option value="intermediate">Intermediate</option><option value="professional">Professional</option><option value="nightmare">Nightmare</option><option value="insanity">Insanity</option><option value="custom">Custom</option></select></label>
       <label>Weather<select id="setupWeather"><option value="unknown">Unknown</option><option value="sunrise">Sunrise</option><option value="clear">Clear</option><option value="fog">Fog</option><option value="blood-moon">Blood Moon</option><option value="light-rain">Light Rain</option><option value="heavy-rain">Heavy Rain</option><option value="windy">Windy</option><option value="snow">Snow</option></select></label>
       <label>Ghost responds to<select id="setupResponds"><option value="unknown">Unknown</option><option value="everyone">Everyone</option><option value="alone">Alone</option></select></label>
     </div>
     <div class="row"><button class="green" id="saveSetup">Start / Save Setup</button></div>
-    <div class="muted">Overlay will prompt chat to guess with <strong>!vote GhostName</strong>. Votes are unofficial and shown as chat context only.</div>
+    <div class="muted">Overlay will prompt chat with loading cards. Use <strong>!guess</strong> for fun and <strong>!vote</strong> only when chat is being asked to help decide.</div>
   </div></div>
-  <div class="panel timer-panel"><div class="head"><strong>Quick Timers</strong><span class="muted" id="timerSummary">incense / hunt / cooldown</span></div><div class="body">
+  <div class="panel support-footer" id="supportFooter"><div class="body">
+    <div class="support-links"><a href="/phasmo/release-notes" target="_blank">Release notes</a><a href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a></div>
+    <div class="support-note">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development.</div>
+  </div></div>
+  <div class="panel tracker-panel"><div class="head"><strong>Quick Trackers</strong><span class="muted" id="timerSummary">timers / sanity / manifestation</span></div><div class="body">
     <div class="quick-timers">
       <button class="blue" data-timer-cmd="!timer incense start">Incense</button>
       <button class="orange" data-timer-cmd="!timer hunt start">Hunt</button>
@@ -408,6 +414,22 @@ HTML_TEMPLATE = r'''<!doctype html>
       <button data-timer-cmd="!timer clear">Clear</button>
     </div>
     <div id="timerGrid" class="timer-grid" style="margin-top:8px"></div>
+    <div class="tracker-section">
+      <div class="spread"><span class="tracker-title">Team Sanity</span><strong id="sanityAverage">Avg: —</strong></div>
+      <div class="sanity-grid">
+        <input id="sanity1" type="number" min="0" max="100" placeholder="P1">
+        <input id="sanity2" type="number" min="0" max="100" placeholder="P2">
+        <input id="sanity3" type="number" min="0" max="100" placeholder="P3">
+        <input id="sanity4" type="number" min="0" max="100" placeholder="P4">
+      </div>
+      <div class="row"><button class="blue" id="saveSanity">Save Sanity</button><button class="orange" id="logHunt">Hunt Triggered</button><button id="clearHunt">Clear Hunt</button></div>
+      <div id="huntReadout" class="tracker-readout">No hunt sanity logged.</div>
+    </div>
+    <div class="tracker-section">
+      <div class="spread"><span class="tracker-title">Manifestation / Name Clue</span><strong id="manifestReadout">Unknown</strong></div>
+      <div class="manifest-grid"><button data-present="unknown">Unknown</button><button data-present="female">Female</button><button data-present="male">Male</button></div>
+      <div class="tracker-readout">Male presentation rules out female-only ghosts. Female presentation rules out male-only ghosts.</div>
+    </div>
   </div></div>
   <div class="panel responds-panel"><div class="body"><div class="spread"><strong>Responds: <span id="respondsText">Unknown</span></strong><button id="changeResponds">Change</button></div><div id="respondsChoices" class="grid3" style="margin-top:8px"><button data-responds="unknown">Unknown</button><button data-responds="everyone">Everyone</button><button data-responds="alone">Alone</button></div><div class="muted" id="respondsHint" style="margin-top:8px"></div></div></div>
   <div class="panel next"><div class="body"><div class="muted" style="letter-spacing:.12em;font-weight:900">NEXT</div><div class="big" id="nextName">Loading</div><p class="muted" id="nextWhy"></p><div class="grid2"><button class="green" id="confirmNext">Confirm</button><button class="red" id="denyNext">No</button></div></div></div>
@@ -431,6 +453,9 @@ const EL={dots:'D.O.T.S Projector',emf5:'EMF Level 5',freezing:'Freezing Tempera
 const G=[
 ['Aswang',['freezing','writing','dots']],['Banshee',['dots','orbs','uv']],['Dayan',['emf5','orbs','box']],['Demon',['writing','uv','freezing']],['Deogen',['dots','writing','box']],['Gallu',['emf5','box','uv']],['Goryo',['dots','emf5','uv']],['Hantu',['orbs','uv','freezing']],['Jinn',['emf5','uv','freezing']],['Kormos',['orbs','box','uv']],['Mare',['writing','orbs','box']],['Moroi',['writing','freezing','box']],['Myling',['writing','emf5','uv']],['Obake',['emf5','orbs','uv']],['Obambo',['uv','writing','dots']],['Oni',['dots','emf5','freezing']],['Onryo',['orbs','freezing','box']],['Phantom',['dots','uv','box']],['Poltergeist',['writing','uv','box']],['Raiju',['dots','emf5','orbs']],['Revenant',['writing','orbs','freezing']],['Shade',['writing','emf5','freezing']],['Spirit',['writing','emf5','box']],['Thaye',['dots','writing','orbs']],['The Mimic',['uv','freezing','box']],['The Twins',['emf5','freezing','box']],['Wraith',['dots','emf5','box']],['Yokai',['dots','orbs','box']],['Yurei',['dots','orbs','freezing']]
 ].map(([name,ev])=>({name,ev}));
+const GENDER_RULES={Banshee:'female',Dayan:'female',Krampus:'male'};
+const HUNT_RULES={Demon:{threshold:70,any:true,note:'Demon can use an ability above normal thresholds.'},Yokai:{threshold:80,note:'Only with voice activity nearby.'},Thaye:{threshold:75,note:'Young Thaye; threshold falls as it ages.'},Raiju:{threshold:65,note:'Near active electronics.'},Dayan:{threshold:65,note:'When players are moving.'},Obambo:{threshold:65,note:'Aggressive state.'},Mare:{threshold:60,note:'In darkness; lower when lights are on.'},Onryo:{threshold:60,any:true,note:'Can hunt after flame/candle mechanics.'},Deogen:{threshold:40,note:'Late hunter.'},Shade:{threshold:35,note:'Very low threshold.'}};
+const DEFAULT_HUNT_THRESHOLD=50;
 const CURSED_ITEMS=['Music Box','Ouija Board','Tarot Cards','Summoning Circle','Haunted Mirror','Monkey Paw','Voodoo Doll'];
 const CURSED_USE={
  'Music Box':'Use it to locate the ghost by song/humming. Risk: dropping it, reaching the ghost, or running out of sanity can trigger a cursed hunt.',
@@ -615,7 +640,18 @@ function showAuthError(msg){
   });
 }
 function impact(g){let s=0; for(const b of B){let v=state.behaviors?.[b.id]||'unknown'; if(v==='observed'){if(b.up.includes(g.name))s+=b.w;if(b.down.includes(g.name))s-=b.w} if(v==='contradicted'){if(b.up.includes(g.name))s-=Math.round(b.w*.65);if(b.down.includes(g.name))s+=Math.round(b.w*.45)}} return s}
-function candidates(){let manual=state.manualGhosts||{}, selected=manual.selected||null, excluded=new Set(manual.excluded||[]), yes=E.filter(k=>state.evidence[k]==='yes'), no=E.filter(k=>state.evidence[k]==='no'), mode=+state.evidenceMode; let pool=G.filter(g=>{if(selected)return g.name===selected; if(excluded.has(g.name))return false; if(mode===0&&!yes.length)return true; if(!yes.every(e=>g.ev.includes(e)||(g.name==='The Mimic'&&e==='orbs')))return false; if(mode===3&&no.some(e=>g.ev.includes(e)||(g.name==='The Mimic'&&e==='orbs')))return false; return true}); return pool.map(g=>({...g,impact:impact(g),score:(selected&&g.name===selected?999:0)+impact(g)+yes.filter(e=>g.ev.includes(e)).length*22+(g.name==='The Mimic'&&yes.includes('orbs')?12:0)})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name))}
+
+function safeRoomName(raw){let v=(raw||'default').toLowerCase().trim().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,64);return v||'default'}
+function apiUrlFor(targetRoom,path){return `${API}${path}?room=${encodeURIComponent(targetRoom)}${token?'&token='+encodeURIComponent(token):''}`}
+async function postStateForRoom(targetRoom,patch){let r=await fetch(apiUrlFor(targetRoom,'/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});if(!r.ok){showAuthError('Update blocked. Token missing or invalid.');return false;}return true}
+function cleanSanityValues(vals){let out=[null,null,null,null];(vals||[]).slice(0,4).forEach((v,i)=>{let n=Number(v);out[i]=Number.isFinite(n)?Math.max(0,Math.min(100,Math.round(n))):null});return out}
+function activeSanityValues(){let vals=cleanSanityValues(state.sanityValues||[]), players=Math.max(1,Math.min(4,+(state.playerCount||4)));return vals.slice(0,players).filter(v=>v!==null)}
+function sanityAverage(){let vals=activeSanityValues(); if(!vals.length)return null; return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length)}
+function huntRule(name){return HUNT_RULES[name]||{threshold:DEFAULT_HUNT_THRESHOLD,note:'Standard hunt threshold.'}}
+function canHuntAt(name,avg){if(avg===null||avg===undefined)return true;let r=huntRule(name);return !!r.any || avg <= r.threshold}
+function huntSummary(){let avg=state.huntSanity;if(avg===null||avg===undefined||avg==='')return 'No hunt sanity logged.';let kept=G.filter(g=>canHuntAt(g.name,+avg)).length;return `Hunt logged at ${Math.round(+avg)}% average sanity. ${kept}/${G.length} ghosts can naturally/specially hunt at that sanity.`}
+function presentationSummary(){let p=state.presentation||'unknown'; if(p==='male')return 'Male presentation/name: Banshee and Dayan ruled out.'; if(p==='female')return 'Female presentation/name: male-only ghosts ruled out if present in candidate pool.'; return 'Unknown'}
+function candidates(){let manual=state.manualGhosts||{}, selected=manual.selected||null, excluded=new Set(manual.excluded||[]), yes=E.filter(k=>state.evidence[k]==='yes'), no=E.filter(k=>state.evidence[k]==='no'), mode=+state.evidenceMode, huntAvg=(state.huntSanity===null||state.huntSanity===undefined||state.huntSanity==='')?null:+state.huntSanity, presentation=state.presentation||'unknown'; let pool=G.filter(g=>{if(selected)return g.name===selected; if(excluded.has(g.name))return false; if(presentation==='male'&&GENDER_RULES[g.name]==='female')return false; if(presentation==='female'&&GENDER_RULES[g.name]==='male')return false; if(!canHuntAt(g.name,huntAvg))return false; if(mode===0&&!yes.length)return true; if(!yes.every(e=>g.ev.includes(e)||(g.name==='The Mimic'&&e==='orbs')))return false; if(mode===3&&no.some(e=>g.ev.includes(e)||(g.name==='The Mimic'&&e==='orbs')))return false; return true}); return pool.map(g=>{let hr=huntRule(g.name), hbonus=(huntAvg!==null&&canHuntAt(g.name,huntAvg)&&hr.threshold>=huntAvg?10:0), pbonus=(presentation!=='unknown'&&GENDER_RULES[g.name]===presentation?8:0);return {...g,impact:impact(g),huntRule:hr,score:(selected&&g.name===selected?999:0)+impact(g)+hbonus+pbonus+yes.filter(e=>g.ev.includes(e)).length*22+(g.name==='The Mimic'&&yes.includes('orbs')?12:0)}}).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name))}
 function status(){let c=candidates(), yes=E.filter(k=>state.evidence[k]==='yes'), mode=+state.evidenceMode, target=mode>0&&yes.length>=mode, mimic=c.some(g=>g.name==='The Mimic'); if(!c.length)return{kind:'conflict',name:'Retest',text:'No ghost matches. Recheck evidence.'}; if(target&&c.length===1)return{kind:'locked',name:`Final ID: ${c[0].name}`,text:'Evidence target reached. Behavior is sanity-check only.'}; if(target&&mimic)return{kind:'mimic',name:'Mimic Check',text:'Evidence target reached, but Mimic remains possible.'}; if(target)return{kind:'locked',name:`Likely: ${c[0].name}`,text:'Evidence target reached. Resolve contradictions only.'}; if(c.length===1)return{kind:'verify',name:`Verify ${c[0].name}`,text:'One candidate remains. Final disconfirming check.'}; return{kind:'open',name:'Investigating',text:'Continue evidence collection.'}}
 function nextEv(){let st=status(); if(['locked','conflict','verify'].includes(st.kind))return null; let c=candidates(), unk=E.filter(e=>state.evidence[e]==='unknown'); if(c.length<=1||!unk.length)return null; return unk.map(ev=>{let y=0,n=0; for(const g of c){let has=g.ev.includes(ev)||(g.name==='The Mimic'&&ev==='orbs'); has?y++:n++} let split=Math.min(y,n), swing=Math.abs(y-n); return{ev,y,n,split,score:split*10-swing-(ev==='box'&&state.responds==='unknown'?2:0)}}).sort((a,b)=>b.score-a.score||b.split-a.split||a.swing-b.swing)[0]}
 function nextBehavior(){let c=candidates(); if(c.length<=1)return null; let cset=new Set(c.map(g=>g.name)); let rows=B.filter(b=>{let v=state.behaviors?.[b.id]||'unknown'; if(v!=='unknown')return false; return b.up.some(g=>cset.has(g))||b.down.some(g=>cset.has(g));}); if(!rows.length)return null; return rows.map(b=>{let up=b.up.filter(g=>cset.has(g)).length, down=b.down.filter(g=>cset.has(g)).length, rel=b.rel==='High'?12:b.rel==='Med'?6:0; return {...b,score:b.w+rel+Math.max(up,down)*8}}).sort((a,b)=>b.score-a.score||b.w-a.w)[0]}
@@ -639,17 +675,21 @@ function weatherWarnings(){
 function titleCase(s){return (s||'unknown').split(/[- ]+/).map(x=>x?x[0].toUpperCase()+x.slice(1):x).join(' ')}
 function setupSummary(){
   const bits=[];
-  if(state.map)bits.push(state.map);
+  bits.push('Room: '+room);
+  if(state.map&&state.map!=='unknown')bits.push(state.map);
   if(state.difficulty&&state.difficulty!=='unknown')bits.push(titleCase(state.difficulty));
   if(state.weather&&state.weather!=='unknown')bits.push(titleCase(state.weather));
   if(state.responds&&state.responds!=='unknown')bits.push('Responds: '+titleCase(state.responds));
-  return bits.length?bits.join(' • '):'map, difficulty, weather, response';
+  if(state.playerCount)bits.push(`${state.playerCount} player${+state.playerCount===1?'':'s'}`);
+  return bits.length?bits.join(' • '):'room, map, difficulty, weather, response';
 }
 function renderSetup(){
   const setupPanel=document.getElementById('setupPanel'); if(!setupPanel)return;
   document.body.classList.toggle('setup-mode', MODE==='setup');
   document.body.classList.toggle('control-mode', MODE==='control');
   setupPanel.classList.toggle('setup-complete', MODE==='control' && state.setupComplete===true);
+  document.getElementById('setupRoom').value=room;
+  document.getElementById('setupPlayers').value=String(state.playerCount||4);
   document.getElementById('setupMap').value=state.map||'unknown';
   document.getElementById('setupDifficulty').value=state.difficulty||'unknown';
   document.getElementById('setupWeather').value=state.weather||'unknown';
@@ -672,10 +712,12 @@ function renderSetup(){
   const controlSummary=document.getElementById('controlSetupSummary');
   if(controlSummary){
     const parts=[];
+    parts.push(`<strong>Room: ${room}</strong>`);
     if(state.map&&state.map!=='unknown')parts.push(`<strong>${state.map}</strong>`);
     if(state.difficulty&&state.difficulty!=='unknown')parts.push(titleCase(state.difficulty));
     if(state.weather&&state.weather!=='unknown')parts.push(titleCase(state.weather));
     if(state.responds&&state.responds!=='unknown')parts.push('Responds: '+titleCase(state.responds));
+    if(state.playerCount)parts.push(`${state.playerCount} player${+state.playerCount===1?'':'s'}`);
     controlSummary.innerHTML=parts.length?parts.join(' • '):'Setup not completed.';
   }
 }
@@ -715,11 +757,19 @@ function renderControl(){document.getElementById('control').classList.remove('hi
  document.getElementById('cursedPanel')?.classList.toggle('collapsed', cursedCollapsed);
  const cursedToggle=document.getElementById('toggleCursed'); if(cursedToggle)cursedToggle.textContent=cursedCollapsed?'Expand':'Collapse';
  let nx=nextEv(), nb=nextBehavior(), st=status(); document.getElementById('nextName').textContent=nx?EL[nx.ev]:(nb?'Behavior: '+nb.cat:st.name); document.getElementById('nextWhy').textContent=nx?`${EL[nx.ev]} splits ${nx.y}/${nx.n}.`+(nx.ev==='box'?` ${responseLine()}`:''):(nb?`${nb.label}. Supports: ${nb.up.join(', ')||'context'}${nb.down.length?`; argues against: ${nb.down.join(', ')}`:''}.`:st.text); document.getElementById('confirmNext').disabled=!(nx||nb);document.getElementById('denyNext').disabled=!(nx||nb);document.getElementById('confirmNext').textContent=nx?'Confirm '+EL[nx.ev]:(nb?'Observed':'Confirmed');document.getElementById('denyNext').textContent=nx?'No '+EL[nx.ev]:(nb?'No / False':'No more evidence'); if(nx){document.getElementById('confirmNext').onclick=()=>postState({evidence:{[nx.ev]:'yes'}});document.getElementById('denyNext').onclick=()=>postState({evidence:{[nx.ev]:'no'}})} else if(nb){document.getElementById('confirmNext').onclick=()=>postState({behaviors:{[nb.id]:'observed'}});document.getElementById('denyNext').onclick=()=>postState({behaviors:{[nb.id]:'contradicted'}})}
- renderTimers(); renderManualGhosts(); renderCursedHelper();
+ renderTimers(); renderTrackers(); renderManualGhosts(); renderCursedHelper();
  document.getElementById('evidenceRows').innerHTML=E.map(k=>{let v=state.evidence[k]||'unknown'; let cls=(want)=>`state ${want} ${(want==='unk'?v==='unknown':v===want)?'active':'inactive'}`; return `<div class='evrow'><span class='evname'>${EL[k]}</span><button class='${cls('yes')}' data-ev='${k}' data-val='yes'>✓</button><button class='${cls('unk')}' data-ev='${k}' data-val='unknown'>?</button><button class='${cls('no')}' data-ev='${k}' data-val='no'>×</button></div>`}).join(''); document.querySelectorAll('[data-ev]').forEach(btn=>btn.onclick=()=>postState({evidence:{[btn.dataset.ev]:btn.dataset.val}}));
- document.getElementById('ghosts').innerHTML=c.slice(0,8).map((g,i)=>`<div class='ghost ${i===0&&g.score>0?'top':''}'><h4>${g.name}</h4><div class='tags'>${g.ev.map(e=>`<span class='chip'>${EL[e]}</span>`).join('')}${g.ev.includes('box')?`<span class='chip blue'>${state.responds==='alone'?'Box: Alone':state.responds==='everyone'?'Box: Everyone':'Box: Unknown response'}</span>`:''}</div><div class='muted'>${g.impact?`${g.impact>0?'+':''}${g.impact} behavior`:'No behavior'}</div></div>`).join(''); renderVotes(); renderBehaviors();}
+ document.getElementById('ghosts').innerHTML=c.slice(0,8).map((g,i)=>`<div class='ghost ${i===0&&g.score>0?'top':''}'><h4>${g.name}</h4><div class='tags'>${g.ev.map(e=>`<span class='chip'>${EL[e]}</span>`).join('')}${g.ev.includes('box')?`<span class='chip blue'>${state.responds==='alone'?'Box: Alone':state.responds==='everyone'?'Box: Everyone':'Box: Unknown response'}</span>`:''}</div><div class='muted'>${g.impact?`${g.impact>0?'+':''}${g.impact} behavior`:'No behavior'}${state.huntSanity!==null&&state.huntSanity!==undefined&&state.huntSanity!==''?` • Hunt ≤${g.huntRule.threshold}%${g.huntRule.any?' / special':''}`:''}${GENDER_RULES[g.name]?` • ${titleCase(GENDER_RULES[g.name])}-only`:''}</div></div>`).join(''); renderVotes(); renderBehaviors();}
 
 function renderTimers(){let box=document.getElementById('timerGrid'); if(!box)return; let timers=['incense','hunt','cooldown']; let map=Object.fromEntries(activeTimers().map(t=>[t.key,t])); box.innerHTML=timers.map(k=>{let t=map[k], val=t?fmtTimer(t.remain):'—'; return `<div class='timer-tile'><div class='timer-name'>${k}</div><div class='timer-val ${t&&t.remain<=0?'done':''}'>${val}</div></div>`}).join('')}
+function renderTrackers(){
+  const vals=cleanSanityValues(state.sanityValues||[]), players=Math.max(1,Math.min(4,+(state.playerCount||4)));
+  for(let i=0;i<4;i++){let el=document.getElementById('sanity'+(i+1)); if(el){el.value=vals[i]===null?'':vals[i]; el.disabled=i>=players; el.placeholder=i<players?'P'+(i+1):'—'}}
+  const avg=sanityAverage(); const avgBox=document.getElementById('sanityAverage'); if(avgBox)avgBox.textContent=avg===null?'Avg: —':`Avg: ${avg}%`;
+  const hunt=document.getElementById('huntReadout'); if(hunt){hunt.textContent=huntSummary(); hunt.classList.toggle('warning', state.huntSanity!==null&&state.huntSanity!==undefined&&state.huntSanity!=='')}
+  const mr=document.getElementById('manifestReadout'); if(mr)mr.textContent=presentationSummary();
+  document.querySelectorAll('[data-present]').forEach(btn=>{btn.classList.toggle('green',(state.presentation||'unknown')===btn.dataset.present && btn.dataset.present!=='unknown');btn.classList.toggle('grey',(state.presentation||'unknown')===btn.dataset.present && btn.dataset.present==='unknown')});
+}
 function renderManualGhosts(){let box=document.getElementById('manualGhostSummary'); if(!box)return; let manual=state.manualGhosts||{}, bits=[]; if(manual.selected)bits.push(`<span class='chip green'>Selected: ${manual.selected}</span>`); for(const g of (manual.excluded||[]))bits.push(`<span class='manual-chip'>Out: ${g}</span>`); box.innerHTML=bits.length?`<div class='manual-list'>${bits.join('')}</div>`:'No manual overrides.'}
 
 function renderVotes(){let box=document.getElementById('votes');let votes=voteSummary('votes'), guesses=voteSummary('guesses'); let html=''; html+=`<div class='muted' style='margin-bottom:6px'><strong>Votes</strong> are useful decision input when we ask chat to help choose. <strong>Guesses</strong> are lucky predictions.</div>`; if(votes.length){html+=`<div class='vote-section'><div class='muted' style='margin:6px 0'>Decision Votes — !vote GhostName</div>${votes.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No decision votes yet. Use !vote when we need chat's help choosing.</p>`; if(guesses.length){html+=`<div class='vote-section'><div class='muted' style='margin:10px 0 6px'>Lucky Guesses — !guess GhostName</div>${guesses.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No lucky guesses yet. Use !guess before evidence comes in.</p>`; box.innerHTML=html}
@@ -1244,6 +1294,8 @@ function renderOverlay(){
   if(obs.length){bits.push(...obs.slice(0,1).map(b=>`<span class='${state.behaviors[b.id]==='observed'?'ov-note-good':'ov-note-bad'}'>${state.behaviors[b.id]==='observed'?'✓':'×'} ${b.label}</span>`))}
   if(votes.length){bits.push(...votes.map(v=>`<span class='ov-note-vote'>Vote ${v.ghost}: ${v.count}</span>`))}
   if(guesses.length && bits.length<2){bits.push(...guesses.map(v=>`<span class='ov-note-vote'>Guess ${v.ghost}: ${v.count}</span>`))}
+  if(state.huntSanity!==null&&state.huntSanity!==undefined&&state.huntSanity!=='')bits.push(`<span class='ov-note-vote'>Hunt @ ${state.huntSanity}%</span>`);
+  if((state.presentation||'unknown')!=='unknown'&&bits.length<2)bits.push(`<span class='ov-note-vote'>${titleCase(state.presentation)} presentation</span>`);
   if(!bits.length)bits.push('!guess for luck • !vote when asked');
   const cautions=weatherWarnings();
   if(cautions.length && bits.length<2) bits.push(`<span class='ov-note-vote'>Weather caution</span>`);
@@ -1251,9 +1303,14 @@ function renderOverlay(){
 }
 document.addEventListener('click',e=>{let r=e.target.dataset.responds;if(r)postState({responds:r}); let tc=e.target.dataset.timerCmd;if(tc)command(tc,'control')});
 document.getElementById('saveSetup')?.addEventListener('click',async()=>{
-  const ok=await postState({setupComplete:true,map:document.getElementById('setupMap').value,difficulty:document.getElementById('setupDifficulty').value,weather:document.getElementById('setupWeather').value,responds:document.getElementById('setupResponds').value});
-  if(ok && MODE==='setup') location.href=`/phasmo/control?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;
+  const targetRoom=safeRoomName(document.getElementById('setupRoom')?.value||room);
+  const ok=await postStateForRoom(targetRoom,{setupComplete:true,playerCount:+document.getElementById('setupPlayers').value||4,map:document.getElementById('setupMap').value,difficulty:document.getElementById('setupDifficulty').value,weather:document.getElementById('setupWeather').value,responds:document.getElementById('setupResponds').value});
+  if(ok && MODE==='setup') location.href=`/phasmo/control?room=${encodeURIComponent(targetRoom)}${token?'&token='+encodeURIComponent(token):''}`;
 });
+document.getElementById('saveSanity')?.addEventListener('click',()=>{let vals=[1,2,3,4].map(i=>document.getElementById('sanity'+i)?.value||null);postState({sanityValues:vals})});
+document.getElementById('logHunt')?.addEventListener('click',()=>{let vals=[1,2,3,4].map(i=>document.getElementById('sanity'+i)?.value||null), clean=cleanSanityValues(vals), players=+state.playerCount||4, active=clean.slice(0,players).filter(v=>v!==null), avg=active.length?Math.round(active.reduce((a,b)=>a+b,0)/active.length):sanityAverage(); if(avg!==null)postState({sanityValues:clean,huntSanity:avg});});
+document.getElementById('clearHunt')?.addEventListener('click',()=>postState({huntSanity:null}));
+document.querySelectorAll('[data-present]').forEach(btn=>btn.addEventListener('click',()=>postState({presentation:btn.dataset.present})));
 document.getElementById('mode')?.addEventListener('change',e=>postState({evidenceMode:e.target.value}));document.getElementById('changeResponds')?.addEventListener('click',()=>document.getElementById('respondsChoices').classList.toggle('hidden'));document.getElementById('reset')?.addEventListener('click',async()=>{const ok=await postState({reset:true}); if(ok) location.href=`/phasmo/setup?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;});document.getElementById('copyOverlay')?.addEventListener('click',()=>navigator.clipboard?.writeText(`${location.origin}/phasmo/overlay?room=${encodeURIComponent(room)}`));document.getElementById('behaviorFilter')?.addEventListener('input',renderBehaviors);
 document.getElementById('toggleEvidence')?.addEventListener('click',()=>{evidenceCollapsed=!evidenceCollapsed;localStorage.setItem('phasmoEvidenceCollapsed',evidenceCollapsed);renderControl();});
 document.getElementById('toggleBehavior')?.addEventListener('click',()=>{behaviorCollapsed=!behaviorCollapsed;localStorage.setItem('phasmoBehaviorCollapsed',behaviorCollapsed);renderControl();});
@@ -1283,6 +1340,10 @@ def default_state(room: str = "default") -> Dict[str, Any]:
         "map": "unknown",
         "difficulty": "unknown",
         "weather": "unknown",
+        "playerCount": 4,
+        "sanityValues": [None, None, None, None],
+        "huntSanity": None,
+        "presentation": "unknown",
         "cursedItems": {},
         "behaviors": {},
         "votes": {},
@@ -1308,6 +1369,10 @@ def read_state(room: str) -> Dict[str, Any]:
         merged["votes"] = data.get("votes", {}) or {}
         merged["guesses"] = data.get("guesses", {}) or {}
         merged["timers"] = data.get("timers", {}) or {}
+        merged["sanityValues"] = (data.get("sanityValues") or [None, None, None, None])[:4] + [None] * max(0, 4 - len(data.get("sanityValues") or []))
+        merged["playerCount"] = int(data.get("playerCount") or 4)
+        merged["huntSanity"] = data.get("huntSanity")
+        merged["presentation"] = data.get("presentation") if data.get("presentation") in {"unknown", "female", "male"} else "unknown"
         merged["cursedItems"] = data.get("cursedItems", {}) or {}
         if not merged.get("map") and data.get("level"):
             merged["map"] = data.get("level")
@@ -1465,6 +1530,45 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         else:
             state["responds"] = "unknown"
         return state, f"Responds set to {state['responds']}."
+
+    if cmd in {"!sanity", "!sane"}:
+        vals = []
+        for raw in parts[1:5]:
+            try:
+                vals.append(max(0, min(100, int(round(float(raw))))))
+            except Exception:
+                vals.append(None)
+        if not vals:
+            return state, "Use !sanity 90 85 80 75."
+        state["sanityValues"] = vals + [None] * max(0, 4 - len(vals))
+        active = [v for v in state["sanityValues"][: int(state.get("playerCount") or 4)] if v is not None]
+        avg = round(sum(active) / len(active)) if active else None
+        return state, f"Sanity updated. Average: {avg if avg is not None else 'unknown'}%."
+
+    if cmd in {"!huntat", "!huntsanity"}:
+        try:
+            state["huntSanity"] = max(0, min(100, int(round(float(lower_parts[1])))))
+            return state, f"Hunt sanity logged at {state['huntSanity']}%."
+        except Exception:
+            return state, "Use !huntat 65."
+
+    if cmd in {"!huntnow", "!loghunt"}:
+        vals = state.get("sanityValues") or []
+        active = [v for v in vals[: int(state.get("playerCount") or 4)] if isinstance(v, (int, float))]
+        if not active:
+            return state, "No sanity values saved. Use !sanity first."
+        state["huntSanity"] = round(sum(active) / len(active))
+        return state, f"Hunt logged at {state['huntSanity']}% average sanity."
+
+    if cmd in {"!manifest", "!presentation", "!gender"}:
+        value = lower_parts[1] if len(lower_parts) > 1 else "unknown"
+        if value in {"female", "f", "woman", "girl"}:
+            state["presentation"] = "female"
+        elif value in {"male", "m", "man", "boy"}:
+            state["presentation"] = "male"
+        else:
+            state["presentation"] = "unknown"
+        return state, f"Presentation clue set to {state['presentation']}."
 
     if cmd in {"!ev", "!evidence"}:
         key = EVIDENCE_ALIASES.get(lower_parts[1], "") if len(lower_parts) > 1 else ""
@@ -1642,7 +1746,7 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         state.setdefault("behaviors", {})[key] = value
         return state, f"{key} set to {value}."
 
-    return state, "Command not recognized. Try !ev emf yes, !be 12 yes, !b deogen observed, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
+    return state, "Command not recognized. Try !ev emf yes, !be 12 yes, !b deogen observed, !sanity 90 85 80 75, !huntat 65, !manifest male, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
 
 
 @app.get("/")
@@ -1661,6 +1765,81 @@ def root():
 def phasmo_index(room: str | None = None):
     safe_room = _room_name(room)
     return RedirectResponse(f"/phasmo/control?room={safe_room}")
+
+
+
+def _simple_info_page(title: str, body: str) -> HTMLResponse:
+    html = f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<style>
+body{{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI,sans-serif}}
+main{{width:min(860px,100vw);padding:18px;margin:0 auto}}
+.card{{background:#172235ee;border:1px solid #334155;border-radius:18px;box-shadow:0 18px 50px #0008;overflow:hidden}}
+.head{{padding:18px;border-bottom:1px solid #334155}}
+.body{{padding:18px;line-height:1.55}}
+h1{{margin:0;font-size:28px}}
+h2{{margin:22px 0 8px;font-size:18px}}
+p{{color:#cbd5e1}}
+ul{{color:#cbd5e1}}
+a{{color:#93c5fd}}
+.small{{color:#94a3b8;font-size:12px}}
+.badge{{display:inline-block;border:1px solid #334155;border-radius:999px;padding:4px 8px;background:#0f172a;color:#cbd5e1;font-size:12px;margin-right:6px}}
+</style>
+</head>
+<body>
+<main>
+<section class="card">
+<div class="head"><h1>{title}</h1><div class="small">Kaizen Controller Phasmophobia Helper</div></div>
+<div class="body">{body}</div>
+</section>
+</main>
+</body>
+</html>"""
+    return HTMLResponse(html)
+
+
+@app.get("/phasmo/release-notes")
+def phasmo_release_notes():
+    body = """
+<p class="small">This page is intentionally simple so updates can be edited directly in <code>main.py</code>.</p>
+<h2>Current Development Notes</h2>
+<ul>
+  <li>Added multi-room/session support for parallel groups.</li>
+  <li>Added setup fields for room/session name and number of players.</li>
+  <li>Changed Quick Timers into Quick Trackers.</li>
+  <li>Added team sanity tracking and hunt-trigger logging.</li>
+  <li>Added manifestation/name clue tracking for gender/model-style ghost constraints.</li>
+  <li>Added separate <span class="badge">!guess</span> and <span class="badge">!vote</span> boards.</li>
+  <li>Added numbered behavior entries with <span class="badge">!be # yes/no</span> support.</li>
+  <li>Expanded loading-screen cards with useful investigation tips and archived questionable field notes.</li>
+  <li>Expanded cursed possession helper and location hints.</li>
+</ul>
+<h2>Contributor Notes</h2>
+<p>Future updates can call out play-testers, correction submissions, map/location corrections, command ideas, and feature requests here.</p>
+<p><a href="/phasmo/acknowledgements">View acknowledgements</a></p>
+"""
+    return _simple_info_page("Release Notes", body)
+
+
+@app.get("/phasmo/acknowledgements")
+def phasmo_acknowledgements():
+    body = """
+<p>This tool exists because people test it, break it, correct it, and suggest better ways to make it useful during real play.</p>
+<h2>Acknowledgements</h2>
+<ul>
+  <li><strong>KaizenController</strong> — project owner, streamer workflow, testing, and design direction.</li>
+  <li><strong>Play-testers and chat users</strong> — command testing, usability feedback, and chaos validation.</li>
+  <li><strong>Community contributors</strong> — corrections to cursed possession locations, ghost behavior logic, and overlay readability.</li>
+</ul>
+<h2>Want to Support Development?</h2>
+<p>This helper is happily provided free for the Phasmophobia community. Optional donations help cover hosting and support further development.</p>
+<p><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support KaizenController on Ko-fi</a></p>
+"""
+    return _simple_info_page("Acknowledgements", body)
 
 
 @app.get("/phasmo/setup")
@@ -1815,6 +1994,26 @@ async def api_post_state(
                 current["difficulty"] = str(body.get("difficulty") or "unknown")[:40]
             if "weather" in body:
                 current["weather"] = str(body.get("weather") or "unknown")[:40]
+            if "playerCount" in body:
+                try:
+                    current["playerCount"] = max(1, min(4, int(body.get("playerCount") or 4)))
+                except Exception:
+                    current["playerCount"] = 4
+            if "sanityValues" in body and isinstance(body["sanityValues"], list):
+                vals = []
+                for item in body["sanityValues"][:4]:
+                    try:
+                        vals.append(max(0, min(100, int(round(float(item))))) if item not in {None, ""} else None)
+                    except Exception:
+                        vals.append(None)
+                current["sanityValues"] = vals + [None] * max(0, 4 - len(vals))
+            if "huntSanity" in body:
+                try:
+                    current["huntSanity"] = None if body.get("huntSanity") in {None, ""} else max(0, min(100, int(round(float(body.get("huntSanity"))))))
+                except Exception:
+                    current["huntSanity"] = None
+            if "presentation" in body:
+                current["presentation"] = body.get("presentation") if body.get("presentation") in {"unknown", "female", "male"} else "unknown"
             if "cursedItems" in body and isinstance(body["cursedItems"], dict):
                 current.setdefault("cursedItems", {})
                 for k, v in body["cursedItems"].items():
