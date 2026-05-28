@@ -438,7 +438,7 @@ HTML_TEMPLATE = r'''<!doctype html>
   <div class="panel votes-panel"><div class="head"><strong>Chat Input</strong><span class="muted">!guess for luck, !vote for decisions</span></div><div class="body"><div id="votes" class="vote-grid"></div><p class="muted" style="margin-top:8px">Commands: !guess Deogen, !vote Wraith, !unguess, !unvote, !guesses, !votes</p></div></div>
 
   <div class="panel support-footer" id="supportFooter"><div class="body">
-    <div class="support-links"><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a><a id="acknowledgementsLink" href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual & support files</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a></div>
+    <div class="support-links"><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a><a id="acknowledgementsLink" href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a></div>
     <div class="support-note">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development.</div>
   </div></div>
 </div>
@@ -1862,7 +1862,6 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
 <h2>Contributor Notes</h2>
 <p>Future updates can call out play-testers, correction submissions, map/location corrections, command ideas, and feature requests here.</p>
 <p><a href="/phasmo/acknowledgements?room={safe_room}">View acknowledgements</a></p>
-<p class="small"><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual and support files</a></p>
 """
     return _simple_info_page("Release Notes", body, safe_room)
 
@@ -1883,7 +1882,6 @@ def phasmo_acknowledgements(room: str | None = Query(default=None)):
 <h2>Want to Support Development?</h2>
 <p>This helper is happily provided free for the Phasmophobia community. Optional donations help cover hosting and support further development.</p>
 <p><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support KaizenController on Ko-fi</a></p>
-<p><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual and support files</a></p>
 <p class="small"><a href="/phasmo/release-notes?room={safe_room}">View release notes</a></p>
 """
     return _simple_info_page("Acknowledgements", body, safe_room)
