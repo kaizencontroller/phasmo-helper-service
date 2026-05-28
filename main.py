@@ -1136,7 +1136,7 @@ function setupOverlay(){
     "title": "Cursed Roulette",
     "sub": "Vince Token, Ghost Hunter, 1990–2025",
     "body": "“If you find Tarot Cards, draw until the problem becomes obvious.”",
-    "note": "Cause of death: the problem became obvious."
+    "note": "Cause of death: decked in the heart"
   },
   {
     "title": "UV Patience",
@@ -1165,7 +1165,7 @@ function setupOverlay(){
   {
     "title": "Smudge Timing",
     "sub": "Owen Incense Reed, Ghost Hunter, 1949–1997",
-    "body": "“Use incense immediately upon entering. It establishes dominance and wastes everyone’s safety net.”",
+    "body": "“Use incense immediately upon entering. It establishes dominance early.”",
     "note": "Cause of death: dominance remained unconfirmed."
   },
   {
@@ -1196,7 +1196,7 @@ function setupOverlay(){
     "title": "Haunted Hotel Tip",
     "sub": "Jackie Torrance, Ghost Hunter, 1961–2001",
     "body": "“Long empty hallways are excellent places to split the party and practice dramatic whispers.”",
-    "note": "Cause of death: hallway had notes."
+    "note": "Cause of death: hallway was a deadend."
   },
   {
     "title": "Television Method",
@@ -1948,7 +1948,6 @@ def phasmo_acknowledgements(room: str | None = Query(default=None)):
   <li><strong><a href="https://twitch.tv/sheikhyabootie" target="_blank" rel="noopener">SheikYaBootie</a></strong> — play-testing, ideas, and chaos validation.</li>
   <li><strong><a href="https://twitch.tv/imestrellas" target="_blank" rel="noopener">imestrellas</a></strong> — play-testing, stream workflow feedback, and multiplayer use cases.</li>
   <li><strong><a href="https://twitch.tv/Cybertraz" target="_blank" rel="noopener">Cybertraz</a></strong> — play-testing, corrections, and usability feedback.</li>
-  <li><strong><a href="https://www.youtube.com/watch?v=l4SFiMrYplM" target="_blank" rel="noopener">Jumpscare video source / creator</a></strong> — video used for the optional “Don’t press this button” gag.</li>
   <li><a href="https://pixabay.com/illustrations/clown-horror-scary-royalty-free-stock-7280647/" target="_blank" rel="noopener"><strong>DangrafArt / Pixabay</strong></a> — clown image used for the optional “Don’t press this button” gag.</li>
   <li><a href="https://pixabay.com/sound-effects/fuzzy-jumpscare-80560/" target="_blank" rel="noopener"><strong>freesound_community / Pixabay</strong></a> — “Fuzzy Jumpscare” sound effect used for the optional “Don’t press this button” gag.</li>
   <li><strong>Community contributors</strong> — corrections to cursed possession locations, ghost behavior logic, overlay readability, and command ideas.</li>
