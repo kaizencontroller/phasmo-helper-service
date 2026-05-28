@@ -438,7 +438,7 @@ HTML_TEMPLATE = r'''<!doctype html>
   <div class="panel votes-panel"><div class="head"><strong>Chat Input</strong><span class="muted">!guess for luck, !vote for decisions</span></div><div class="body"><div id="votes" class="vote-grid"></div><p class="muted" style="margin-top:8px">Commands: !guess Deogen, !vote Wraith, !unguess, !unvote, !guesses, !votes</p></div></div>
 
   <div class="panel support-footer" id="supportFooter"><div class="body">
-    <div class="support-links"><a href="/phasmo/release-notes" target="_blank">Release notes</a><a href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a></div>
+    <div class="support-links"><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a><a id="acknowledgementsLink" href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual & support files</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a></div>
     <div class="support-note">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development.</div>
   </div></div>
 </div>
@@ -711,6 +711,10 @@ function renderSetup(){
   if(setupTop)setupTop.href=setupHref;
   const leaderboardLink=document.getElementById('leaderboardRouteLink');
   if(leaderboardLink)leaderboardLink.href=`/phasmo/leaderboard?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;
+  const releaseLink=document.getElementById('releaseNotesLink');
+  if(releaseLink)releaseLink.href=`/phasmo/release-notes?room=${encodeURIComponent(room)}`;
+  const ackLink=document.getElementById('acknowledgementsLink');
+  if(ackLink)ackLink.href=`/phasmo/acknowledgements?room=${encodeURIComponent(room)}`;
   const controlSummary=document.getElementById('controlSetupSummary');
   if(controlSummary){
     const parts=[];
@@ -1783,7 +1787,13 @@ def phasmo_index(room: str | None = None):
 
 
 
-def _simple_info_page(title: str, body: str) -> HTMLResponse:
+def _simple_info_page(title: str, body: str, room: str = "default") -> HTMLResponse:
+    safe_room = _room_name(room)
+    state = read_state(safe_room)
+    is_ready = bool(state.get("setupComplete"))
+    home_href = f"/phasmo/control?room={safe_room}" if is_ready else f"/phasmo/setup?room={safe_room}"
+    home_label = "Back to Control" if is_ready else "Back to Setup"
+    mode_label = "active run" if is_ready else "setup needed"
     html = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -1793,6 +1803,15 @@ def _simple_info_page(title: str, body: str) -> HTMLResponse:
 <style>
 body{{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI,sans-serif}}
 main{{width:min(860px,100vw);padding:18px;margin:0 auto}}
+.brandbar{{display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(135deg,#172235ee,#0f172aee);border:1px solid #334155;border-radius:18px;box-shadow:0 18px 50px #0008;padding:12px 14px;margin-bottom:12px;text-decoration:none;color:#f8fafc}}
+.brandleft{{display:flex;align-items:center;gap:12px;min-width:0}}
+.logo{{width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 30% 20%,#38bdf855,transparent 38%),linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #475569;display:grid;place-items:center;box-shadow:inset 0 0 22px #ffffff12}}
+.logo span{{font-weight:950;letter-spacing:-.08em;color:#fff;text-shadow:0 2px 0 #000}}
+.brandtext{{min-width:0}}
+.brandtitle{{font-size:18px;font-weight:950;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.brandsub{{font-size:12px;color:#94a3b8;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.brandcta{{border:1px solid #475569;background:#0f172a;border-radius:999px;padding:8px 11px;color:#bfdbfe;font-size:12px;font-weight:850;white-space:nowrap}}
+.brandbar:hover{{border-color:#60a5fa;box-shadow:0 18px 50px #0008,0 0 0 2px #38bdf833}}
 .card{{background:#172235ee;border:1px solid #334155;border-radius:18px;box-shadow:0 18px 50px #0008;overflow:hidden}}
 .head{{padding:18px;border-bottom:1px solid #334155}}
 .body{{padding:18px;line-height:1.55}}
@@ -1803,10 +1822,15 @@ ul{{color:#cbd5e1}}
 a{{color:#93c5fd}}
 .small{{color:#94a3b8;font-size:12px}}
 .badge{{display:inline-block;border:1px solid #334155;border-radius:999px;padding:4px 8px;background:#0f172a;color:#cbd5e1;font-size:12px;margin-right:6px}}
+@media(max-width:560px){{main{{padding:12px}}.brandbar{{border-radius:16px;padding:10px}}.logo{{width:40px;height:40px;border-radius:14px}}.brandtitle{{font-size:15px}}.brandcta{{padding:7px 9px;font-size:11px}}}}
 </style>
 </head>
 <body>
 <main>
+<a class="brandbar" href="{home_href}" aria-label="{home_label}">
+  <span class="brandleft"><span class="logo"><span>KC</span></span><span class="brandtext"><span class="brandtitle">Kaizen Phasmo Helper</span><span class="brandsub">room: {safe_room} • {mode_label}</span></span></span>
+  <span class="brandcta">{home_label}</span>
+</a>
 <section class="card">
 <div class="head"><h1>{title}</h1><div class="small">Kaizen Controller Phasmophobia Helper</div></div>
 <div class="body">{body}</div>
@@ -1818,8 +1842,9 @@ a{{color:#93c5fd}}
 
 
 @app.get("/phasmo/release-notes")
-def phasmo_release_notes():
-    body = """
+def phasmo_release_notes(room: str | None = Query(default=None)):
+    safe_room = _room_name(room)
+    body = f"""
 <p class="small">This page is intentionally simple so updates can be edited directly in <code>main.py</code>.</p>
 <h2>Current Development Notes</h2>
 <ul>
@@ -1827,22 +1852,25 @@ def phasmo_release_notes():
   <li>Added setup fields for room/session name and number of players.</li>
   <li>Changed Quick Timers into Quick Trackers.</li>
   <li>Added team sanity tracking and hunt-trigger logging.</li>
-  <li>Added manifestation/name clue tracking for gender/model-style ghost constraints.</li>
+  <li>Moved witnessed model/name clue tracking into Behavior Branches.</li>
   <li>Added separate <span class="badge">!guess</span> and <span class="badge">!vote</span> boards.</li>
   <li>Added numbered behavior entries with <span class="badge">!be # yes/no</span> support.</li>
   <li>Expanded loading-screen cards with useful investigation tips and archived questionable field notes.</li>
   <li>Expanded cursed possession helper and location hints.</li>
+  <li>Added a room-aware title bar that links back to Setup or Control based on the current session state.</li>
 </ul>
 <h2>Contributor Notes</h2>
 <p>Future updates can call out play-testers, correction submissions, map/location corrections, command ideas, and feature requests here.</p>
-<p><a href="/phasmo/acknowledgements">View acknowledgements</a></p>
+<p><a href="/phasmo/acknowledgements?room={safe_room}">View acknowledgements</a></p>
+<p class="small"><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual and support files</a></p>
 """
-    return _simple_info_page("Release Notes", body)
+    return _simple_info_page("Release Notes", body, safe_room)
 
 
 @app.get("/phasmo/acknowledgements")
-def phasmo_acknowledgements():
-    body = """
+def phasmo_acknowledgements(room: str | None = Query(default=None)):
+    safe_room = _room_name(room)
+    body = f"""
 <p>This tool exists because people test it, break it, correct it, and suggest better ways to make it useful during real play.</p>
 <h2>Acknowledgements</h2>
 <ul>
@@ -1855,8 +1883,10 @@ def phasmo_acknowledgements():
 <h2>Want to Support Development?</h2>
 <p>This helper is happily provided free for the Phasmophobia community. Optional donations help cover hosting and support further development.</p>
 <p><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support KaizenController on Ko-fi</a></p>
+<p><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual and support files</a></p>
+<p class="small"><a href="/phasmo/release-notes?room={safe_room}">View release notes</a></p>
 """
-    return _simple_info_page("Acknowledgements", body)
+    return _simple_info_page("Acknowledgements", body, safe_room)
 
 
 @app.get("/phasmo/setup")
