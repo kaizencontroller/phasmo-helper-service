@@ -1996,15 +1996,22 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         state["huntSanity"] = round(sum(active) / len(active))
         return state, f"Hunt logged at {state['huntSanity']}% average sanity."
 
-    if cmd in {"!manifest", "!presentation", "!gender"}:
-        value = lower_parts[1] if len(lower_parts) > 1 else "unknown"
-        if value in {"female", "f", "woman", "girl"}:
+    if cmd in {"!manifest", "!presentation", "!gender", "!model", "!witnessed", "!nameclue", "!name", "!female", "!male", "!unknownmodel"}:
+        if cmd == "!female":
+            value = "female"
+        elif cmd == "!male":
+            value = "male"
+        elif cmd == "!unknownmodel":
+            value = "unknown"
+        else:
+            value = lower_parts[1] if len(lower_parts) > 1 else "unknown"
+        if value in {"female", "f", "woman", "girl", "girl-name", "fem"}:
             state["presentation"] = "female"
-        elif value in {"male", "m", "man", "boy"}:
+        elif value in {"male", "m", "man", "boy", "boy-name", "masc"}:
             state["presentation"] = "male"
         else:
             state["presentation"] = "unknown"
-        return state, f"Presentation clue set to {state['presentation']}."
+        return state, f"Witnessed model/name clue set to {state['presentation']}."
 
     if cmd in {"!yes", "!no", "!maybe", "!clear"}:
         # Streamer.bot import compatibility. These apply to the next best unknown evidence.
@@ -2211,25 +2218,44 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         state.setdefault("behaviors", {})[key] = value
         return state, f"Behavior #{entry_num} set to {value}."
 
-    if cmd in {"!b", "!beh", "!behavior", "!behaviour"}:
+    if cmd in {"!b", "!beh", "!behavior", "!behaviour", "!be", "!behaviorentry", "!behaviorline", "!observed"}:
         if not _ALLOW_BEHAVIOR_COMMANDS:
             return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable behavior commands."
-        if len(lower_parts) > 1 and lower_parts[1].isdigit():
-            entry_num = int(lower_parts[1])
+        if len(lower_parts) <= 1:
+            return state, "Use !behavior 7 yes, !behavior 7 no, !observed 7, or !behavior wraith yes."
+
+        target = lower_parts[1]
+        raw_value = lower_parts[2] if len(lower_parts) > 2 else "observed"
+
+        # Streamer.bot import has a dedicated !observed command, so default it to yes/observed.
+        if cmd == "!observed" and len(lower_parts) == 2:
+            raw_value = "observed"
+
+        # Numbered behavior rows shown in the Behavior Branches UI.
+        if target.isdigit():
+            entry_num = int(target)
             if entry_num < 1 or entry_num > len(BEHAVIOR_INDEX_IDS):
                 return state, f"Behavior number must be between 1 and {len(BEHAVIOR_INDEX_IDS)}."
             key = BEHAVIOR_INDEX_IDS[entry_num - 1]
-            value = _normalize_value(lower_parts[2] if len(lower_parts) > 2 else "observed", "behavior")
+            value = _normalize_value(raw_value, "behavior")
             state.setdefault("behaviors", {})[key] = value
             return state, f"Behavior #{entry_num} set to {value}."
-        key = BEHAVIOR_ALIASES.get(lower_parts[1], "") if len(lower_parts) > 1 else ""
-        if not key:
-            return state, f"Unknown behavior: {parts[1] if len(parts) > 1 else 'blank'}."
-        value = _normalize_value(lower_parts[2] if len(lower_parts) > 2 else "observed", "behavior")
-        state.setdefault("behaviors", {})[key] = value
-        return state, f"{key} set to {value}."
 
-    return state, "Command not recognized. Try !map tanglewood, !difficulty professional, !weather fog, !players 4, !setup, !ev emf yes, !behavior 12 yes, !b deogen observed, !sanity 90 85 80 75, !huntat 65, !manifest male, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
+        # Alias-based behavior commands, such as !behavior wraith yes or !b no-salt yes.
+        key = BEHAVIOR_ALIASES.get(target, "")
+        if not key:
+            # Common typo helper: allow labels pasted with spaces after !behavior by joining everything except final yes/no.
+            maybe_value = lower_parts[-1] if len(lower_parts) > 2 else "observed"
+            maybe_alias = "-".join(lower_parts[1:-1]) if len(lower_parts) > 2 else target
+            key = BEHAVIOR_ALIASES.get(maybe_alias, "")
+            raw_value = maybe_value if key else raw_value
+        if not key:
+            return state, f"Unknown behavior: {parts[1] if len(parts) > 1 else 'blank'}. Use the visible row number, e.g. !behavior 7 yes."
+        value = _normalize_value(raw_value, "behavior")
+        state.setdefault("behaviors", {})[key] = value
+        return state, f"Behavior {key} set to {value}."
+
+    return state, "Command not recognized. Try !map tanglewood, !difficulty professional, !weather fog, !players 4, !setup, !ev emf yes, !behavior 12 yes, !observed 12, !gender male, !sanity 90 85 80 75, !huntat 65, !manifest male, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
 
 
 @app.get("/")
