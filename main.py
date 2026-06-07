@@ -23,6 +23,69 @@ _JUMPSCARE_URL = os.getenv("PHASMO_JUMPSCARE_URL", "").strip()
 
 _JUMPSCARE_COUNTER_FILE = "__global_jumpscare_counter.json"
 
+_CONFIG_FILE = "__global_config.json"
+
+CONFIG_DESCRIPTIONS = {
+    "allowSetupCommands": ("Setup/map commands", "Allows chat/API commands such as !map, !difficulty, !weather, !players, and !setup."),
+    "allowEvidenceCommands": ("Evidence commands", "Allows chat/API commands that update evidence, response condition, and evidence mode."),
+    "allowBehaviorCommands": ("Behavior commands", "Allows chat/API commands such as !behavior, !be, !observed, and behavior aliases."),
+    "allowTimerCommands": ("Timer commands", "Allows chat/API commands for incense, hunt, cooldown, and timer clearing."),
+    "allowSanityCommands": ("Sanity and hunt-threshold commands", "Allows !sanity, !huntat, and !huntnow."),
+    "allowWitnessedCommands": ("Witnessed model/name clue commands", "Allows !gender, !model, !manifest, !female, !male, and related commands."),
+    "allowViewerVoteCommands": ("Viewer guess/vote commands", "Allows !guess, !vote, !unguess, !unvote, !guesses, and !votes."),
+    "allowManualGhostCommands": ("Manual ghost override commands", "Allows !ghost, !select, !notghost, !restoreghost, and !clearghost."),
+    "allowPanicCommand": ("Panic command", "Allows the harmless !panic command."),
+    "allowEasterEggs": ("Easter eggs", "Allows optional joke/easter-egg behavior such as classified notes and joke awards."),
+    "allowJumpscareButton": ("Don't press this button", "Shows/enables the setup-page jumpscare button and overlay jumpscare trigger."),
+}
+
+
+CONFIG_DEFAULTS = {
+    "allowSetupCommands": True,
+    "allowEvidenceCommands": True,
+    "allowBehaviorCommands": _ALLOW_BEHAVIOR_COMMANDS,
+    "allowTimerCommands": True,
+    "allowSanityCommands": True,
+    "allowWitnessedCommands": True,
+    "allowViewerVoteCommands": True,
+    "allowManualGhostCommands": True,
+    "allowPanicCommand": True,
+    "allowEasterEggs": True,
+    "allowJumpscareButton": True,
+}
+
+
+def _config_path() -> Path:
+    _STATE_DIR.mkdir(parents=True, exist_ok=True)
+    return _STATE_DIR / _CONFIG_FILE
+
+
+def _read_config() -> Dict[str, bool]:
+    config = dict(CONFIG_DEFAULTS)
+    try:
+        data = json.loads(_config_path().read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            for key in CONFIG_DEFAULTS:
+                if key in data:
+                    config[key] = bool(data[key])
+    except Exception:
+        pass
+    return config
+
+
+def _write_config(patch: Dict[str, Any]) -> Dict[str, bool]:
+    current = _read_config()
+    for key in CONFIG_DEFAULTS:
+        if key in patch:
+            current[key] = bool(patch[key])
+    _config_path().write_text(json.dumps(current, indent=2, sort_keys=True), encoding="utf-8")
+    return current
+
+
+def _config_bool(key: str) -> bool:
+    return bool(_read_config().get(key, CONFIG_DEFAULTS.get(key, True)))
+
+
 _RESET_COUNTER_FILE = "__global_reset_counter.json"
 
 FAKE_GHOSTS = [
@@ -601,7 +664,7 @@ HTML_TEMPLATE = r'''<!doctype html>
   <div class="panel votes-panel"><div class="head"><strong>Chat Input</strong><span class="muted">!guess for luck, !vote for decisions</span></div><div class="body"><div id="votes" class="vote-grid"></div><p class="muted" style="margin-top:8px">Commands: !guess Deogen, !vote Wraith, !unguess, !unvote, !guesses, !votes</p></div></div>
 
   <div class="panel support-footer" id="supportFooter"><div class="body">
-    <div class="support-links"><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a><a id="acknowledgementsLink" href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual & support files</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a></div>
+    <div class="support-links"><a id="configLink" href="/phasmo/config">Config</a><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a><a id="acknowledgementsLink" href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual & support files</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a></div>
     <div class="support-note">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development. <span id="footerGhost" class="footer-ghost hidden">👁</span></div>
   </div></div>
   <div class="panel danger-zone" id="jumpscarePanel"><div class="body">
@@ -892,6 +955,8 @@ function renderSetup(){
   }
   const fg=document.getElementById('footerGhost');
   if(fg){fg.classList.toggle('hidden', sessionStorage.getItem('phasmoJumpscarePressed')!=='true');}
+  const jumpPanel=document.getElementById('jumpscarePanel');
+  if(jumpPanel){jumpPanel.classList.toggle('hidden', state.config && (state.config.allowEasterEggs===false || state.config.allowJumpscareButton===false));}
   const jc=document.getElementById('jumpscareCount'); if(jc && !jc.dataset.revealed){jc.classList.add('hidden');}
   const notes=weatherWarnings();
   const controlWarn=document.getElementById('controlWeatherWarning');
@@ -905,6 +970,8 @@ function renderSetup(){
   if(setupTop)setupTop.href=setupHref;
   const leaderboardLink=document.getElementById('leaderboardRouteLink');
   if(leaderboardLink)leaderboardLink.href=`/phasmo/leaderboard?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;
+  const configLink=document.getElementById('configLink');
+  if(configLink)configLink.href=`/phasmo/config?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;
   const releaseLink=document.getElementById('releaseNotesLink');
   if(releaseLink)releaseLink.href=`/phasmo/release-notes?room=${encodeURIComponent(room)}`;
   const ackLink=document.getElementById('acknowledgementsLink');
@@ -1618,6 +1685,10 @@ document.addEventListener('keydown',async(e)=>{
     konamiPos++;
     if(konamiPos>=konami.length){
       konamiPos=0;
+      if(state.config && state.config.allowEasterEggs===false){
+        showEasterToast('EASTER EGGS DISABLED IN CONFIG');
+        return;
+      }
       const until=Date.now()+90000;
       state.classifiedUntil=until;
       render();
@@ -1704,6 +1775,7 @@ def read_state(room: str) -> Dict[str, Any]:
     if not path.exists():
         state = default_state(room)
         state["jumpscareCount"] = _read_jumpscare_count()
+        state["config"] = _read_config()
         return state
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -1728,10 +1800,12 @@ def read_state(room: str) -> Dict[str, Any]:
         }
         merged["jumpscareCount"] = _read_jumpscare_count()
         merged["resetCount"] = _read_reset_count()
+        merged["config"] = _read_config()
         return merged
     except Exception:
         state = default_state(room)
         state["jumpscareCount"] = _read_jumpscare_count()
+        state["config"] = _read_config()
         return state
 
 
@@ -1742,6 +1816,7 @@ def write_state(room: str, state: Dict[str, Any]) -> Dict[str, Any]:
     # Jumpscare presses are intentionally global across all rooms/sessions.
     # Do not persist this value into individual room state files.
     to_save.pop("jumpscareCount", None)
+    to_save.pop("config", None)
     _state_path(room).write_text(json.dumps(to_save, indent=2, sort_keys=True), encoding="utf-8")
     state["jumpscareCount"] = _read_jumpscare_count()
     return state
@@ -1870,6 +1945,39 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         cmd = "!" + cmd
         lower_parts[0] = cmd
         parts[0] = "!" + parts[0].lstrip("!")
+
+    def _disabled(setting: str, label: str) -> Tuple[Dict[str, Any], str] | None:
+        if not _config_bool(setting):
+            return state, f"{label} are disabled in Phasmo Helper Config."
+        return None
+
+    setup_cmds = {"!setup", "!map", "!level", "!difficulty", "!diff", "!weather", "!players", "!playercount"}
+    evidence_cmds = {"!mode", "!evidencemode", "!responds", "!response", "!interact", "!yes", "!no", "!maybe", "!clear", "!ev", "!evidence"}
+    behavior_cmds = {"!b", "!beh", "!behavior", "!behaviour", "!be", "!behaviorentry", "!behaviorline", "!observed"}
+    timer_cmds = {"!timer", "!timers", "!starttimer", "!stoptimer", "!incense", "!smudge", "!hunt", "!cooldown", "!cd"}
+    sanity_cmds = {"!sanity", "!sane", "!huntat", "!huntsanity", "!huntnow", "!loghunt"}
+    witnessed_cmds = {"!manifest", "!presentation", "!gender", "!model", "!witnessed", "!nameclue", "!name", "!female", "!male", "!unknownmodel"}
+    viewer_vote_cmds = {"!guess", "!vote", "!unguess", "!clearguess", "!unvote", "!clearvote", "!guesses", "!votes"}
+    manual_ghost_cmds = {"!ghost", "!select", "!notghost", "!restoreghost", "!clearghost"}
+
+    for setting, label, group in (
+        ("allowSetupCommands", "Setup/map commands", setup_cmds),
+        ("allowEvidenceCommands", "Evidence commands", evidence_cmds),
+        ("allowBehaviorCommands", "Behavior commands", behavior_cmds),
+        ("allowTimerCommands", "Timer commands", timer_cmds),
+        ("allowSanityCommands", "Sanity commands", sanity_cmds),
+        ("allowWitnessedCommands", "Witnessed model/name clue commands", witnessed_cmds),
+        ("allowViewerVoteCommands", "Viewer guess/vote commands", viewer_vote_cmds),
+        ("allowManualGhostCommands", "Manual ghost override commands", manual_ghost_cmds),
+    ):
+        if cmd in group:
+            blocked = _disabled(setting, label)
+            if blocked:
+                return blocked
+
+    if cmd == "!panic":
+        if not _config_bool("allowPanicCommand") or not _config_bool("allowEasterEggs"):
+            return state, "Panic/easter-egg commands are disabled in Phasmo Helper Config."
 
     if cmd in {"!reset", "!phasmoreset"}:
         new_state = _new_reset_state(state.get("room", "default"))
@@ -2219,8 +2327,8 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         return state, f"Behavior #{entry_num} set to {value}."
 
     if cmd in {"!b", "!beh", "!behavior", "!behaviour", "!be", "!behaviorentry", "!behaviorline", "!observed"}:
-        if not _ALLOW_BEHAVIOR_COMMANDS:
-            return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable behavior commands."
+        if not _config_bool("allowBehaviorCommands"):
+            return state, "Behavior chat commands are disabled in Phasmo Helper Config."
         if len(lower_parts) <= 1:
             return state, "Use !behavior 7 yes, !behavior 7 no, !observed 7, or !behavior wraith yes."
 
@@ -2353,7 +2461,7 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
 <h2>Contributor Notes</h2>
 <p>Future updates can call out play-testers, correction submissions, map/location corrections, command ideas, and feature requests here.</p>
 <p><a href="/phasmo/acknowledgements?room={safe_room}">View acknowledgements</a></p>
-<p class="small"><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual and support files</a></p>
+<p class="small"><a href="/phasmo/config?room={safe_room}">Configuration</a> • <a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual and support files</a></p>
 """
     return _simple_info_page("Release Notes", body, safe_room)
 
@@ -2381,6 +2489,120 @@ def phasmo_acknowledgements(room: str | None = Query(default=None)):
 <p class="small"><a href="/phasmo/release-notes?room={safe_room}">View release notes</a></p>
 """
     return _simple_info_page("Acknowledgements", body, safe_room)
+
+
+
+@app.get("/api/phasmo/config")
+def api_get_config():
+    return {"ok": True, "config": _read_config(), "descriptions": CONFIG_DESCRIPTIONS}
+
+
+@app.post("/api/phasmo/config")
+async def api_post_config(
+    request: Request,
+    token: str | None = Query(default=None),
+    x_phasmo_token: str | None = Header(default=None),
+):
+    if not _auth_ok(x_phasmo_token, token):
+        raise HTTPException(status_code=401, detail="unauthorized")
+    body = await request.json()
+    if not isinstance(body, dict):
+        raise HTTPException(status_code=400, detail="config body must be an object")
+    return {"ok": True, "config": _write_config(body)}
+
+
+@app.get("/phasmo/config")
+def phasmo_config(room: str | None = Query(default=None), token: str | None = Query(default=None)):
+    safe_room = _room_name(room)
+    state = read_state(safe_room)
+    is_ready = bool(state.get("setupComplete"))
+    home_href = f"/phasmo/control?room={safe_room}" if is_ready else f"/phasmo/setup?room={safe_room}"
+    home_label = "Back to Control" if is_ready else "Back to Setup"
+    if token:
+        home_href += f"&token={token}"
+    rows = ""
+    config = _read_config()
+    for key, (label, desc) in CONFIG_DESCRIPTIONS.items():
+        checked = "checked" if config.get(key) else ""
+        rows += f"""
+        <label class="toggle-row">
+          <span><strong>{label}</strong><small>{desc}</small><code>{key}</code></span>
+          <input type="checkbox" data-key="{key}" {checked}>
+        </label>
+        """
+    html = f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phasmo Helper Config</title>
+<style>
+body{{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI,sans-serif}}
+main{{width:min(860px,100vw);padding:18px;margin:0 auto}}
+.brandbar,.card{{background:linear-gradient(135deg,#172235ee,#0f172aee);border:1px solid #334155;border-radius:18px;box-shadow:0 18px 50px #0008}}
+.brandbar{{display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px;padding:12px 14px;margin-bottom:12px;text-decoration:none;color:#f8fafc}}
+.brandleft{{display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden}}
+.logo{{width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 30% 20%,#38bdf855,transparent 38%),linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #475569;display:grid;place-items:center}}
+.logo span{{font-weight:950;color:#fff;text-shadow:0 2px 0 #000}}
+.brandtitle{{display:block;font-size:18px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.brandsub{{display:block;font-size:12px;color:#94a3b8;margin-top:3px}}
+.brandcta{{border:1px solid #475569;background:#0f172a;border-radius:999px;padding:8px 11px;color:#bfdbfe;font-size:12px;font-weight:850;white-space:nowrap}}
+.card{{overflow:hidden}}
+.head{{padding:18px;border-bottom:1px solid #334155}}
+.body{{padding:18px}}
+h1{{margin:0;font-size:28px}}
+p{{color:#cbd5e1;line-height:1.5}}
+a{{color:#93c5fd}}
+.toggle-row{{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid #334155}}
+.toggle-row:last-child{{border-bottom:0}}
+.toggle-row strong{{display:block;font-size:15px}}
+.toggle-row small{{display:block;color:#94a3b8;line-height:1.35;margin-top:3px}}
+.toggle-row code{{display:inline-block;margin-top:5px;color:#bae6fd;background:#020617;border:1px solid #334155;border-radius:999px;padding:2px 7px;font-size:11px}}
+input[type=checkbox]{{width:52px;height:30px;accent-color:#22c55e}}
+.status{{margin-top:12px;color:#93c5fd;font-size:13px}}
+.err{{color:#fecaca}}
+.links{{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}}
+.links a{{border:1px solid #334155;border-radius:999px;padding:6px 10px;text-decoration:none;background:#0f172a}}
+</style>
+</head>
+<body>
+<main>
+<a class="brandbar" href="{home_href}">
+  <div class="brandleft"><div class="logo"><span>KC</span></div><div><span class="brandtitle">Kaizen Phasmo Helper</span><span class="brandsub">room: {safe_room} • global command config</span></div></div>
+  <span class="brandcta">{home_label}</span>
+</a>
+<section class="card">
+<div class="head"><h1>Config</h1><p>These global toggles persist on the server and control which chat/API features are allowed. Changes apply to all rooms.</p></div>
+<div class="body">
+  {rows}
+  <div id="status" class="status">Ready.</div>
+  <div class="links">
+    <a href="/phasmo/setup?room={safe_room}{('&token=' + token) if token else ''}">Setup</a>
+    <a href="/phasmo/control?room={safe_room}{('&token=' + token) if token else ''}">Control</a>
+    <a href="/phasmo/release-notes?room={safe_room}">Release notes</a>
+    <a href="/phasmo/acknowledgements?room={safe_room}">Acknowledgements</a>
+  </div>
+</div>
+</section>
+</main>
+<script>
+const token=new URLSearchParams(location.search).get('token')||localStorage.getItem('phasmoAdminToken')||'';
+if(token) localStorage.setItem('phasmoAdminToken', token);
+function apiUrl(){{return '/api/phasmo/config'+(token?'?token='+encodeURIComponent(token):'')}}
+async function save(key,val){{
+  const status=document.getElementById('status');
+  status.className='status';
+  status.textContent='Saving...';
+  const r=await fetch(apiUrl(),{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{[key]:val}})}});
+  if(!r.ok){{status.className='status err';status.textContent='Save blocked. Open this page with &token=YOUR_TOKEN if admin token is enabled.'; return;}}
+  const data=await r.json();
+  status.textContent='Saved. '+key+' = '+(data.config[key]?'on':'off');
+}}
+document.querySelectorAll('[data-key]').forEach(el=>el.addEventListener('change',()=>save(el.dataset.key,el.checked)));
+</script>
+</body>
+</html>"""
+    return HTMLResponse(html)
 
 
 @app.get("/phasmo/setup")
@@ -2517,6 +2739,9 @@ def phasmo_jumpscare_video():
 @app.post("/api/phasmo/jumpscare")
 def api_jumpscare(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
+    if not _config_bool("allowEasterEggs") or not _config_bool("allowJumpscareButton"):
+        current = read_state(safe_room)
+        return {"ok": False, "result": "Jumpscare button is disabled in Phasmo Helper Config.", "count": _read_jumpscare_count(), "state": current}
     with _STATE_LOCK:
         count = _write_jumpscare_count(_read_jumpscare_count() + 1)
         current = read_state(safe_room)
