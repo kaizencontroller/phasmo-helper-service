@@ -546,6 +546,7 @@ HTML_TEMPLATE = r'''<!doctype html>
       <div id="controlWeatherWarning" class="warnbox hidden"></div>
       <div class="spread"><span class="muted">Evidence mode</span><select id="mode"><option value="3">3 evidence</option><option value="2">2 evidence</option><option value="1">1 evidence</option><option value="0">0 evidence</option></select></div>
       <div class="top-links"><a class="badge" id="setupRouteLinkTop" href="#">Setup</a><a class="badge" id="leaderboardRouteLink" href="#">Leaderboard</a></div>
+      <div id="controlCommandStatus" class="muted" style="margin-top:6px"></div>
     </div>
   </div>
   <div class="panel" id="setupPanel"><div class="head"><div><strong>Run Setup</strong><div class="muted" id="setupSummaryLine">map, difficulty, weather, response, cursed item</div></div><span class="muted" id="setupStatus">not set</span></div><div class="body stack">
@@ -873,10 +874,16 @@ function renderSetup(){
   if(appHomeCta)appHomeCta.textContent=done?'Control':'Setup';
   document.getElementById('setupStatus').textContent=done?'ready':'setup recommended';
   document.getElementById('setupSummaryLine').textContent=setupSummary();
+  const commandLine=state.lastCommand?`Last chat command: ${state.lastCommand} → ${state.lastCommandResult||'received'}`:'';
   const setupCmd=document.getElementById('setupCommandStatus');
   if(setupCmd){
-    if(state.lastCommand){setupCmd.textContent=`Last chat command: ${state.lastCommand} → ${state.lastCommandResult||'received'}`; setupCmd.classList.remove('hidden');}
-    else setupCmd.textContent='';
+    setupCmd.textContent=commandLine;
+    setupCmd.classList.toggle('hidden', !commandLine);
+  }
+  const controlCmd=document.getElementById('controlCommandStatus');
+  if(controlCmd){
+    controlCmd.textContent=commandLine;
+    controlCmd.classList.toggle('hidden', !commandLine);
   }
   const award=document.getElementById('awardBanner');
   if(award){
@@ -1857,6 +1864,12 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
     if not parts:
         return state, "No command entered."
     cmd = lower_parts[0]
+    # Streamer.bot can provide the triggered command without the leading "!".
+    # Normalize both "!behavior 7 yes" and "behavior 7 yes" to the same internal command.
+    if cmd and not cmd.startswith("!"):
+        cmd = "!" + cmd
+        lower_parts[0] = cmd
+        parts[0] = "!" + parts[0].lstrip("!")
 
     if cmd in {"!reset", "!phasmoreset"}:
         new_state = _new_reset_state(state.get("room", "default"))
