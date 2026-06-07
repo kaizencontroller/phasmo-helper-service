@@ -34,6 +34,8 @@ CONFIG_DESCRIPTIONS = {
     "allowWitnessedCommands": ("Witnessed model/name clue commands", "Allows !gender, !model, !manifest, !female, !male, and related commands."),
     "allowViewerVoteCommands": ("Viewer guess/vote commands", "Allows !guess, !vote, !unguess, !unvote, !guesses, and !votes."),
     "allowManualGhostCommands": ("Manual ghost override commands", "Allows !ghost, !select, !notghost, !restoreghost, and !clearghost."),
+    "allowIgnoreCommands": ("Ignore-list commands", "Allows mod/control commands such as !ignore, !unignore, !ignored, and !ignorelist."),
+    "allowNextRoundCommand": ("Next Round command", "Allows !nextround to start a new round while preserving reusable setup."),
     "allowPanicCommand": ("Panic command", "Allows the harmless !panic command."),
     "allowEasterEggs": ("Easter eggs", "Allows optional joke/easter-egg behavior such as classified notes and joke awards."),
     "allowJumpscareButton": ("Don't press this button", "Shows/enables the setup-page jumpscare button and overlay jumpscare trigger."),
@@ -49,6 +51,8 @@ CONFIG_DEFAULTS = {
     "allowWitnessedCommands": True,
     "allowViewerVoteCommands": True,
     "allowManualGhostCommands": True,
+    "allowIgnoreCommands": True,
+    "allowNextRoundCommand": True,
     "allowPanicCommand": True,
     "allowEasterEggs": True,
     "allowJumpscareButton": True,
@@ -662,7 +666,7 @@ HTML_TEMPLATE = r'''<!doctype html>
     <input id="behaviorFilter" placeholder="filter: speed, salt, photo" style="width:100%;margin-bottom:8px"><div id="behaviors"></div></div></div>
   <div class="panel cursed-panel" id="cursedPanel"><div class="head"><div><strong>Cursed Possession Helper</strong><div class="muted" id="cursedMapHint">Select a map in setup for location hints.</div></div><button class="btn-small" id="toggleCursed">Collapse</button></div><div class="body"><div id="cursedRows" class="cursed-grid"></div></div></div>
   <div class="panel candidates-panel"><div class="head"><strong>Candidates</strong><span class="muted" id="summary"></span></div><div class="body"><div class="ghosts" id="ghosts"></div></div></div>
-  <div class="panel votes-panel"><div class="head"><strong>Chat Input</strong><span class="muted">!guess for luck, !vote for decisions</span></div><div class="body"><div id="votes" class="vote-grid"></div><p class="muted" style="margin-top:8px">Commands: !guess Deogen, !vote Wraith, !unguess, !unvote, !guesses, !votes</p></div></div>
+  <div class="panel votes-panel"><div class="head"><strong>Chat Input</strong><span class="muted">!guess for luck, !vote for decisions</span></div><div class="body"><div id="ignoredUsersLine" class="muted" style="margin-bottom:8px"></div><div id="votes" class="vote-grid"></div><p class="muted" style="margin-top:8px">Commands: !guess Deogen, !vote Wraith, !unguess, !unvote, !guesses, !votes</p></div></div>
 
   <div class="panel support-footer" id="supportFooter"><div class="body">
     <div class="support-links"><a id="configLink" href="/phasmo/config">Config</a><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a><a id="acknowledgementsLink" href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual & support files</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a></div>
@@ -1083,7 +1087,7 @@ function renderTrackers(){
 }
 function renderManualGhosts(){let box=document.getElementById('manualGhostSummary'); if(!box)return; let manual=state.manualGhosts||{}, bits=[]; if(manual.selected)bits.push(`<span class='chip green'>Selected: ${manual.selected}</span>`); for(const g of (manual.excluded||[]))bits.push(`<span class='manual-chip'>Out: ${g}</span>`); box.innerHTML=bits.length?`<div class='manual-list'>${bits.join('')}</div>`:'No manual overrides.'}
 
-function renderVotes(){let box=document.getElementById('votes');let votes=voteSummary('votes'), guesses=voteSummary('guesses'); let html=''; html+=`<div class='muted' style='margin-bottom:6px'><strong>Votes</strong> are useful decision input when we ask chat to help choose. <strong>Guesses</strong> are lucky predictions.</div>`; if(votes.length){html+=`<div class='vote-section'><div class='muted' style='margin:6px 0'>Decision Votes — !vote GhostName</div>${votes.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No decision votes yet. Use !vote when we need chat's help choosing.</p>`; if(guesses.length){html+=`<div class='vote-section'><div class='muted' style='margin:10px 0 6px'>Lucky Guesses — !guess GhostName</div>${guesses.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No lucky guesses yet. Use !guess before evidence comes in.</p>`; box.innerHTML=html}
+function renderVotes(){let box=document.getElementById('votes');let ignoredLine=document.getElementById('ignoredUsersLine'); if(ignoredLine){let ignored=state.ignoredUsers||[]; ignoredLine.textContent=ignored.length?`Ignored in this room: ${ignored.join(', ')}`:''; ignoredLine.classList.toggle('hidden', !ignored.length)}let votes=voteSummary('votes'), guesses=voteSummary('guesses'); let html=''; html+=`<div class='muted' style='margin-bottom:6px'><strong>Votes</strong> are useful decision input when we ask chat to help choose. <strong>Guesses</strong> are lucky predictions.</div>`; if(votes.length){html+=`<div class='vote-section'><div class='muted' style='margin:6px 0'>Decision Votes — !vote GhostName</div>${votes.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No decision votes yet. Use !vote when we need chat's help choosing.</p>`; if(guesses.length){html+=`<div class='vote-section'><div class='muted' style='margin:10px 0 6px'>Lucky Guesses — !guess GhostName</div>${guesses.map(v=>`<div class='vote-row'><div><div class='vote-name'>${v.ghost}</div><div class='vote-users'>${v.users.join(', ')}</div></div><span class='badge'>${v.count}</span></div>`).join('')}</div>`} else html+=`<p class='muted'>No lucky guesses yet. Use !guess before evidence comes in.</p>`; box.innerHTML=html}
 function renderBehaviors(){let box=document.getElementById('behaviors'), q=(document.getElementById('behaviorFilter').value||'').toLowerCase(), cset=new Set(candidates().map(g=>g.name)), st=status(); box.innerHTML=''; let groups={}; for(const b of B){let logged=(state.behaviors?.[b.id]||'unknown')!=='unknown'; if(q && !(b.label+' '+b.cat+' '+b.up.join(' ')+b.down.join(' ')).toLowerCase().includes(q))continue; let relevant=b.up.some(g=>cset.has(g))||b.down.some(g=>cset.has(g)); if(!relevant&&!logged)continue; if(st.kind==='mimic'&&!logged&&!b.up.includes('The Mimic')&&!b.down.includes('The Mimic'))continue; if(['locked','verify'].includes(st.kind)&&!logged)continue; (groups[b.cat]??=[]).push(b)} for(const cat of Object.keys(groups)){let rows=groups[cat], selected=rows.find(b=>(state.behaviors?.[b.id]||'unknown')!=='unknown'), open=expanded[cat]===true; let el=document.createElement('div');el.className='branch'; let title=document.createElement('button');title.className='branch-title';title.innerHTML=`<span>${open?'▼':'▶'} ${cat}</span><span class='badge'>${selected?'logged':rows.length+' options'}</span>`;title.onclick=()=>{expanded[cat]=!open;renderBehaviors()};el.appendChild(title); if(selected){let v=state.behaviors[selected.id], div=document.createElement('div');div.className='selected '+(v==='contradicted'?'bad':'');let sn=B.findIndex(x=>x.id===selected.id)+1;div.innerHTML=`<strong>#${sn} ${v==='observed'?'✓':'×'} ${selected.label}</strong><div class='tags'>${selected.up.map(g=>`<span class='chip'>↑ ${g}</span>`).join('')}${selected.down.map(g=>`<span class='chip'>↓ ${g}</span>`).join('')}<span class='chip'>${selected.rel}</span></div><div class='row'><button data-clear='${selected.id}'>Clear</button><button class='blue' data-change='${cat}'>Change</button></div>`;el.appendChild(div)} if(open){let body=document.createElement('div');body.className='branch-body'; for(const b of rows){let opt=document.createElement('div');opt.className='option';let bn=B.findIndex(x=>x.id===b.id)+1;opt.innerHTML=`<div class='option-label'>#${bn} ${b.label}</div><div class='tags'>${b.up.map(g=>`<span class='chip'>↑ ${g}</span>`).join('')}${b.down.map(g=>`<span class='chip'>↓ ${g}</span>`).join('')}<span class='chip'>${b.rel}</span></div><div class='grid2'><button class='green' data-beh='${b.id}' data-cat='${cat}' data-val='observed'>Observed</button><button class='red' data-beh='${b.id}' data-cat='${cat}' data-val='contradicted'>No / False</button></div>`;body.appendChild(opt)} el.appendChild(body)} box.appendChild(el)} document.querySelectorAll('[data-clear]').forEach(btn=>btn.onclick=()=>postState({behaviors:{[btn.dataset.clear]:'unknown'}}));document.querySelectorAll('[data-change]').forEach(btn=>{btn.onclick=()=>{expanded[btn.dataset.change]=true;renderBehaviors()}});document.querySelectorAll('[data-beh]').forEach(btn=>btn.onclick=()=>{let rows=B.filter(x=>x.cat===btn.dataset.cat), patch={behaviors:{}}; for(const sib of rows)patch.behaviors[sib.id]='unknown'; patch.behaviors[btn.dataset.beh]=btn.dataset.val; expanded[btn.dataset.cat]=false; postState(patch)})}
 function setupOverlay(){
   const CARD_MS=10000;
@@ -1809,6 +1813,7 @@ def default_state(room: str = "default") -> Dict[str, Any]:
         "behaviors": {},
         "votes": {},
         "guesses": {},
+        "ignoredUsers": [],
         "timers": {},
         "manualGhosts": {"selected": None, "excluded": []},
         "updatedAt": int(time.time() * 1000),
@@ -1848,6 +1853,7 @@ def read_state(room: str) -> Dict[str, Any]:
         merged["behaviors"] = data.get("behaviors", {}) or {}
         merged["votes"] = data.get("votes", {}) or {}
         merged["guesses"] = data.get("guesses", {}) or {}
+        merged["ignoredUsers"] = sorted({_normal_user(u) for u in (data.get("ignoredUsers") or []) if str(u).strip()})
         merged["timers"] = data.get("timers", {}) or {}
         merged["sanityValues"] = (data.get("sanityValues") or [None, None, None, None])[:4] + [None] * max(0, 4 - len(data.get("sanityValues") or []))
         merged["playerCount"] = int(data.get("playerCount") or 4)
@@ -2036,6 +2042,8 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
     witnessed_cmds = {"!manifest", "!presentation", "!gender", "!model", "!witnessed", "!nameclue", "!name", "!female", "!male", "!unknownmodel"}
     viewer_vote_cmds = {"!guess", "!vote", "!unguess", "!clearguess", "!unvote", "!clearvote", "!guesses", "!votes"}
     manual_ghost_cmds = {"!ghost", "!select", "!notghost", "!restoreghost", "!clearghost"}
+    ignore_cmds = {"!ignore", "!unignore", "!ignored", "!ignorelist"}
+    next_round_cmds = {"!nextround", "!nextcontract", "!newround"}
 
     for setting, label, group in (
         ("allowSetupCommands", "Setup/map commands", setup_cmds),
@@ -2046,6 +2054,8 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         ("allowWitnessedCommands", "Witnessed model/name clue commands", witnessed_cmds),
         ("allowViewerVoteCommands", "Viewer guess/vote commands", viewer_vote_cmds),
         ("allowManualGhostCommands", "Manual ghost override commands", manual_ghost_cmds),
+        ("allowIgnoreCommands", "Ignore-list commands", ignore_cmds),
+        ("allowNextRoundCommand", "Next Round commands", next_round_cmds),
     ):
         if cmd in group:
             blocked = _disabled(setting, label)
@@ -2056,9 +2066,47 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         if not _config_bool("allowPanicCommand") or not _config_bool("allowEasterEggs"):
             return state, "Panic/easter-egg commands are disabled in Phasmo Helper Config."
 
+    sender = _normal_user(user)
+    ignored_set = set(state.get("ignoredUsers") or [])
+    if sender in ignored_set and cmd not in {"!unignore", "!ignored", "!ignorelist"}:
+        return state, f"{sender} is ignored for this room."
+
+    if cmd in {"!ignore", "!unignore", "!ignored", "!ignorelist"}:
+        if cmd in {"!ignored", "!ignorelist"}:
+            ignored = sorted(set(state.get("ignoredUsers") or []))
+            return state, "Ignored users: " + (", ".join(ignored) if ignored else "none.")
+        if len(parts) < 2:
+            return state, f"Use {cmd} username."
+        target = _normal_user(parts[1])
+        ignored = set(state.get("ignoredUsers") or [])
+        if cmd == "!ignore":
+            ignored.add(target)
+            state["ignoredUsers"] = sorted(ignored)
+            state.setdefault("guesses", {}).pop(target, None)
+            state.setdefault("votes", {}).pop(target, None)
+            return state, f"{target} is now ignored for Phasmo Helper chat inputs. Their guess/vote was cleared."
+        ignored.discard(target)
+        state["ignoredUsers"] = sorted(ignored)
+        return state, f"{target} is no longer ignored."
+
     if cmd in {"!reset", "!phasmoreset"}:
+        previous_ignored = state.get("ignoredUsers", []) or []
         new_state = _new_reset_state(state.get("room", "default"))
-        return new_state, f"Run reset. Setup required. Award unlocked: {new_state.get('awardMessage', 'Best Supporting Scream')}."
+        new_state["ignoredUsers"] = previous_ignored
+        return new_state, f"Run reset. Setup required. Ignored users preserved."
+
+    if cmd in {"!nextround", "!nextcontract", "!newround"}:
+        previous = dict(state)
+        new_state = _new_reset_state(state.get("room", "default"))
+        new_state["setupComplete"] = False
+        new_state["playerCount"] = previous.get("playerCount", 4)
+        new_state["difficulty"] = previous.get("difficulty", "unknown")
+        new_state["responds"] = previous.get("responds", "unknown")
+        new_state["evidenceMode"] = previous.get("evidenceMode", "3")
+        new_state["ignoredUsers"] = previous.get("ignoredUsers", []) or []
+        new_state["map"] = "unknown"
+        new_state["weather"] = "unknown"
+        return new_state, "Next round started. Preserved players, difficulty, response, evidence mode, and ignored users; cleared map and weather."
 
     if cmd in {"!setup"}:
         # Basic setup helper:
@@ -2860,7 +2908,9 @@ async def api_post_state(
     with _STATE_LOCK:
         current = read_state(safe_room)
         if body.get("reset") is True:
+            previous = dict(current)
             current = _new_reset_state(safe_room)
+            current["ignoredUsers"] = previous.get("ignoredUsers", []) or []
         elif body.get("nextRound") is True:
             previous = dict(current)
             current = _new_reset_state(safe_room)
@@ -2870,10 +2920,11 @@ async def api_post_state(
             current["difficulty"] = previous.get("difficulty", "unknown")
             current["responds"] = previous.get("responds", "unknown")
             current["evidenceMode"] = previous.get("evidenceMode", "3")
+            current["ignoredUsers"] = previous.get("ignoredUsers", []) or []
             current["map"] = "unknown"
             current["weather"] = "unknown"
             current["lastCommand"] = "Next Round"
-            current["lastCommandResult"] = "New round started. Preserved players, difficulty, response, and evidence mode; cleared map and weather."
+            current["lastCommandResult"] = "New round started. Preserved players, difficulty, response, evidence mode, and ignored chatters; cleared map and weather."
         else:
             if "evidence" in body and isinstance(body["evidence"], dict):
                 current["evidence"].update({k: v for k, v in body["evidence"].items() if k in EVIDENCE and v in {"yes", "no", "unknown"}})
@@ -2936,6 +2987,8 @@ async def api_post_state(
                     key = str(k).lower()[:80]
                     if str(v) in {"found", "out", "unknown"}:
                         current["cursedItems"][key] = str(v)
+            if "ignoredUsers" in body and isinstance(body["ignoredUsers"], list):
+                current["ignoredUsers"] = sorted({_normal_user(u) for u in body["ignoredUsers"] if str(u).strip()})
         write_state(safe_room, current)
     return {"ok": True, "state": current}
 
