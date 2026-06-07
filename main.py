@@ -2362,6 +2362,37 @@ async def api_post_state(
     return {"ok": True, "state": current}
 
 
+
+@app.get("/api/phasmo/command")
+def api_get_command(
+    room: str | None = Query(default=None),
+    command: str | None = Query(default=""),
+    user: str | None = Query(default=None),
+    username: str | None = Query(default=None),
+    userName: str | None = Query(default=None),
+    displayName: str | None = Query(default=None),
+    token: str | None = Query(default=None),
+    x_phasmo_token: str | None = Header(default=None),
+):
+    """Compatibility endpoint for Streamer.bot imports that send commands as a GET URL.
+
+    Preferred integration is POST JSON, but older/simple Streamer.bot imports often use a
+    URL like:
+      /api/phasmo/command?room=kaizen&user=%userName%&command=%command%%20%rawInputUrlEncoded%
+    """
+    if not _auth_ok(x_phasmo_token, token):
+        raise HTTPException(status_code=401, detail="unauthorized")
+    safe_room = _room_name(room)
+    cmd_text = (command or "").strip()
+    sender = user or username or userName or displayName or "anonymous"
+    with _STATE_LOCK:
+        state = read_state(safe_room)
+        state, result = apply_command(state, cmd_text, user=sender)
+        state["lastCommand"] = cmd_text
+        state["lastCommandResult"] = result
+        write_state(safe_room, state)
+    return {"ok": True, "result": result, "state": state}
+
 @app.post("/api/phasmo/command")
 async def api_post_command(
     request: Request,
