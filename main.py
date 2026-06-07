@@ -560,6 +560,7 @@ HTML_TEMPLATE = r'''<!doctype html>
     </div>
     <div class="row"><button class="green" id="saveSetup">Start / Save Setup</button></div>
     <div class="muted">Overlay will prompt chat with loading cards. Use <strong>!guess</strong> for fun and <strong>!vote</strong> only when chat is being asked to help decide.</div>
+    <div id="setupCommandStatus" class="muted" style="margin-top:6px"></div>
     <div id="awardBanner" class="award-banner hidden"></div>
   </div></div>
   <div class="panel tracker-panel"><div class="head"><strong>Quick Trackers</strong><span class="muted" id="timerSummary">timers / sanity</span></div><div class="body">
@@ -872,6 +873,11 @@ function renderSetup(){
   if(appHomeCta)appHomeCta.textContent=done?'Control':'Setup';
   document.getElementById('setupStatus').textContent=done?'ready':'setup recommended';
   document.getElementById('setupSummaryLine').textContent=setupSummary();
+  const setupCmd=document.getElementById('setupCommandStatus');
+  if(setupCmd){
+    if(state.lastCommand){setupCmd.textContent=`Last chat command: ${state.lastCommand} → ${state.lastCommandResult||'received'}`; setupCmd.classList.remove('hidden');}
+    else setupCmd.textContent='';
+  }
   const award=document.getElementById('awardBanner');
   if(award){
     if(state.awardMessage){award.textContent=`Post-contract award: ${state.awardMessage}`; award.classList.remove('hidden');}
@@ -1616,7 +1622,26 @@ document.addEventListener('keydown',async(e)=>{
   }
 });
 
-getState(); if(MODE!=='setup'){setInterval(getState, MODE==='overlay'?1000:3000);}
+async function pollState(){
+  const active=document.activeElement;
+  const editing=!!(active && active.closest && active.closest('#setupPanel') && ['INPUT','SELECT','TEXTAREA'].includes(active.tagName));
+  let r=await fetch(`${API}/state?room=${encodeURIComponent(room)}`);
+  let next=await r.json();
+  if(MODE==='setup' && next.setupComplete===true){
+    state=next;
+    render();
+    location.href=`/phasmo/control?room=${encodeURIComponent(room)}${token?'&token='+encodeURIComponent(token):''}`;
+    return;
+  }
+  if(MODE==='setup' && editing){
+    // Keep remote updates in memory, but do not repaint over someone typing in setup fields.
+    state=next;
+    return;
+  }
+  state=next;
+  render();
+}
+getState(); setInterval(pollState, MODE==='overlay'?1000:3000);
 </script></body></html>'''
 
 
