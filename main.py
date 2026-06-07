@@ -138,6 +138,80 @@ GHOST_ALIASES.update({
     "deo": "Deogen",
 })
 
+MAP_ALIASES = {
+    "unknown": "unknown",
+    "tanglewood": "6 Tanglewood Drive", "6": "6 Tanglewood Drive", "6t": "6 Tanglewood Drive", "6-tanglewood": "6 Tanglewood Drive",
+    "ridgeview": "10 Ridgeview Court", "10": "10 Ridgeview Court", "10r": "10 Ridgeview Court",
+    "willow": "13 Willow Street", "13": "13 Willow Street", "13w": "13 Willow Street",
+    "edgefield": "42 Edgefield Road", "42": "42 Edgefield Road", "42e": "42 Edgefield Road",
+    "nells": "Nell's Diner", "nell": "Nell's Diner", "diner": "Nell's Diner", "nells-diner": "Nell's Diner",
+    "grafton": "Grafton Farmhouse", "farmhouse": "Grafton Farmhouse",
+    "woodwind": "Camp Woodwind", "camp": "Camp Woodwind", "camp-woodwind": "Camp Woodwind",
+    "point": "Point Hope", "hope": "Point Hope", "point-hope": "Point Hope", "lighthouse": "Point Hope",
+    "bleasdale": "Bleasdale Farmhouse",
+    "restricted": "Sunny Meadows Restricted", "sunny-restricted": "Sunny Meadows Restricted", "sunny-meadows-restricted": "Sunny Meadows Restricted", "smr": "Sunny Meadows Restricted",
+    "prison": "Prison",
+    "maple": "Maple Lodge Campsite", "maple-lodge": "Maple Lodge Campsite", "lodge": "Maple Lodge Campsite",
+    "brownstone": "Brownstone High School", "school": "Brownstone High School", "highschool": "Brownstone High School", "high-school": "Brownstone High School",
+    "sunny": "Sunny Meadows Mental Institution", "sunny-meadows": "Sunny Meadows Mental Institution", "sunny-meadows-mental": "Sunny Meadows Mental Institution", "institution": "Sunny Meadows Mental Institution", "smm": "Sunny Meadows Mental Institution",
+}
+
+DIFFICULTY_ALIASES = {
+    "unknown": "unknown",
+    "amateur": "amateur",
+    "intermediate": "intermediate",
+    "pro": "professional",
+    "professional": "professional",
+    "nightmare": "nightmare",
+    "insanity": "insanity",
+    "custom": "custom",
+}
+
+WEATHER_ALIASES = {
+    "unknown": "unknown",
+    "sunrise": "sunrise",
+    "clear": "clear",
+    "fog": "fog",
+    "foggy": "fog",
+    "blood": "blood-moon",
+    "bloodmoon": "blood-moon",
+    "blood-moon": "blood-moon",
+    "light-rain": "light-rain",
+    "lightrain": "light-rain",
+    "rain": "light-rain",
+    "heavy-rain": "heavy-rain",
+    "heavyrain": "heavy-rain",
+    "storm": "heavy-rain",
+    "wind": "windy",
+    "windy": "windy",
+    "snow": "snow",
+    "snowy": "snow",
+}
+
+
+def _slug_words(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", (text or "").strip().lower()).strip("-")
+
+
+def _match_setup_value(raw: str, aliases: Dict[str, str]) -> str | None:
+    value = " ".join((raw or "").strip().split())
+    if not value:
+        return None
+    key = _slug_words(value)
+    if key in aliases:
+        return aliases[key]
+    key_compact = key.replace("-", "")
+    for alias, target in aliases.items():
+        if alias.replace("-", "") == key_compact:
+            return target
+    # Allow partial map names like "tangle" or "brown".
+    matches = [target for alias, target in aliases.items() if key and (key in alias or key in _slug_words(target))]
+    matches = list(dict.fromkeys(matches))
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
+
 BEHAVIOR_ALIASES = {
     "40-hunt": "deogen-late-hunt",
     "active-early": "thaye-high-activity-early",
@@ -1763,6 +1837,74 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         new_state = _new_reset_state(state.get("room", "default"))
         return new_state, f"Run reset. Setup required. Award unlocked: {new_state.get('awardMessage', 'Best Supporting Scream')}."
 
+    if cmd in {"!setup"}:
+        # Basic setup helper:
+        #   !setup
+        #   !setup start
+        #   !setup tanglewood professional sunrise everyone 4
+        if len(parts) == 1 or (len(lower_parts) > 1 and lower_parts[1] in {"start", "save", "ready", "go"}):
+            state["setupComplete"] = True
+            return state, "Setup marked complete."
+        raw = " ".join(parts[1:])
+        # Try a loose positional parse: map difficulty weather responds players.
+        if len(parts) >= 2:
+            # Map may be multiple words; do best-effort lookup from all non-option words first.
+            for cut in range(len(parts), 1, -1):
+                candidate = _match_setup_value(" ".join(parts[1:cut]), MAP_ALIASES)
+                if candidate:
+                    state["map"] = candidate
+                    rest = [p.lower() for p in parts[cut:]]
+                    for token in rest:
+                        if token in DIFFICULTY_ALIASES:
+                            state["difficulty"] = DIFFICULTY_ALIASES[token]
+                        elif token in WEATHER_ALIASES:
+                            state["weather"] = WEATHER_ALIASES[token]
+                        elif token in {"alone", "solo"}:
+                            state["responds"] = "alone"
+                        elif token in {"everyone", "all", "group"}:
+                            state["responds"] = "everyone"
+                        elif token.isdigit():
+                            state["playerCount"] = max(1, min(4, int(token)))
+                    state["setupComplete"] = True
+                    return state, f"Setup saved: {state.get('map', 'unknown')} • {state.get('difficulty', 'unknown')} • {state.get('weather', 'unknown')} • Responds: {state.get('responds', 'unknown')} • {state.get('playerCount', 4)} player(s)."
+        return state, "Use !setup, or set fields with !map, !difficulty, !weather, !responds, and !players."
+
+    if cmd in {"!map", "!level"}:
+        value = _match_setup_value(" ".join(parts[1:]), MAP_ALIASES)
+        if not value:
+            return state, "Map not recognized. Try !map tanglewood, !map ridgeview, !map willow, !map edgefield, !map nells, !map grafton, !map woodwind, !map point hope, !map bleasdale, !map restricted, !map prison, !map maple, !map brownstone, or !map sunny."
+        state["map"] = value
+        return state, f"Map set to {value}."
+
+    if cmd in {"!difficulty", "!diff"}:
+        value = _match_setup_value(" ".join(parts[1:]), DIFFICULTY_ALIASES)
+        if not value:
+            return state, "Difficulty not recognized. Try amateur, intermediate, professional, nightmare, insanity, or custom."
+        state["difficulty"] = value
+        # Keep evidence mode roughly aligned unless user overrides it manually later.
+        if value in {"nightmare"}:
+            state["evidenceMode"] = "2"
+        elif value in {"insanity"}:
+            state["evidenceMode"] = "1"
+        elif value in {"amateur", "intermediate", "professional"}:
+            state["evidenceMode"] = "3"
+        return state, f"Difficulty set to {value}."
+
+    if cmd in {"!weather"}:
+        value = _match_setup_value(" ".join(parts[1:]), WEATHER_ALIASES)
+        if not value:
+            return state, "Weather not recognized. Try sunrise, clear, fog, blood moon, light rain, heavy rain, windy, or snow."
+        state["weather"] = value
+        return state, f"Weather set to {value}."
+
+    if cmd in {"!players", "!playercount"}:
+        try:
+            count = max(1, min(4, int(lower_parts[1])))
+        except Exception:
+            return state, "Use !players 1, !players 2, !players 3, or !players 4."
+        state["playerCount"] = count
+        return state, f"Player count set to {count}."
+
     if cmd in {"!panic"}:
         state["panicCount"] = int(state.get("panicCount") or 0) + 1
         user_name = (user or "chat").strip() or "chat"
@@ -1826,6 +1968,17 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
             state["presentation"] = "unknown"
         return state, f"Presentation clue set to {state['presentation']}."
 
+    if cmd in {"!yes", "!no", "!maybe", "!clear"}:
+        # Streamer.bot import compatibility. These apply to the next best unknown evidence.
+        # Prefer explicit !ev orb yes for serious use.
+        ev_order = ["dots", "emf5", "freezing", "orbs", "writing", "box", "uv"]
+        target = next((ev for ev in ev_order if state.get("evidence", {}).get(ev, "unknown") == "unknown"), None)
+        if not target:
+            return state, "No unknown evidence found. Use !ev [evidence] [yes/no/unknown] to change a specific item."
+        value = {"!yes": "yes", "!no": "no", "!maybe": "unknown", "!clear": "unknown"}[cmd]
+        state.setdefault("evidence", {})[target] = value
+        return state, f"{EVIDENCE_LABELS.get(target, target)} set to {value}. For better control use !ev [evidence] [yes/no]."
+
     if cmd in {"!ev", "!evidence"}:
         key = EVIDENCE_ALIASES.get(lower_parts[1], "") if len(lower_parts) > 1 else ""
         if not key:
@@ -1834,9 +1987,19 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         state.setdefault("evidence", {})[key] = value
         return state, f"{EVIDENCE_LABELS[key]} set to {value}."
 
-    if cmd in {"!timer", "!timers"}:
+    if cmd in {"!timer", "!timers", "!starttimer", "!stoptimer"}:
         if len(lower_parts) == 1:
             return state, "Use !timer incense start, !timer hunt start, !timer cooldown start, or !timer clear."
+        if cmd in {"!starttimer", "!stoptimer"}:
+            key = TIMER_ALIASES.get(lower_parts[1])
+            if not key:
+                return state, f"Unknown timer: {parts[1]}. Use incense, hunt, or cooldown."
+            if cmd == "!starttimer":
+                seconds = int(lower_parts[2]) if len(lower_parts) > 2 and lower_parts[2].isdigit() else None
+                _start_timer(state, key, seconds)
+                return state, f"{key.title()} timer started."
+            _stop_timer(state, key)
+            return state, f"{key.title()} timer cleared."
         if lower_parts[1] in {"clear", "reset", "stopall"}:
             _clear_timers(state)
             return state, "All timers cleared."
@@ -1877,12 +2040,15 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
             return state, f"Unknown ghost for quick tests: {ghost_text or 'blank'}."
         return state, _ghost_test_summary(ghost)
 
-    if cmd in {"!ghost", "!select", "!notghost", "!restoreghost"}:
+    if cmd in {"!ghost", "!select", "!notghost", "!restoreghost", "!clearghost"}:
         action = lower_parts[1] if len(lower_parts) > 1 else ""
         manual = state.setdefault("manualGhosts", {"selected": None, "excluded": []})
         manual.setdefault("excluded", [])
 
-        if cmd == "!notghost":
+        if cmd == "!clearghost":
+            action = "clear"
+            ghost_text = ""
+        elif cmd == "!notghost":
             action = "not"
             ghost_text = " ".join(parts[1:])
         elif cmd == "!restoreghost":
@@ -1979,6 +2145,21 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         summary = ", ".join(f"{ghost}: {count}" for ghost, count in sorted(counts.items(), key=lambda item: (-item[1], item[0])))
         return state, f"Lucky guesses: {summary}."
 
+    if cmd in {"!observed"}:
+        if not _ALLOW_BEHAVIOR_COMMANDS:
+            return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable observed commands."
+        if len(lower_parts) > 1 and lower_parts[1].isdigit():
+            entry_num = int(lower_parts[1])
+            if entry_num < 1 or entry_num > len(BEHAVIOR_INDEX_IDS):
+                return state, f"Behavior number must be between 1 and {len(BEHAVIOR_INDEX_IDS)}."
+            key = BEHAVIOR_INDEX_IDS[entry_num - 1]
+        else:
+            key = BEHAVIOR_ALIASES.get(lower_parts[1], "") if len(lower_parts) > 1 else ""
+        if not key:
+            return state, f"Unknown observed behavior: {parts[1] if len(parts) > 1 else 'blank'}."
+        state.setdefault("behaviors", {})[key] = "observed"
+        return state, f"{key} set to observed."
+
     if cmd in {"!be", "!behaviorentry", "!behaviorline"}:
         if not _ALLOW_BEHAVIOR_COMMANDS:
             return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable !be commands."
@@ -1992,9 +2173,17 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         state.setdefault("behaviors", {})[key] = value
         return state, f"Behavior #{entry_num} set to {value}."
 
-    if cmd in {"!b", "!beh", "!behavior"}:
+    if cmd in {"!b", "!beh", "!behavior", "!behaviour"}:
         if not _ALLOW_BEHAVIOR_COMMANDS:
-            return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable !b commands."
+            return state, "Behavior chat commands are disabled. Set PHASMO_ALLOW_BEHAVIOR_COMMANDS=true to enable behavior commands."
+        if len(lower_parts) > 1 and lower_parts[1].isdigit():
+            entry_num = int(lower_parts[1])
+            if entry_num < 1 or entry_num > len(BEHAVIOR_INDEX_IDS):
+                return state, f"Behavior number must be between 1 and {len(BEHAVIOR_INDEX_IDS)}."
+            key = BEHAVIOR_INDEX_IDS[entry_num - 1]
+            value = _normalize_value(lower_parts[2] if len(lower_parts) > 2 else "observed", "behavior")
+            state.setdefault("behaviors", {})[key] = value
+            return state, f"Behavior #{entry_num} set to {value}."
         key = BEHAVIOR_ALIASES.get(lower_parts[1], "") if len(lower_parts) > 1 else ""
         if not key:
             return state, f"Unknown behavior: {parts[1] if len(parts) > 1 else 'blank'}."
@@ -2002,7 +2191,7 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         state.setdefault("behaviors", {})[key] = value
         return state, f"{key} set to {value}."
 
-    return state, "Command not recognized. Try !ev emf yes, !be 12 yes, !b deogen observed, !sanity 90 85 80 75, !huntat 65, !manifest male, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
+    return state, "Command not recognized. Try !map tanglewood, !difficulty professional, !weather fog, !players 4, !setup, !ev emf yes, !behavior 12 yes, !b deogen observed, !sanity 90 85 80 75, !huntat 65, !manifest male, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
 
 
 @app.get("/")
