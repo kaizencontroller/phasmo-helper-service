@@ -1,62 +1,82 @@
-# Kaizen Phasmo Helper — Full Modular Rebuild v5
+# Kaizen Phasmo Helper — Full Modular Rebuild v4
 
-## Purpose
-This revision keeps the original mobile-first Phasmo helper design, but finishes the workflow cleanup after v4.
+This package keeps the original mobile-first Phasmo Helper design but splits the app into a lighter modular layout.
 
-## Key v5 changes
+## Main changes from v3
 
-- Split setup flow conceptually:
-  - `/phasmo/room` — reusable room/game settings.
-  - `/phasmo/round` — contract-specific round setup.
-  - `/phasmo/control` — active investigation screen.
-- Kept `/phasmo/setup` as an alias for round setup for compatibility.
-- Homepage CTA changed from `Start / Join Room` to `Create Room`.
-- Header/logo click goes to `/phasmo` home.
-- Moved Helper/Tracker display mode controls to `/phasmo/config`.
-- Helper/Tracker choices are slider/segmented toggle controls instead of dropdowns.
-- Config now includes room-level display modes and support opt-in, plus global command permission toggles.
-- Contract Result confirmation is no longer a standing control-screen panel.
-  - It appears only when clicking `Next Round` if there are unscored guesses/votes.
-- Chat panel on control is compact by default.
-  - Shows counts and leading vote/guess only.
-  - Full details are expandable.
-- Streamer.bot Setup page rewritten as a practical one-time SOP.
-  - Streamer.bot setup happens before room creation.
-  - Daily/weekly room changes should only update the `phasmoRoom` variable.
-- Added unlisted dev admin panel:
-  - `/phasmo/dev-admin`
-  - Local default code: `1234`
-  - Railway requires `PHASMO_DEV_ADMIN_CODE`; without it, the panel is disabled.
-- Dev admin supports:
-  - Load sample demo data.
-  - Clear sample demo data.
-  - Seed active rooms and leaderboard history.
+- Added `PHASMO_QUICKSTART_VIDEO_URL` Railway environment variable.
+  - When set, the homepage/footer show a Quick Start Video link.
+- Added `/phasmo/streamerbot` setup page.
+- Added Streamer.bot default-room routing:
+  - `!phasmo-room <room>`
+  - `!phasmo room <room>`
+  - `!setroom <room>`
+- `/api/phasmo/command` now accepts the room in the JSON body:
+  - `room`
+  - `phasmoRoom`
+  - `roomName`
+- `/api/phasmo/command` can route by stored Streamer.bot profile when room is omitted and channel/bot info is supplied.
+- Added `/api/phasmo/streamerbot/profile` GET/POST endpoints.
+- Added independent display modes:
+  - `controlMode`: `helper` or `tracker`
+  - `overlayMode`: `helper` or `tracker`
+- Setup screen now exposes Control Screen Mode and Overlay Mode.
+- Tracker mode hides the next-best-test panel on control.
+- Tracker overlay shows simplified game state/evidence/candidates without suggested next test.
+- Kept bug reports as a footer link instead of a large inline homepage form.
+- Kept public pages narrow/mobile-first like the original setup/control pages.
 
-## Important URLs
+## Railway environment variables
 
-- Home: `/phasmo`
-- Room setup: `/phasmo/room?room=kaizen`
-- Round setup: `/phasmo/round?room=kaizen`
-- Backward-compatible round setup alias: `/phasmo/setup?room=kaizen`
-- Control: `/phasmo/control?room=kaizen`
-- Overlay: `/phasmo/overlay?room=kaizen`
-- Config: `/phasmo/config?room=kaizen`
-- Streamer.bot SOP: `/phasmo/streamerbot?room=kaizen`
-- Dev admin: `/phasmo/dev-admin`
+Optional:
 
-## Local dev admin behavior
+```text
+PHASMO_QUICKSTART_VIDEO_URL=https://your-video-link-here
+PHASMO_STATE_DIR=/tmp/phasmo_state
+PHASMO_ROOM_TTL_SECONDS=14400
+PHASMO_SUPPORT_WEBHOOK_URL=...
+```
 
-Local development uses `1234` if `PHASMO_DEV_ADMIN_CODE` is not set.
+## Streamer.bot recommended command body
 
-Railway/production disables the dev admin panel unless `PHASMO_DEV_ADMIN_CODE` is explicitly set.
+Use a single endpoint:
 
-## Local testing quick start
+```text
+POST /api/phasmo/command
+```
+
+Example JSON body:
+
+```json
+{
+  "room": "%phasmoRoom%",
+  "command": "%rawInput%",
+  "user": "%userName%",
+  "source": "streamerbot",
+  "channel": "%broadcasterUserName%",
+  "botAccount": "%botName%"
+}
+```
+
+If you do not want a Streamer.bot variable, use the remembered-room workflow:
+
+```text
+!phasmo-room kaizen
+!guess Deogen
+!ev orbs yes
+!be 12 yes
+!result Deogen
+```
+
+The server will remember the default room for the supplied channel/bot profile.
+
+## Local test
 
 ```powershell
 cd "$HOME\Documents\Kaizen_Controller\phasmo-helper-service"
+py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements
-Remove-Item Env:\PHASMO_ADMIN_TOKEN -ErrorAction SilentlyContinue
 $env:PHASMO_STATE_DIR="$PWD\.local_state"
 $env:PHASMO_QUICKSTART_VIDEO_URL="https://example.com/quickstart"
 python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
@@ -64,36 +84,31 @@ python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
 
 Open:
 
-- `http://127.0.0.1:8000/phasmo`
-- `http://127.0.0.1:8000/phasmo/dev-admin`
-- Use code `1234` to load sample data.
-- Then test:
-  - `http://127.0.0.1:8000/phasmo/room?room=kaizen`
-  - `http://127.0.0.1:8000/phasmo/round?room=kaizen`
-  - `http://127.0.0.1:8000/phasmo/control?room=kaizen`
-  - `http://127.0.0.1:8000/phasmo/config?room=kaizen`
-  - `http://127.0.0.1:8000/phasmo/streamerbot?room=kaizen`
-
-## Railway variables
-
-Recommended:
-
 ```text
-PHASMO_QUICKSTART_VIDEO_URL=https://your-current-video-link
-PHASMO_DEV_ADMIN_CODE=<private admin code>
+http://127.0.0.1:8000/phasmo
+http://127.0.0.1:8000/phasmo/streamerbot?room=test
+http://127.0.0.1:8000/phasmo/setup?room=test
+http://127.0.0.1:8000/phasmo/control?room=test
+http://127.0.0.1:8000/phasmo/overlay?room=test
 ```
 
-Optional:
+Command test:
 
-```text
-PHASMO_SUPPORT_WEBHOOK_URL=<discord-compatible-webhook>
-PHASMO_ROOM_TTL_SECONDS=14400
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/api/phasmo/command" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body '{"command":"!phasmo-room test","user":"mod","channel":"kaizencontroller","source":"streamerbot"}'
+
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/api/phasmo/command" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body '{"command":"!guess Deogen","user":"viewer","channel":"kaizencontroller","source":"streamerbot"}'
 ```
 
-Remove/blank:
-
-```text
-PHASMO_ADMIN_TOKEN
-```
-
-Room passcodes are now per-room 4-digit convenience locks, not global app tokens.
+## v5.1 hotfix
+- Prevented the 1-second polling loop from repainting over active Room/Round Setup edits.
+- Added a dirty-form guard so room names, passcodes, map/weather/difficulty, player count, and response settings do not snap back while the streamer is typing before saving.
+- `main.py` remains a tiny entrypoint importing `phasmo_helper.app`.
