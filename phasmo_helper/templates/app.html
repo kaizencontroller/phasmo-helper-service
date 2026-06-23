@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kaizen Phasmophobia Helper</title>
+<link rel="stylesheet" href="/phasmo/static/phasmo.css" />
+</head>
+<body>
+<div id="control" class="app hidden">
+  <a class="homebar" id="appHomeBar" href="/phasmo" aria-label="Kaizen Phasmo Helper home">
+    <span class="homeleft"><span class="homelogo"><span>KC</span></span><span class="hometext"><span class="hometitle">Kaizen Phasmo Helper</span><span class="homesub" id="appHomeSub">loading session…</span></span></span>
+    <span class="homecta" id="appHomeCta">Home</span>
+  </a>
+  <div class="panel top-panel" id="topPanel"><div class="head"><div><strong>Phasmo Control</strong><div class="muted">shared room: <span id="roomLabel"></span></div></div><div class="row" style="gap:6px"><span class="badge" id="countBadge">0</span><button class="btn-small" id="toggleTopPanel">Collapse</button></div></div>
+    <div class="body">
+      <div id="authMessage" class="error hidden"></div>
+      <div class="top-summary" id="controlSetupSummary">Setup not completed.</div>
+      <div id="controlWeatherWarning" class="warnbox hidden"></div>
+      <div class="spread"><span class="muted">Evidence mode</span><select id="mode"><option value="3">3 evidence</option><option value="2">2 evidence</option><option value="1">1 evidence</option><option value="0">0 evidence</option></select></div>
+      <div class="top-links"><a class="badge" id="setupRouteLinkTop" href="#">Round</a><a class="badge" id="leaderboardRouteLink" href="#">Leaderboard</a></div>
+      <div id="controlCommandStatus" class="muted" style="margin-top:6px"></div>
+    </div>
+  </div>
+  <div class="panel" id="setupPanel"><div class="head"><div><strong id="setupPanelTitle">Setup</strong><div class="muted" id="setupSummaryLine">room and round settings</div></div><span class="muted" id="setupStatus">not set</span></div><div class="body stack">
+    <div id="setupAuthMessage" class="error hidden"></div>
+    <div class="setup-grid room-setup-fields">
+      <label>Room / Session Name<input id="setupRoom" placeholder="kaizen, lobby-2, solo-run"></label>
+      <label>Optional Room Passcode<input id="setupPasscode" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="4 digits, optional"></label>
+      <label class="wide">Streamer / Channel Name<input id="setupSupportChannel" placeholder="optional Twitch channel"></label>
+    </div>
+    <div class="setup-grid round-setup-fields">
+      <label>Number of Players<select id="setupPlayers"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></label>
+      <label>Evidence Mode<select id="setupEvidenceMode"><option value="3">3 evidence</option><option value="2">2 evidence</option><option value="1">1 evidence</option><option value="0">0 evidence</option></select></label>
+      <label>Map / Location<select id="setupMap"><option value="unknown">Unknown</option><option>6 Tanglewood Drive</option><option>10 Ridgeview Court</option><option>13 Willow Street</option><option>42 Edgefield Road</option><option>Nell's Diner</option><option>Grafton Farmhouse</option><option>Camp Woodwind</option><option>Point Hope</option><option>Bleasdale Farmhouse</option><option>Sunny Meadows Restricted</option><option>Prison</option><option>Maple Lodge Campsite</option><option>Brownstone High School</option><option>Sunny Meadows Mental Institution</option></select></label>
+      <label>Game Level / Difficulty<select id="setupDifficulty"><option value="unknown">Unknown</option><option value="amateur">Amateur</option><option value="intermediate">Intermediate</option><option value="professional">Professional</option><option value="nightmare">Nightmare</option><option value="insanity">Insanity</option><option value="custom">Custom</option></select></label>
+      <label>Weather<select id="setupWeather"><option value="unknown">Unknown</option><option value="sunrise">Sunrise</option><option value="clear">Clear</option><option value="fog">Fog</option><option value="blood-moon">Blood Moon</option><option value="light-rain">Light Rain</option><option value="heavy-rain">Heavy Rain</option><option value="windy">Windy</option><option value="snow">Snow</option></select></label>
+      <label>Ghost responds to<select id="setupResponds"><option value="unknown">Unknown</option><option value="everyone">Everyone</option><option value="alone">Alone</option></select></label>
+    </div>
+    <div class="row"><button class="green" id="saveSetup">Save</button><a class="badge" id="setupConfigLink" href="#">Config</a><a class="badge" id="setupControlLink" href="#">Control</a></div>
+    <div class="muted" id="setupHelpText">Room setup is for reusable room settings. Round setup is for contract-specific details.</div>
+    <div id="setupCommandStatus" class="muted" style="margin-top:6px"></div>
+    <div id="awardBanner" class="award-banner hidden"></div>
+  </div></div>
+  <div class="panel tracker-panel"><div class="head"><strong>Quick Trackers</strong><span class="muted" id="timerSummary">timers / sanity</span></div><div class="body">
+    <div class="quick-timers">
+      <button class="blue" data-timer-cmd="!timer incense start">Incense</button>
+      <button class="orange" data-timer-cmd="!timer hunt start">Hunt</button>
+      <button class="blue" data-timer-cmd="!timer cooldown start">Cooldown</button>
+      <button data-timer-cmd="!timer clear">Clear</button>
+    </div>
+    <div id="timerGrid" class="timer-grid" style="margin-top:8px"></div>
+    <div class="tracker-section sanity-section">
+      <div class="spread"><span class="tracker-title">Team Sanity</span><strong id="sanityAverage">Avg: —</strong></div>
+      <div class="sanity-grid">
+        <input id="sanity1" type="number" min="0" max="100" placeholder="P1">
+        <input id="sanity2" type="number" min="0" max="100" placeholder="P2">
+        <input id="sanity3" type="number" min="0" max="100" placeholder="P3">
+        <input id="sanity4" type="number" min="0" max="100" placeholder="P4">
+      </div>
+      <div class="row"><button class="blue" id="saveSanity">Save Sanity</button><button class="orange" id="logHunt">Hunt Triggered</button><button id="clearHunt">Clear Hunt</button></div>
+      <div id="huntReadout" class="tracker-readout">No hunt sanity logged.</div>
+      <div id="vanGoblinBadge" class="van-goblin hidden">🧌 Van Goblin activity detected. Sanity was logged before evidence moved.</div>
+    </div>
+  </div></div>
+  <div class="panel responds-panel"><div class="body"><div class="spread"><strong>Responds: <span id="respondsText">Unknown</span></strong><button id="changeResponds">Change</button></div><div id="respondsChoices" class="grid3" style="margin-top:8px"><button data-responds="unknown">Unknown</button><button data-responds="everyone">Everyone</button><button data-responds="alone">Alone</button></div><div class="muted" id="respondsHint" style="margin-top:8px"></div></div></div>
+  <div class="panel next"><div class="body"><div class="muted" style="letter-spacing:.12em;font-weight:900">NEXT</div><div class="big" id="nextName">Loading</div><p class="muted" id="nextWhy"></p><div class="grid2"><button class="green" id="confirmNext">Confirm</button><button class="red" id="denyNext">No</button></div></div></div>
+  <div class="panel action-panel"><div class="body row"><button class="orange" id="reset">Reset</button><button class="blue" id="nextRound">Next Round</button><button class="blue" id="copyOverlay">Copy Overlay URL</button></div></div>
+  <div id="resultModal" class="modal hidden"><div class="modal-card"><div class="head"><div><strong>Confirm Contract Result</strong><div class="muted">Score guesses before starting the next round.</div></div><button id="cancelResultModal" class="btn-small">Cancel</button></div><div class="body"><div class="top-summary" id="resultSummary">No confirmed result yet.</div><div class="row"><select id="actualGhostSelect"></select><button class="green" id="confirmActualGhost">Confirm & Start Next Round</button></div><div class="muted" style="margin-top:8px">Use the actual ghost shown in the in-game journal after the contract ends. This protects the leaderboard from bad helper data or incomplete investigations.</div><div class="row" style="margin-top:10px"><button class="grey" id="skipScoringNextRound">Skip Scoring / Void Round</button><a class="badge" id="resultLeaderboardLink" href="#">Leaderboard</a></div></div></div></div>
+  <div class="panel evidence-panel" id="evidencePanel"><div class="head"><strong>Evidence Board</strong><button class="btn-small" id="toggleEvidence">Collapse</button></div><div class="body" id="evidenceRows"></div></div>
+  <div class="panel behavior-panel collapsed" id="behaviorPanel"><div class="head"><strong>Behavior Branches</strong><button class="btn-small" id="toggleBehavior">Expand</button></div><div class="body">
+    <div class="witness-block">
+      <div class="witness-head"><strong>Witnessed Model / Name Clue</strong><span class="muted" id="manifestReadout">Unknown</span></div>
+      <div class="manifest-grid"><button data-present="unknown">Unknown</button><button data-present="female">Female</button><button data-present="male">Male</button></div>
+      <div class="tracker-readout">Only use this when the manifested model or ghost name gives a reliable clue. Male presentation rules out female-only ghosts; female presentation rules out male-only ghosts.</div>
+    </div>
+    <input id="behaviorFilter" placeholder="filter: speed, salt, photo" style="width:100%;margin-bottom:8px"><div id="behaviors"></div></div></div>
+  <div class="panel cursed-panel" id="cursedPanel"><div class="head"><div><strong>Cursed Possession Helper</strong><div class="muted" id="cursedMapHint">Select a map in setup for location hints.</div></div><button class="btn-small" id="toggleCursed">Collapse</button></div><div class="body"><div id="cursedRows" class="cursed-grid"></div></div></div>
+  <div class="panel candidates-panel"><div class="head"><strong>Candidates</strong><span class="muted" id="summary"></span></div><div class="body"><div class="ghosts" id="ghosts"></div></div></div>
+  <div class="panel votes-panel compact" id="chatPanel"><div class="head"><strong>Chat</strong><span class="muted" id="chatCounts">Guesses: 0 • Votes: 0</span></div><div class="body"><div id="chatCompact" class="top-summary">No chat input yet.</div><button class="btn-small" id="toggleChatDetails">View details</button><div id="chatDetails" class="hidden" style="margin-top:8px"><div id="ignoredUsersLine" class="muted" style="margin-bottom:8px"></div><div id="votes" class="vote-grid"></div></div></div></div>
+
+  <div class="panel feedback-panel hidden" id="feedbackPanel"><div class="head"><div><strong>Quick Check</strong><div class="muted">How is the helper working for you?</div></div><button id="dismissFeedback" class="btn-small">Not now</button></div><div class="body"><div class="row"><button class="green" data-feedback="up">👍 Good</button><button class="red" data-feedback="down">👎 Needs work</button></div><div class="muted" id="feedbackStatus" style="margin-top:8px">This pops up occasionally during setup so issues get caught early.</div></div></div>
+
+  <div class="panel support-footer" id="supportFooter"><div class="body">
+    <div class="support-links"><a id="configLink" href="/phasmo/config">Config</a><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a><a id="acknowledgementsLink" href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual & support files</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a><a id="streamerBotLink" href="/phasmo/streamerbot">Streamer.bot setup</a><a id="bugReportLink" href="/phasmo/bug-report">Bug reports</a></div>
+    <div class="support-note">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development. <span id="footerGhost" class="footer-ghost hidden">👁</span></div>
+  </div></div>
+  <div class="panel danger-zone" id="jumpscarePanel"><div class="body">
+    <button id="jumpscareButton" class="danger-button">Don’t press this button</button>
+    <div id="jumpscareCount" class="danger-count hidden"></div>
+  </div></div>
+  <div id="jumpscareModal" class="jumpscare-modal" aria-hidden="true"><button id="jumpscareClose" class="jumpscare-close">Close</button><video id="jumpscareVideo" preload="auto" playsinline src="/phasmo/jumpscare-video"></video></div>
+</div>
+<div id="overlay" class="overlay hidden"><section class="ov-card" id="ovCard"><div class="ov-top"><div class="ov-kicker" id="ovKicker">Next Best Test</div><div class="ov-ghosts" id="ovGhosts"></div></div><div class="ov-step" id="ovStep">Loading</div><p class="ov-sub" id="ovSub"></p><div class="ov-bottom"><div class="ov-evidence" id="ovEvidence"></div><div class="ov-notes"><div class="ov-notes-title">Notes / Chat</div><div class="ov-note-text" id="ovNotes">No behaviors or guesses.</div></div></div></section><div id="ovPanicTakeover" class="ov-panic-takeover hidden"><div class="ov-panic-kicker">CHAT EVENT</div><div class="ov-panic-title">PANIC DECLARED</div><div class="ov-panic-sub">Remain calm. Or at least narrate the chaos clearly.</div></div><div id="ovJumpscare" class="ov-jumpscare hidden"><video id="ovJumpscareVideo" preload="auto" playsinline src="/phasmo/jumpscare-video"></video><div class="ov-jumpscare-label">button pressed</div></div></div>
+<script>window.PHASMO_MODE='__MODE__';</script>
+<script src="/phasmo/static/phasmo.js"></script></body></html>
