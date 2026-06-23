@@ -1,13 +1,19 @@
 const MODE=window.PHASMO_MODE||'control';
 const params=new URLSearchParams(location.search);
-const room=params.get('room')||'default';
-const roomCodeKey=`phasmoRoomCode:${room}`;
-let roomCode=(params.get('code')||localStorage.getItem(roomCodeKey)||'').replace(/[^0-9]/g,'').slice(0,4);
-if(roomCode.length===4){ localStorage.setItem(roomCodeKey, roomCode); }
+function normalizeRoomKey(raw){let v=(raw||'default').toLowerCase().trim().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,64);return v||'default'}
+const room=normalizeRoomKey(params.get('room')||'default');
+function roomCodeKeyFor(targetRoom){return `phasmoRoomCode:${normalizeRoomKey(targetRoom||room)}`}
+function cleanRoomCode(raw){return (raw||'').replace(/[^0-9]/g,'').slice(0,4)}
+let roomCode=cleanRoomCode(params.get('code')||localStorage.getItem(roomCodeKeyFor(room))||'');
+if(roomCode.length===4){ localStorage.setItem(roomCodeKeyFor(room), roomCode); }
 const API='/api/phasmo';
-function codeSuffix(){return roomCode&&roomCode.length===4?'&code='+encodeURIComponent(roomCode):''}
-function rememberRoomCode(raw){roomCode=(raw||'').replace(/[^0-9]/g,'').slice(0,4); if(roomCode.length===4)localStorage.setItem(roomCodeKey,roomCode); return roomCode;}
-async function retryWithRoomCode(message){const entered=prompt(message||'This room is locked. Enter the 4-digit room passcode.'); return rememberRoomCode(entered).length===4;}
+let authPromptActive=false;
+function storedRoomCodeFor(targetRoom){const key=roomCodeKeyFor(targetRoom); const fallback=normalizeRoomKey(targetRoom)===room?roomCode:''; return cleanRoomCode(localStorage.getItem(key)||fallback||'')}
+function codeSuffixFor(targetRoom=room){const code=storedRoomCodeFor(targetRoom);return code&&code.length===4?'&code='+encodeURIComponent(code):''}
+function codeSuffix(){return codeSuffixFor(room)}
+function rememberRoomCodeFor(targetRoom,raw){const cleaned=cleanRoomCode(raw); const key=roomCodeKeyFor(targetRoom); if(cleaned.length===4){localStorage.setItem(key,cleaned); if(normalizeRoomKey(targetRoom)===room)roomCode=cleaned;} return cleaned;}
+function rememberRoomCode(raw){return rememberRoomCodeFor(room,raw)}
+async function retryWithRoomCode(message,targetRoom=room){if(authPromptActive)return false; authPromptActive=true; try{const entered=prompt(message||'This room is locked. Enter the 4-digit room passcode.'); return rememberRoomCodeFor(targetRoom,entered).length===4;} finally{authPromptActive=false;}}
 const E=['dots','emf5','freezing','orbs','writing','box','uv'];
 const EL={dots:'D.O.T.S Projector',emf5:'EMF Level 5',freezing:'Freezing Temperatures',orbs:'Ghost Orb',writing:'Ghost Writing',box:'Spirit Box',uv:'Ultraviolet'};
 const G=[
@@ -173,12 +179,34 @@ const CURSED_HINTS={
 const B=[{"id":"hantu-temperature-speed","cat":"Movement Speed","label":"Speed changes with room temperature","up":["Hantu"],"down":[],"w":48,"rel":"High"},{"id":"raiju-electronics-speed","cat":"Movement Speed","label":"Speeds up near active electronics","up":["Raiju"],"down":[],"w":48,"rel":"High"},{"id":"revenant-los-speed","cat":"Movement Speed","label":"Slow searching, extremely fast after detecting a player","up":["Revenant"],"down":[],"w":52,"rel":"High"},{"id":"deogen-distance-speed","cat":"Movement Speed","label":"Very fast far away, very slow when close","up":["Deogen"],"down":[],"w":56,"rel":"High"},{"id":"dayan-moving-speed","cat":"Movement Speed","label":"Fast when a nearby player is moving","up":["Dayan"],"down":[],"w":44,"rel":"High"},{"id":"dayan-still-slow","cat":"Movement Speed","label":"Slow when nearby player stands still","up":["Dayan"],"down":[],"w":40,"rel":"High"},{"id":"twins-speed-profiles","cat":"Movement Speed","label":"Two different hunt speed profiles","up":["The Twins"],"down":[],"w":38,"rel":"Med"},{"id":"thaye-aging-speed","cat":"Movement Speed","label":"Starts fast/hyperactive, calms and slows over time","up":["Thaye"],"down":[],"w":44,"rel":"High"},{"id":"obambo-state-speed","cat":"Movement Speed","label":"Alternates calm/aggressive speed and hunt behavior","up":["Obambo"],"down":[],"w":40,"rel":"Med"},{"id":"aswang-los-ramp","cat":"Movement Speed","label":"Lower base speed but faster line-of-sight acceleration","up":["Aswang"],"down":[],"w":34,"rel":"Med"},{"id":"wraith-no-salt","cat":"Salt / Ultraviolet","label":"Does not disturb salt at all","up":["Wraith"],"down":[],"w":58,"rel":"High"},{"id":"salt-footprints","cat":"Salt / Ultraviolet","label":"Salt disturbed and UV footprints appear","up":[],"down":["Wraith"],"w":45,"rel":"High"},{"id":"gallu-no-salt-enraged","cat":"Salt / Ultraviolet","label":"Cannot disturb salt while enraged","up":["Gallu"],"down":[],"w":36,"rel":"Med"},{"id":"obake-unique-print","cat":"Salt / Ultraviolet","label":"Unique UV print such as six fingers or double switch print","up":["Obake"],"down":[],"w":58,"rel":"High"},{"id":"obake-hides-prints","cat":"Salt / Ultraviolet","label":"Repeated valid UV interactions sometimes leave no print","up":["Obake"],"down":[],"w":32,"rel":"Med"},{"id":"breaker-off-direct","cat":"Electricity / Breaker / Lights","label":"Ghost turns breaker off directly","up":["Hantu","Mare"],"down":["Jinn"],"w":30,"rel":"Med"},{"id":"breaker-on-benefit","cat":"Electricity / Breaker / Lights","label":"Performs better with breaker on","up":["Jinn","Raiju"],"down":["Hantu"],"w":22,"rel":"Low"},{"id":"jinn-breaker-speed","cat":"Electricity / Breaker / Lights","label":"Fast with breaker on, line of sight, and target over 3m away","up":["Jinn"],"down":[],"w":46,"rel":"High"},{"id":"jinn-sanity-drain","cat":"Electricity / Breaker / Lights","label":"Nearby sanity drain with EMF at fuse box","up":["Jinn"],"down":[],"w":38,"rel":"Med"},{"id":"hantu-breath-breaker-off","cat":"Electricity / Breaker / Lights","label":"Freezing breath during hunts when breaker is off or broken","up":["Hantu"],"down":[],"w":48,"rel":"High"},{"id":"mare-lights-off","cat":"Electricity / Breaker / Lights","label":"More dangerous when current room lights are off or broken","up":["Mare"],"down":[],"w":32,"rel":"Med"},{"id":"mare-no-lights-on","cat":"Electricity / Breaker / Lights","label":"Never turns lights on and may immediately turn them off","up":["Mare"],"down":[],"w":34,"rel":"Med"},{"id":"light-shatter-event","cat":"Electricity / Breaker / Lights","label":"Prefers light-shattering events","up":["Mare"],"down":[],"w":24,"rel":"Low"},{"id":"raiju-wide-interference","cat":"Electricity / Breaker / Lights","label":"Electronic interference range feels larger than normal","up":["Raiju"],"down":[],"w":34,"rel":"Med"},{"id":"yokai-short-hearing","cat":"Electricity / Breaker / Lights","label":"During hunts, only hears voice/electronics very close","up":["Yokai"],"down":[],"w":42,"rel":"High"},{"id":"early-hunt","cat":"Hunt Timing / Threshold","label":"Hunts earlier than normal sanity threshold","up":["Demon","Mare","Onryo","Thaye","Raiju","Yokai","Dayan","Kormos","Gallu","Obambo"],"down":["Shade","Deogen"],"w":30,"rel":"Med"},{"id":"demon-ability-hunt","cat":"Hunt Timing / Threshold","label":"Very early hunt that may ignore sanity","up":["Demon"],"down":[],"w":46,"rel":"Med"},{"id":"shade-shy","cat":"Hunt Timing / Threshold","label":"Will not hunt or interact while players are in the same room","up":["Shade"],"down":["Demon","Oni"],"w":42,"rel":"Med"},{"id":"yokai-talking-hunt","cat":"Hunt Timing / Threshold","label":"Talking in same room appears to enable earlier hunt","up":["Yokai"],"down":[],"w":38,"rel":"Med"},{"id":"kormos-sprint-threshold","cat":"Hunt Timing / Threshold","label":"Player sprinting in same room appears to enable earlier hunt","up":["Kormos"],"down":[],"w":36,"rel":"Med"},{"id":"aswang-zero-grace","cat":"Hunt Timing / Threshold","label":"Hunt sometimes appears to start with no grace period","up":["Aswang"],"down":[],"w":36,"rel":"Med"},{"id":"gallu-state-thresholds","cat":"Hunt Timing / Threshold","label":"Hunt threshold changes with normal/enraged/weakened state","up":["Gallu"],"down":[],"w":32,"rel":"Med"},{"id":"obambo-aggressive-hunts","cat":"Hunt Timing / Threshold","label":"Aggressive state hunts earlier but may be shorter","up":["Obambo"],"down":[],"w":34,"rel":"Med"},{"id":"deogen-late-hunt","cat":"Hunt Timing / Threshold","label":"Does not hunt until lower sanity than normal","up":["Deogen"],"down":[],"w":26,"rel":"Low"},{"id":"onryo-flame-prevent","cat":"Fire / Incense / Crucifix","label":"Lit flame nearby prevents hunts like a crucifix","up":["Onryo"],"down":[],"w":48,"rel":"High"},{"id":"onryo-third-blowout","cat":"Fire / Incense / Crucifix","label":"Hunt attempt after third flame blowout with no nearby flame","up":["Onryo"],"down":[],"w":52,"rel":"High"},{"id":"spirit-long-incense","cat":"Fire / Incense / Crucifix","label":"Incense prevents hunts much longer than normal","up":["Spirit"],"down":["Demon"],"w":48,"rel":"High"},{"id":"demon-short-incense","cat":"Fire / Incense / Crucifix","label":"Incense protection seems shorter than normal","up":["Demon"],"down":["Spirit"],"w":46,"rel":"High"},{"id":"demon-crucifix-range","cat":"Fire / Incense / Crucifix","label":"Crucifix blocks hunt from farther away than expected","up":["Demon"],"down":[],"w":32,"rel":"Med"},{"id":"gallu-crucifix-enraged","cat":"Fire / Incense / Crucifix","label":"Crucifix burn causes enraged Gallu behavior","up":["Gallu"],"down":[],"w":38,"rel":"Med"},{"id":"yurei-incense-trap","cat":"Fire / Incense / Crucifix","label":"Non-hunt incense traps it in favorite room","up":["Yurei"],"down":[],"w":32,"rel":"Med"},{"id":"phantom-photo-disappear","cat":"Ghost Events / Manifestation","label":"Ghost disappears when photographed or filmed","up":["Phantom"],"down":[],"w":58,"rel":"High"},{"id":"photo-visible","cat":"Ghost Events / Manifestation","label":"Ghost remains visible in ghost photo","up":[],"down":["Phantom"],"w":32,"rel":"Med"},{"id":"oni-no-mist","cat":"Ghost Events / Manifestation","label":"No mist-form/airball events observed after many events","up":["Oni"],"down":[],"w":34,"rel":"Med"},{"id":"oni-full-visible","cat":"Ghost Events / Manifestation","label":"Very visible during hunts or strong full-form events","up":["Oni"],"down":["Phantom"],"w":35,"rel":"Med"},{"id":"kormos-no-mist-chase","cat":"Ghost Events / Manifestation","label":"Cannot perform mist-form or chasing ghost events","up":["Kormos"],"down":[],"w":32,"rel":"Med"},{"id":"banshee-singing","cat":"Ghost Events / Manifestation","label":"Frequent singing events or unusual singing sanity drain target","up":["Banshee"],"down":[],"w":34,"rel":"Med"},{"id":"phantom-sanity-look","cat":"Ghost Events / Manifestation","label":"Looking at manifestation drains sanity unusually fast","up":["Phantom"],"down":[],"w":30,"rel":"Low"},{"id":"myling-quiet-footsteps","cat":"Sound / Spirit Box","label":"Hunt footsteps/vocalizations only audible when close","up":["Myling"],"down":[],"w":46,"rel":"High"},{"id":"banshee-scream","cat":"Sound / Spirit Box","label":"Banshee scream on parabolic microphone","up":["Banshee"],"down":[],"w":48,"rel":"High"},{"id":"deogen-spiritbox-breath","cat":"Sound / Spirit Box","label":"Deogen breathing response on Spirit Box","up":["Deogen"],"down":[],"w":44,"rel":"High"},{"id":"moroi-curse","cat":"Sound / Spirit Box","label":"Cursed player drains sanity rapidly after paranormal audio/contact","up":["Moroi"],"down":[],"w":42,"rel":"Med"},{"id":"box-alone-mismatch","cat":"Sound / Spirit Box","label":"Spirit Box only works under correct alone/everyone condition","up":[],"down":[],"w":0,"rel":"Context"},{"id":"goryo-camera-dots","cat":"Room / Roaming / D.O.T.S","label":"D.O.T.S visible on camera only, not naked eye","up":["Goryo"],"down":[],"w":50,"rel":"High"},{"id":"goryo-room-stable","cat":"Room / Roaming / D.O.T.S","label":"Favorite room does not naturally change","up":["Goryo"],"down":[],"w":28,"rel":"Low"},{"id":"thaye-high-activity-early","cat":"Room / Roaming / D.O.T.S","label":"Very high activity early, lower activity later","up":["Thaye"],"down":[],"w":36,"rel":"Med"},{"id":"mare-long-roam-lights-on","cat":"Room / Roaming / D.O.T.S","label":"Seems to roam farther when lights are on","up":["Mare"],"down":[],"w":20,"rel":"Low"},{"id":"yurei-door-room","cat":"Room / Roaming / D.O.T.S","label":"Strong door ability or favorite-room trapping behavior","up":["Yurei"],"down":[],"w":38,"rel":"Med"},{"id":"banshee-target","cat":"Targeting / Awareness","label":"Only one player seems targeted during hunts","up":["Banshee"],"down":[],"w":42,"rel":"Med"},{"id":"deogen-knows-location","cat":"Targeting / Awareness","label":"Always knows where players are during hunts","up":["Deogen"],"down":[],"w":44,"rel":"High"},{"id":"kormos-no-los","cat":"Targeting / Awareness","label":"No visual line-of-sight; detects voice/electronics/footsteps instead","up":["Kormos"],"down":[],"w":50,"rel":"High"},{"id":"aswang-hidden-spares","cat":"Targeting / Awareness","label":"Reaches correctly hidden player and hunt ends instead of killing","up":["Aswang"],"down":[],"w":58,"rel":"High"},{"id":"wraith-teleport","cat":"Targeting / Awareness","label":"Teleports to player and leaves EMF at feet level","up":["Wraith"],"down":[],"w":32,"rel":"Med"},{"id":"phantom-travel","cat":"Targeting / Awareness","label":"Travels to random player and leaves EMF at head level","up":["Phantom"],"down":[],"w":28,"rel":"Low"},{"id":"polter-multi-throw","cat":"Object / Interaction","label":"Object pile explosion or many throws at once","up":["Poltergeist"],"down":[],"w":55,"rel":"High"},{"id":"polter-hunt-throw-rate","cat":"Object / Interaction","label":"Throws objects constantly during hunts","up":["Poltergeist"],"down":[],"w":44,"rel":"High"},{"id":"twins-double-interaction","cat":"Object / Interaction","label":"Near-simultaneous interactions in separate places","up":["The Twins"],"down":[],"w":42,"rel":"Med"},{"id":"shade-low-interaction","cat":"Object / Interaction","label":"Low interaction/events while players are near the ghost","up":["Shade"],"down":["Oni","Poltergeist"],"w":34,"rel":"Med"},{"id":"obake-shapeshift","cat":"Object / Interaction","label":"Brief shapeshift/model flicker during hunt","up":["Obake"],"down":[],"w":52,"rel":"High"},{"id":"mimic-fake-orbs","cat":"Mimic / Special Cases","label":"Ghost Orbs plus impossible evidence combo","up":["The Mimic"],"down":[],"w":60,"rel":"High"},{"id":"mimic-changing-tells","cat":"Mimic / Special Cases","label":"Behavior tells change between hunts or over time","up":["The Mimic"],"down":[],"w":44,"rel":"Med"}];
 let state={evidence:{},behaviors:{},votes:{},responds:'unknown',evidenceMode:'3'}; let expanded={}; let evidenceCollapsed=localStorage.getItem('phasmoEvidenceCollapsed')==='true'; let behaviorCollapsed=localStorage.getItem('phasmoBehaviorCollapsed')==='true'; let cursedCollapsed=localStorage.getItem('phasmoCursedCollapsed')==='true'; let topPanelCollapsed=localStorage.getItem('phasmoTopPanelCollapsed')==='true'; let sanitySaveTimer=null; let setupDirty=false;
 function apiUrl(path){return `${API}${path}?room=${encodeURIComponent(room)}${codeSuffix()}`}
-async function getState(){let r=await fetch(`${API}/state?room=${encodeURIComponent(room)}`);state=await r.json();if(!shouldHoldSetupRender())render();}
+async function fetchRoomState(targetRoom=room){
+  let r=await fetch(`${API}/state?room=${encodeURIComponent(targetRoom)}${codeSuffixFor(targetRoom)}`);
+  if(r.status===403){
+    const ok=await retryWithRoomCode('This room is locked. Enter the 4-digit room passcode to join.',targetRoom);
+    if(!ok){location.href='/phasmo/rooms';return null;}
+    r=await fetch(`${API}/state?room=${encodeURIComponent(targetRoom)}${codeSuffixFor(targetRoom)}`);
+  }
+  if(r.status===403){
+    showAuthError('Room locked. The passcode was not accepted.');
+    return null;
+  }
+  if(r.status===410){
+    location.href='/phasmo/rooms';
+    return null;
+  }
+  if(!r.ok){
+    showAuthError('Could not load room state. Please try again.');
+    return null;
+  }
+  return await r.json();
+}
+async function getState(){let next=await fetchRoomState(room);if(!next)return;state=next;if(!shouldHoldSetupRender())render();}
 async function postState(patch){
   let r=await fetch(apiUrl('/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});
   if(r.status===403 && await retryWithRoomCode('This room is locked. Enter the 4-digit room passcode to make changes.')){
     r=await fetch(apiUrl('/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});
   }
+  if(r.status===410){showAuthError('This room session is closed. Create a new room to continue.');return false;}
   if(!r.ok){
     showAuthError('Update blocked. If this room has a passcode, enter the 4-digit code.');
     return false;
@@ -192,6 +220,7 @@ async function command(cmd,user='control'){
   if(r.status===403 && await retryWithRoomCode('This room is locked. Enter the 4-digit room passcode to send commands.')){
     r=await fetch(apiUrl('/command'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:cmd,user:user,roomPasscode:roomCode})});
   }
+  if(r.status===410){showAuthError('This room session is closed. Commands are disabled.');return false;}
   if(!r.ok){
     showAuthError('Command blocked. If this room has a passcode, enter the 4-digit code.');
     return false;
@@ -213,8 +242,8 @@ function setValueUnlessEditing(id,value){const el=document.getElementById(id);if
 function impact(g){let s=0; for(const b of B){let v=state.behaviors?.[b.id]||'unknown'; if(v==='observed'){if(b.up.includes(g.name))s+=b.w;if(b.down.includes(g.name))s-=b.w} if(v==='contradicted'){if(b.up.includes(g.name))s-=Math.round(b.w*.65);if(b.down.includes(g.name))s+=Math.round(b.w*.45)}} return s}
 
 function safeRoomName(raw){let v=(raw||'default').toLowerCase().trim().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,64);return v||'default'}
-function apiUrlFor(targetRoom,path){return `${API}${path}?room=${encodeURIComponent(targetRoom)}${targetRoom===room?codeSuffix():''}`}
-async function postStateForRoom(targetRoom,patch){let r=await fetch(apiUrlFor(targetRoom,'/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});if(r.status===403 && await retryWithRoomCode('This room is locked. Enter the 4-digit room passcode to make changes.')){r=await fetch(apiUrlFor(targetRoom,'/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});} if(!r.ok){showAuthError('Update blocked. If this room has a passcode, enter the 4-digit code.');return false;}return true}
+function apiUrlFor(targetRoom,path){return `${API}${path}?room=${encodeURIComponent(targetRoom)}${codeSuffixFor(targetRoom)}`}
+async function postStateForRoom(targetRoom,patch){let r=await fetch(apiUrlFor(targetRoom,'/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});if(r.status===403 && await retryWithRoomCode('This room is locked. Enter the 4-digit room passcode to make changes.',targetRoom)){r=await fetch(apiUrlFor(targetRoom,'/state'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)});} if(r.status===410){showAuthError('This room session is closed.');return false;}if(r.status===400){let msg=await r.text().catch(()=>null);showAuthError('Room name blocked. Use a stream-safe room name with letters, numbers, spaces, hyphens, or underscores.');return false;}if(!r.ok){showAuthError('Update blocked. If this room has a passcode, enter the 4-digit code.');return false;}return true}
 function cleanSanityValues(vals){let out=[null,null,null,null];(vals||[]).slice(0,4).forEach((v,i)=>{if(v===null||v===undefined||v===''){out[i]=null;return;}let n=Number(v);out[i]=Number.isFinite(n)?Math.max(0,Math.min(100,Math.round(n))):null});return out}
 function activeSanityValues(){let vals=cleanSanityValues(state.sanityValues||[]), players=Math.max(1,Math.min(4,+(state.playerCount||4)));return vals.slice(0,players).filter(v=>v!==null)}
 function sanityAverage(){let vals=activeSanityValues(); if(!vals.length)return null; return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length)}
@@ -262,6 +291,20 @@ function activeTimers(){
 function fmtTimer(s){if(s<=0)return 'done'; let m=Math.floor(s/60), r=String(s%60).padStart(2,'0'); return `${m}:${r}`}
 
 function voteSummary(kind='votes'){let source=kind==='guesses'?(state.guesses||{}):(state.votes||{});let counts={}; for(const [user,ghost] of Object.entries(source)){counts[ghost]??=[];counts[ghost].push(user)} return Object.entries(counts).map(([ghost,users])=>({ghost,users,count:users.length})).sort((a,b)=>b.count-a.count||a.ghost.localeCompare(b.ghost))}
+function escHtml(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+function candidateReelHtml(list, confirmed=''){
+  const box=document.getElementById('ovGhosts');
+  const names=confirmed?[confirmed]:(list||[]).map(g=>g.name);
+  if(!box)return '';
+  if(!names.length){box.className='ov-ghosts static-mode';return '';}
+  if(names.length<=3){
+    box.className='ov-ghosts static-mode';
+    return names.map(name=>`<span class='badge'>${escHtml(name)}</span>`).join('');
+  }
+  box.className='ov-ghosts reel-mode';
+  const chips=names.map(name=>`<span class='badge'>${escHtml(name)}</span>`).join('');
+  return `<div class='ghost-reel'><div class='ghost-reel-track'><span class='ghost-reel-label'>Remaining</span>${chips}<span class='ghost-reel-label'>Remaining</span>${chips}</div></div>`;
+}
 function populateActualGhostSelect(){let sel=document.getElementById('actualGhostSelect'); if(!sel||sel.dataset.ready==='true')return; sel.innerHTML='<option value="">Select actual ghost…</option>'+G.map(g=>`<option value="${g.name}">${g.name}</option>`).join(''); sel.dataset.ready='true'}
 function renderContractResult(){
   populateActualGhostSelect();
@@ -937,20 +980,20 @@ function setupOverlay(){
     const tip=pick(classifiedTips, phase);
     setCard('CLASSIFIED',tip.title,tip.sub,'pregame-legacy');
     document.getElementById('ovEvidence').innerHTML=`<div class='pg-warning'>Authorized personnel only</div><div class='pg-quote'>${tip.body}</div><div class='pg-source'>${tip.note}</div>`;
-    document.getElementById('ovGhosts').innerHTML='';
+    {const g=document.getElementById('ovGhosts'); if(g){g.className='ov-ghosts static-mode';g.innerHTML='';}}
     return;
   }
   const roomTip=roomTips[(room||'').toLowerCase()];
   if(roomTip && phase===4){
     setCard('ROOM-SPECIFIC NOTE',roomTip.title,roomTip.sub,'pregame-tip');
     document.getElementById('ovEvidence').innerHTML=`<div class='pg-quote'>${roomTip.body}</div><div class='pg-source'>${roomTip.note}</div>`;
-    document.getElementById('ovGhosts').innerHTML='';
+    {const g=document.getElementById('ovGhosts'); if(g){g.className='ov-ghosts static-mode';g.innerHTML='';}}
     return;
   }
   if((state.awardMessage||'') && phase===5){
     setCard('POST-CONTRACT AWARD',state.awardMessage,'Unofficial, unhelpful, and probably deserved.','pregame-comms');
     document.getElementById('ovEvidence').innerHTML=`<div class='pg-headerline'><div class='pg-emblem'>🏆</div><div><div class='pg-mini'>Investigation award</div><div class='pg-main'>${state.awardMessage}</div></div></div>`;
-    document.getElementById('ovGhosts').innerHTML='';
+    {const g=document.getElementById('ovGhosts'); if(g){g.className='ov-ghosts static-mode';g.innerHTML='';}}
     return;
   }
   if(phase===0){
@@ -972,7 +1015,7 @@ function setupOverlay(){
     document.getElementById('ovEvidence').innerHTML=`<div class='pg-warning'>Recovered advice — not recommended</div><div class='pg-quote'>${tip.body}</div><div class='pg-source'>${tip.note}</div>`;
   }
 
-  document.getElementById('ovGhosts').innerHTML='';
+  {const g=document.getElementById('ovGhosts'); if(g){g.className='ov-ghosts static-mode';g.innerHTML='';}}
 }
 
 function renderTrackerOverlay(){
@@ -1002,9 +1045,7 @@ function renderTrackerOverlay(){
   if(state.weather&&state.weather!=='unknown')setupBits.push(titleCase(state.weather));
   setupBits.push(`${yesCount} confirmed / ${noCount} ruled out`);
   document.getElementById('ovSub').textContent=setupBits.join(' • ');
-  let ghostBits=(confirmed?[confirmed]:c.slice(0,3).map(g=>g.name)).map(name=>`<span class='badge'>${name}</span>`);
-  if(!confirmed&&c.length>3)ghostBits.push(`<span class='badge'>+${c.length-3}</span>`);
-  document.getElementById('ovGhosts').innerHTML=ghostBits.join('');
+  document.getElementById('ovGhosts').innerHTML=candidateReelHtml(c, confirmed);
   document.getElementById('ovEvidence').innerHTML=E.map(k=>{
     const v=state.evidence[k]||'unknown';
     return `<span class='ev-dot ${v==='yes'?'yes':v==='no'?'no':''}' title='${label[k]}: ${v}'><span class='ev-mark'>${icon[k]}</span></span>`;
@@ -1087,9 +1128,7 @@ function renderOverlay(){
   }
   document.getElementById('ovSub').textContent=subText;
 
-  let ghostBits=c.slice(0,3).map(g=>`<span class='badge'>${g.name}</span>`);
-  if(c.length>3) ghostBits.push(`<span class='badge'>+${c.length-3}</span>`);
-  document.getElementById('ovGhosts').innerHTML=ghostBits.join('');
+  document.getElementById('ovGhosts').innerHTML=candidateReelHtml(c, isFinal?c[0]?.name:'');
 
   document.getElementById('ovEvidence').innerHTML=E.map(k=>{
     const v=state.evidence[k]||'unknown';
@@ -1129,8 +1168,10 @@ document.querySelectorAll('#setupPanel input,#setupPanel select,#setupPanel text
   el.addEventListener('change',()=>{setupDirty=true;});
 });
 document.getElementById('saveSetup')?.addEventListener('click',async()=>{
-  const targetRoom=safeRoomName(document.getElementById('setupRoom')?.value||room);
-  const passcode=rememberRoomCode(document.getElementById('setupPasscode')?.value||roomCode||'');
+  const rawRoom=document.getElementById('setupRoom')?.value||room;
+  if(!/^[A-Za-z0-9][A-Za-z0-9 _-]{1,31}$/.test(rawRoom.trim())){showAuthError('Use a stream-safe room name: 3–32 characters, letters/numbers/spaces/hyphens/underscores only.');return;}
+  const targetRoom=safeRoomName(rawRoom);
+  const passcode=rememberRoomCodeFor(targetRoom,document.getElementById('setupPasscode')?.value||storedRoomCodeFor(targetRoom)||'');
   let patch={};
   if(MODE==='room'){
     patch={roomPasscode:passcode,supportChannel:document.getElementById('setupSupportChannel')?.value||''};
@@ -1149,7 +1190,7 @@ document.getElementById('saveSanity')?.addEventListener('click',saveSanityNow);
 document.getElementById('logHunt')?.addEventListener('click',()=>{let vals=[1,2,3,4].map(i=>document.getElementById('sanity'+i)?.value||null), clean=cleanSanityValues(vals), players=+state.playerCount||4, active=clean.slice(0,players).filter(v=>v!==null), avg=active.length?Math.round(active.reduce((a,b)=>a+b,0)/active.length):sanityAverage(); if(avg!==null)postState({sanityValues:clean,huntSanity:avg});});
 document.getElementById('clearHunt')?.addEventListener('click',()=>postState({huntSanity:null}));
 document.querySelectorAll('[data-present]').forEach(btn=>btn.addEventListener('click',()=>postState({presentation:btn.dataset.present})));
-document.getElementById('mode')?.addEventListener('change',e=>postState({evidenceMode:e.target.value}));document.getElementById('changeResponds')?.addEventListener('click',()=>document.getElementById('respondsChoices').classList.toggle('hidden'));document.getElementById('reset')?.addEventListener('click',async()=>{const ok=await postState({reset:true}); if(ok) location.href=`/phasmo/round?room=${encodeURIComponent(room)}${codeSuffix()}`;});
+document.getElementById('mode')?.addEventListener('change',e=>postState({evidenceMode:e.target.value}));document.getElementById('changeResponds')?.addEventListener('click',()=>document.getElementById('respondsChoices').classList.toggle('hidden'));document.getElementById('reset')?.addEventListener('click',async()=>{if(!confirm('Reset Current Round clears evidence, behaviors, timers, guesses, and votes for this contract only. It does not close the room. Continue?'))return; const ok=await postState({reset:true}); if(ok) location.href=`/phasmo/round?room=${encodeURIComponent(room)}${codeSuffix()}`;});
 async function startNextRound(){const ok=await postState({nextRound:true}); if(ok) location.href=`/phasmo/round?room=${encodeURIComponent(room)}${codeSuffix()}`;}
 function showResultModal(){populateActualGhostSelect();renderContractResult();document.getElementById('resultModal')?.classList.remove('hidden');}
 document.getElementById('nextRound')?.addEventListener('click',async()=>{
@@ -1159,7 +1200,8 @@ document.getElementById('nextRound')?.addEventListener('click',async()=>{
   if((hasGuesses||hasVotes)&&!confirmed){showResultModal();return;}
   await startNextRound();
 });
-document.getElementById('copyOverlay')?.addEventListener('click',()=>navigator.clipboard?.writeText(`${location.origin}/phasmo/overlay?room=${encodeURIComponent(room)}`));
+document.getElementById('copyOverlay')?.addEventListener('click',()=>navigator.clipboard?.writeText(`${location.origin}/phasmo/overlay?room=${encodeURIComponent(room)}${codeSuffix()}`));
+document.getElementById('endSession')?.addEventListener('click',async()=>{if(!confirm('End Session closes this room, removes it from Active Rooms, and stops normal edits/commands. Leaderboard history stays saved. Continue?'))return; const ok=await postState({endSession:true,closedBy:'control'}); if(ok) location.href='/phasmo';});
 document.getElementById('confirmActualGhost')?.addEventListener('click',async()=>{const ghost=document.getElementById('actualGhostSelect')?.value||''; if(!ghost){showAuthError('Select the actual ghost before confirming the contract result.');return;} const ok=await postState({contractResult:{confirmedGhost:ghost,confirmedBy:'control'}}); if(ok) await startNextRound();});
 document.getElementById('skipScoringNextRound')?.addEventListener('click',startNextRound);
 document.getElementById('cancelResultModal')?.addEventListener('click',()=>document.getElementById('resultModal')?.classList.add('hidden'));
@@ -1259,16 +1301,28 @@ document.addEventListener('keydown',async(e)=>{
   }
 });
 
+
+async function loadSiteBanner(){
+  const el=document.getElementById('siteBanner'), text=document.getElementById('siteBannerText');
+  if(!el||!text)return;
+  try{
+    const r=await fetch('/api/phasmo/banner');
+    const data=await r.json();
+    const b=data.banner||{};
+    if(!b.enabled||!b.message){el.classList.add('hidden');return;}
+    const key='phasmoBannerDismissed:'+String(b.updatedAt||'current');
+    if(localStorage.getItem(key)==='true'){el.classList.add('hidden');return;}
+    text.textContent=b.message;
+    el.classList.remove('hidden');
+    document.getElementById('dismissSiteBanner')?.addEventListener('click',()=>{localStorage.setItem(key,'true');el.classList.add('hidden');},{once:true});
+  }catch(e){}
+}
+
 async function pollState(){
   const holdSetupRender=shouldHoldSetupRender();
-  let r=await fetch(`${API}/state?room=${encodeURIComponent(room)}`);
-  let next=await r.json();
-  if(MODE==='setup' && next.setupComplete===true && !holdSetupRender){
-    state=next;
-    render();
-    location.href=`/phasmo/control?room=${encodeURIComponent(room)}${codeSuffix()}`;
-    return;
-  }
+  let next=await fetchRoomState(room);
+  if(!next)return;
+  // Do not auto-redirect away from Round Setup. Streamers may intentionally return here during an active run.
   if(holdSetupRender){
     // Keep remote updates in memory, but do not repaint over local room/round setup edits.
     state=next;
@@ -1277,4 +1331,4 @@ async function pollState(){
   state=next;
   render();
 }
-getState().then(()=>maybeShowFeedbackPrompt()); setInterval(pollState, 1000);
+loadSiteBanner(); getState().then(()=>maybeShowFeedbackPrompt()); setInterval(pollState, (MODE==='overlay'?1000:(MODE==='control'?2000:5000)));

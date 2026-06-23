@@ -11,6 +11,13 @@ def _room_file_is_active(path: Path, now_ms: int | None = None) -> bool:
         return False
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
+        if data.get("roomStatus") == "closed":
+            closed_at = int(data.get("closedAt") or data.get("updatedAt") or 0)
+            if not closed_at:
+                return False
+            now_ms = now_ms or int(time.time() * 1000)
+            # Closed rooms are hidden from Active Rooms but kept briefly for export/audit.
+            return (now_ms - closed_at) < (settings._CLOSED_ROOM_RETENTION_SECONDS * 1000)
         updated = int(data.get("lastActiveAt") or data.get("updatedAt") or 0)
     except Exception:
         return False
@@ -46,6 +53,8 @@ def active_room_summaries() -> list[Dict[str, Any]]:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except Exception:
+            continue
+        if data.get("roomStatus") == "closed":
             continue
         updated = int(data.get("lastActiveAt") or data.get("updatedAt") or 0)
         if not updated or (now_ms - updated) >= (settings._ROOM_TTL_SECONDS * 1000):

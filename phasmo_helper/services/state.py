@@ -88,6 +88,9 @@ def default_state(room: str = "default") -> Dict[str, Any]:
         "supportContact": "",
         "supportNote": "",
         "lastSupportPingAt": 0,
+        "roomStatus": "open",
+        "closedAt": 0,
+        "closedBy": "",
     }
 
 
@@ -125,6 +128,12 @@ def read_state(room: str) -> Dict[str, Any]:
         }
         merged["jumpscareCount"] = _read_jumpscare_count()
         merged["resetCount"] = _read_reset_count()
+        merged["roomStatus"] = data.get("roomStatus") if data.get("roomStatus") in {"open", "closed"} else "open"
+        try:
+            merged["closedAt"] = int(data.get("closedAt") or 0)
+        except Exception:
+            merged["closedAt"] = 0
+        merged["closedBy"] = str(data.get("closedBy") or "")[:120]
         merged["config"] = _read_config()
         return merged
     except Exception:

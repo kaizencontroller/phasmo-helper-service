@@ -11,6 +11,8 @@ from ..services.commands import apply_command
 from ..services.leaderboard import _score_contract_result
 from ..services.reports import _bug_report_path, _feedback_path, maybe_record_support_ping
 from ..services.rooms import active_room_summaries, cleanup_inactive_rooms
+from ..services.banner import read_banner
+from ..services.security import ensure_valid_room_name, passcode_attempt_allowed, record_failed_passcode
 from ..services.streamerbot import get_default_room, get_profile, parse_room_command, set_default_room
 from ..services.state import (
     _auth_ok, _clean_room_code, _new_reset_state, _read_jumpscare_count, _room_code_ok, _room_name, _write_jumpscare_count,
@@ -40,6 +42,11 @@ def api_phasmo_rooms():
     return {"ok": True, "ttlSeconds": settings._ROOM_TTL_SECONDS, "rooms": active_room_summaries()}
 
 
+@router.get("/api/phasmo/banner")
+def api_phasmo_banner():
+    return {"ok": True, "banner": read_banner()}
+
+
 @router.post("/api/phasmo/bug-report")
 async def api_bug_report(request: Request):
     try:
@@ -51,8 +58,17 @@ async def api_bug_report(request: Request):
     message = str(body.get("message") or "").strip()
     if not message:
         raise HTTPException(status_code=400, detail="message is required")
+    now_ms = int(time.time() * 1000)
     payload = {
-        "createdAt": int(time.time() * 1000),
+        "id": f"BR-{now_ms}-{_room_name(str(body.get('room') or 'default'))}",
+        "createdAt": now_ms,
+        "updatedAt": now_ms,
+        "status": "new",
+        "priority": "medium",
+        "targetVersion": "",
+        "fixedVersion": "",
+        "internalNotes": "",
+        "publicNotes": "",
         "name": str(body.get("name") or "")[:120],
         "contact": str(body.get("contact") or "")[:200],
         "category": str(body.get("category") or "bug")[:60],
@@ -92,11 +108,18 @@ async def api_phasmo_feedback(request: Request):
 
 
 @router.get("/api/phasmo/state")
-def api_get_state(room: str | None = Query(default=None)):
+def api_get_state(request: Request, room: str | None = Query(default=None), code: str | None = Query(default=None)):
+    ensure_valid_room_name(room or "default")
     safe_room = _room_name(room)
     with settings._STATE_LOCK:
         cleanup_inactive_rooms()
-        return public_state(read_state(safe_room))
+        current = read_state(safe_room)
+        if current.get("roomStatus") == "closed":
+            raise HTTPException(status_code=410, detail="room is closed")
+        if not _room_code_ok(current, code or ""):
+            record_failed_passcode(request, safe_room)
+            raise HTTPException(status_code=403, detail="room passcode required")
+        return public_state(current)
 
 
 @router.post("/api/phasmo/state")
@@ -109,15 +132,34 @@ async def api_post_state(
 ):
     if not _auth_ok(x_phasmo_token, token):
         raise HTTPException(status_code=401, detail="unauthorized")
+    ensure_valid_room_name(room or "default")
     safe_room = _room_name(room)
     body = await request.json()
     with settings._STATE_LOCK:
         cleanup_inactive_rooms()
         current = read_state(safe_room)
-        supplied_code = body.get("roomPasscode") or body.get("roomCode") or code or ""
+        # Authenticate locked-room edits with the existing code from the query/body.
+        # Do not use the incoming roomPasscode as the auth value because that field
+        # is also how the owner changes or clears the room passcode.
+        supplied_code = code or body.get("currentRoomPasscode") or body.get("authRoomPasscode") or body.get("code") or ""
+        if current.get("roomStatus") == "closed" and not body.get("reopenRoom"):
+            raise HTTPException(status_code=410, detail="room is closed")
         if not _room_code_ok(current, supplied_code):
+            record_failed_passcode(request, safe_room)
             raise HTTPException(status_code=403, detail="room passcode required")
-        if body.get("reset") is True:
+        if body.get("endSession") is True or body.get("closeRoom") is True:
+            current["roomStatus"] = "closed"
+            current["closedAt"] = int(time.time() * 1000)
+            current["closedBy"] = str(body.get("closedBy") or "control")[:120]
+            current["lastCommand"] = "End Session"
+            current["lastCommandResult"] = "Room closed. It has been removed from Active Rooms; scored history is preserved."
+        elif body.get("reopenRoom") is True:
+            current["roomStatus"] = "open"
+            current["closedAt"] = 0
+            current["closedBy"] = ""
+            current["lastCommand"] = "Reopen Room"
+            current["lastCommandResult"] = "Room reopened."
+        elif body.get("reset") is True:
             previous = dict(current)
             current = _new_reset_state(safe_room)
             current["ignoredUsers"] = previous.get("ignoredUsers", []) or []
@@ -233,6 +275,7 @@ async def api_post_state(
 
 @router.get("/api/phasmo/command")
 def api_get_command(
+    request: Request,
     room: str | None = Query(default=None),
     command: str | None = Query(default=""),
     user: str | None = Query(default=None),
@@ -262,6 +305,7 @@ def api_get_command(
     requested_room = parse_room_command(cmd_text)
     with settings._STATE_LOCK:
         if requested_room:
+            ensure_valid_room_name(requested_room)
             profile = set_default_room(requested_room, channel=channel_name, bot_account=bot_name, user=sender)
             safe_room = requested_room
             state = read_state(safe_room)
@@ -269,9 +313,14 @@ def api_get_command(
             state["lastCommandResult"] = f"Streamer.bot default room set to {safe_room}."
             write_state(safe_room, state)
             return {"ok": True, "room": safe_room, "result": f"Phasmo room set to {safe_room}.", "profile": profile, "state": public_state(state)}
-        safe_room = _room_name(room or get_default_room(channel=channel_name, bot_account=bot_name, user=sender) or "default")
+        selected_room = room or get_default_room(channel=channel_name, bot_account=bot_name, user=sender) or "default"
+        ensure_valid_room_name(str(selected_room))
+        safe_room = _room_name(str(selected_room))
         state = read_state(safe_room)
+        if state.get("roomStatus") == "closed":
+            raise HTTPException(status_code=410, detail="room is closed")
         if not _room_code_ok(state, code or ""):
+            record_failed_passcode(request, safe_room)
             raise HTTPException(status_code=403, detail="room passcode required")
         state, result = apply_command(state, cmd_text, user=sender)
         state["lastCommand"] = cmd_text
@@ -314,16 +363,22 @@ async def api_post_command(
     requested_room = parse_room_command(str(command))
     with settings._STATE_LOCK:
         if requested_room:
+            ensure_valid_room_name(requested_room)
             profile = set_default_room(requested_room, channel=channel, bot_account=bot_account, user=user)
             state = read_state(requested_room)
             state["lastCommand"] = command
             state["lastCommandResult"] = f"Streamer.bot default room set to {requested_room}."
             write_state(requested_room, state)
             return {"ok": True, "room": requested_room, "result": f"Phasmo room set to {requested_room}.", "profile": profile, "state": public_state(state)}
-        safe_room = _room_name(room or body.get("room") or body.get("phasmoRoom") or body.get("roomName") or get_default_room(channel=channel, bot_account=bot_account, user=user) or "default")
+        selected_room = room or body.get("room") or body.get("phasmoRoom") or body.get("roomName") or get_default_room(channel=channel, bot_account=bot_account, user=user) or "default"
+        ensure_valid_room_name(str(selected_room))
+        safe_room = _room_name(str(selected_room))
         state = read_state(safe_room)
+        if state.get("roomStatus") == "closed":
+            raise HTTPException(status_code=410, detail="room is closed")
         supplied_code = body.get("roomPasscode") or body.get("roomCode") or body.get("code") or code or ""
         if not _room_code_ok(state, supplied_code):
+            record_failed_passcode(request, safe_room)
             raise HTTPException(status_code=403, detail="room passcode required")
         state, result = apply_command(state, command, user=user)
         state["lastCommand"] = command
@@ -364,6 +419,7 @@ async def api_streamerbot_profile_post(request: Request):
     room_value = body.get("room") or body.get("defaultRoom") or body.get("phasmoRoom") or ""
     if not str(room_value).strip():
         raise HTTPException(status_code=400, detail="room is required")
+    ensure_valid_room_name(str(room_value))
     profile = set_default_room(
         str(room_value),
         channel=str(body.get("channel") or body.get("streamer") or body.get("broadcaster") or ""),

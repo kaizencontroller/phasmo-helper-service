@@ -14,6 +14,7 @@ _JUMPSCARE_URL = os.getenv("PHASMO_JUMPSCARE_URL", "").strip()
 _JUMPSCARE_COUNTER_FILE = "__global_jumpscare_counter.json"
 _CONFIG_FILE = "__global_config.json"
 _ROOM_TTL_SECONDS = int(os.getenv("PHASMO_ROOM_TTL_SECONDS", str(4 * 60 * 60)))
+_CLOSED_ROOM_RETENTION_SECONDS = int(os.getenv("PHASMO_CLOSED_ROOM_RETENTION_SECONDS", str(7 * 24 * 60 * 60)))
 _BUG_REPORT_FILE = "__global_bug_reports.jsonl"
 _FEEDBACK_FILE = "__global_feedback.jsonl"
 _LEADERBOARD_FILE = "__global_leaderboard.json"
@@ -32,3 +33,11 @@ _DEV_ADMIN_CODE = os.getenv("PHASMO_DEV_ADMIN_CODE", "").strip()
 if not _IS_RAILWAY and not _DEV_ADMIN_CODE:
     _DEV_ADMIN_CODE = "1234"
 _DEV_ADMIN_ENABLED = bool(_DEV_ADMIN_CODE) and (not _IS_RAILWAY or bool(os.getenv("PHASMO_DEV_ADMIN_CODE", "").strip()))
+
+# Public safety / cost controls
+_ABUSE_MODE = os.getenv("PHASMO_ABUSE_MODE", "false").strip().lower() in {"1", "true", "yes", "on"}
+_DEGRADED_MODE = os.getenv("PHASMO_DEGRADED_MODE", "false").strip().lower() in {"1", "true", "yes", "on"}
+_MAX_REQUEST_BYTES = int(os.getenv("PHASMO_MAX_REQUEST_BYTES", "10000"))
+_RATE_LIMIT_FILE = "__global_rate_limit_events.jsonl"
+_SITE_BANNER_FILE = "__global_site_banner.json"
+_ROOM_NAME_BLOCKLIST_EXTRA = os.getenv("PHASMO_ROOM_NAME_BLOCKLIST_EXTRA", "")

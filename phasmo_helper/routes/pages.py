@@ -11,7 +11,9 @@ from ..core.data import GHOST_NAMES
 from ..core.utils import _normal_user
 from ..services.leaderboard import _read_leaderboard
 from ..services.rooms import active_room_summaries
-from ..services.state import _room_name, read_state
+from ..services.banner import read_banner
+from ..services.security import validate_room_name
+from ..services.state import _room_name, _room_code_ok, read_state
 from ..templates_loader import HTML_TEMPLATE
 
 router = APIRouter()
@@ -28,9 +30,45 @@ body{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI
 main{width:min(460px,100vw);padding:10px;margin:0 auto;display:grid;gap:10px}
 .hero,.card{background:linear-gradient(135deg,#172235ee,#0f172aee);border:1px solid #334155;border-radius:18px;box-shadow:0 16px 40px #0007;overflow:hidden}
 .hero{padding:16px;display:grid;gap:12px}
-.brand{display:flex;gap:10px;align-items:center;min-width:0}.logo{width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 30% 20%,#38bdf855,transparent 38%),linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #475569;display:grid;place-items:center;font-weight:950;letter-spacing:-.08em;box-shadow:inset 0 0 22px #ffffff12}.brandcopy{min-width:0;overflow:hidden}.kicker{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}h1{margin:2px 0 0;font-size:28px;line-height:.95;letter-spacing:-.045em}h2{margin:0;font-size:18px}p{color:#cbd5e1;line-height:1.4;margin:0}.muted{color:#94a3b8;font-size:12px}.actions,.support-links{display:flex;gap:7px;flex-wrap:wrap}a.button,button{border:1px solid #475569;background:#0f172a;color:#f8fafc;border-radius:999px;padding:9px 11px;text-decoration:none;font-weight:850;cursor:pointer;font-size:13px}a.button.primary,button.primary{border-color:#22c55e;background:#14532d}.card .head{padding:13px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;gap:8px;align-items:center}.card .body{padding:13px}.room-grid{display:grid;gap:8px}.room-card{border:1px solid #334155;background:#0f172a;border-radius:14px;padding:10px}.room-card strong{display:block}.room-card span{display:block;color:#94a3b8;font-size:12px;margin-top:2px}.room-card p{font-size:13px;margin:8px 0}.room-card div:last-child{display:flex;gap:8px;flex-wrap:wrap}.room-card a,.support-links a{color:#93c5fd;font-size:12px;text-decoration:none}.support-note{font-size:11px;line-height:1.35;color:#94a3b8}.support-footer{border-style:dashed;opacity:.85}input,textarea,select{background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit;width:100%}textarea{min-height:120px}.form-grid{display:grid;grid-template-columns:1fr;gap:10px}.status{color:#93c5fd;font-size:13px;margin-top:8px}.small{font-size:12px;color:#94a3b8}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #334155;padding:8px 5px;text-align:left;vertical-align:top}th{color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}.table-wrap{overflow-x:auto}.locked{color:#fde68a;font-weight:900}code{color:#bae6fd;background:#020617;border:1px solid #334155;border-radius:999px;padding:2px 6px;font-size:12px}ol{color:#cbd5e1;line-height:1.45}li{margin:6px 0}
+.brand{display:flex;gap:10px;align-items:center;min-width:0}.logo{width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 30% 20%,#38bdf855,transparent 38%),linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #475569;display:grid;place-items:center;font-weight:950;letter-spacing:-.08em;box-shadow:inset 0 0 22px #ffffff12}.brandcopy{min-width:0;overflow:hidden}.kicker{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}h1{margin:2px 0 0;font-size:28px;line-height:.95;letter-spacing:-.045em}h2{margin:0;font-size:18px}p{color:#cbd5e1;line-height:1.4;margin:0}.muted{color:#94a3b8;font-size:12px}.actions,.support-links{display:flex;gap:7px;flex-wrap:wrap}a.button,button{border:1px solid #475569;background:#0f172a;color:#f8fafc;border-radius:999px;padding:9px 11px;text-decoration:none;font-weight:850;cursor:pointer;font-size:13px}a.button.primary,button.primary{border-color:#22c55e;background:#14532d}.card .head{padding:13px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;gap:8px;align-items:center}.card .body{padding:13px}.room-grid{display:grid;gap:8px}.room-card{border:1px solid #334155;background:#0f172a;border-radius:14px;padding:10px}.room-card strong{display:block}.room-card span{display:block;color:#94a3b8;font-size:12px;margin-top:2px}.room-card p{font-size:13px;margin:8px 0}.room-card div:last-child{display:flex;gap:8px;flex-wrap:wrap}.room-card a,.support-links a{color:#93c5fd;font-size:12px;text-decoration:none}.support-note{font-size:11px;line-height:1.35;color:#94a3b8}.support-footer{border-style:dashed;opacity:.85}input,textarea,select{background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit;width:100%}textarea{min-height:120px}.form-grid{display:grid;grid-template-columns:1fr;gap:10px}.status{color:#93c5fd;font-size:13px;margin-top:8px}.small{font-size:12px;color:#94a3b8}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #334155;padding:8px 5px;text-align:left;vertical-align:top}th{color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}.table-wrap{overflow-x:auto}.locked{color:#fde68a;font-weight:900}code{color:#bae6fd;background:#020617;border:1px solid #334155;border-radius:999px;padding:2px 6px;font-size:12px}ol{color:#cbd5e1;line-height:1.45}li{margin:6px 0}.brand-link{display:block;text-decoration:none;color:inherit;cursor:pointer}.brand-link:hover{border-color:#60a5fa}.site-banner{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:14px;padding:10px 12px;font-weight:850;line-height:1.3}.site-banner .small{color:#fdba74}.error{border:1px solid #ef4444;background:#451a20;color:#fecaca;border-radius:12px;padding:10px;font-size:13px}
 """
 
+
+
+
+def _site_banner_html() -> str:
+    banner = read_banner()
+    if not banner.get("enabled") or not str(banner.get("message") or "").strip():
+        return ""
+    msg = html.escape(str(banner.get("message") or ""))
+    level = html.escape(str(banner.get("level") or "notice"))
+    return f"<section class='site-banner' data-level='{level}'><div>{msg}</div><div class='small'>Kaizen Controller notice</div></section>"
+
+
+def _locked_room_gate(safe_room: str, target_path: str, code: str | None = None) -> HTMLResponse | None:
+    safe_room = _room_name(safe_room)
+    state = read_state(safe_room)
+    if state.get("roomStatus") == "closed":
+        return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Room Closed</title><style>{_public_page_style()}</style></head><body><main>{_site_banner_html()}<a class="hero brand-link" href="/phasmo"><div class="brand"><div class="logo">KC</div><div class="brandcopy"><div class="kicker">Kaizen Phasmo Helper</div><h1>Room Closed</h1></div></div><p>This room session has ended and is no longer accepting updates.</p></a><section class="card"><div class="body actions"><a class="button primary" href="/phasmo/room">Create Room</a><a class="button" href="/phasmo/rooms">Active Rooms</a></div></section>{_support_footer(safe_room)}</main></body></html>""", status_code=410)
+    if _room_code_ok(state, code or ""):
+        return None
+    target = f"{target_path}?room={safe_room}"
+    return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Locked Room</title><style>{_public_page_style()}</style></head><body><main>{_site_banner_html()}<a class="hero brand-link" href="/phasmo"><div class="brand"><div class="logo">KC</div><div class="brandcopy"><div class="kicker">room: {safe_room}</div><h1>Locked Room</h1></div></div><p>Enter the 4-digit room passcode before joining this room.</p></a><section class="card"><div class="body"><form id="gateForm" class="form-grid"><input id="gateCode" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="4-digit passcode"><button class="primary" type="submit">Enter Room</button><a class="button" href="/phasmo/rooms">Back to Active Rooms</a></form><div id="gateStatus" class="status"></div></div></section>{_support_footer(safe_room)}</main><script>
+const room={safe_room!r}; const target={target!r};
+function key(r){{return 'phasmoRoomCode:'+r}}
+function clean(v){{return (v||'').replace(/[^0-9]/g,'').slice(0,4)}}
+async function tryCode(c,go){{if(clean(c).length!==4)return false; const r=await fetch('/api/phasmo/state?room='+encodeURIComponent(room)+'&code='+encodeURIComponent(clean(c))); if(r.ok){{localStorage.setItem(key(room),clean(c)); if(go) location.href=target+'&code='+encodeURIComponent(clean(c)); return true;}} return false;}}
+(async()=>{{const stored=localStorage.getItem(key(room)); if(stored) await tryCode(stored,true);}})();
+document.getElementById('gateForm').addEventListener('submit',async e=>{{e.preventDefault(); const c=document.getElementById('gateCode').value; const ok=await tryCode(c,true); document.getElementById('gateStatus').textContent=ok?'Opening room…':'Passcode not accepted.';}});
+</script></body></html>""", status_code=403)
+
+
+def _room_gate_or_template(room: str | None, code: str | None, target_path: str, mode: str) -> HTMLResponse:
+    safe_room = _room_name(room or "default")
+    gate = _locked_room_gate(safe_room, target_path, code)
+    if gate:
+        return gate
+    return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", mode))
 
 def _support_footer(safe_room: str = "default") -> str:
     safe_room = _room_name(safe_room)
@@ -73,8 +111,9 @@ def phasmo_index(room: str | None = Query(default=None)):
     html_doc = f"""<!doctype html>
 <html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>Kaizen Phasmo Helper</title><style>{_public_page_style()}</style></head>
 <body><main>
+{_site_banner_html()}
 <section class=\"hero\">
-  <div class=\"brand\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Controller tools</div><h1>Phasmo Helper</h1></div></div>
+  <a class=\"brand brand-link\" href=\"/phasmo\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Controller tools</div><h1>Phasmo Helper</h1></div></a>
   <p>A lightweight group and streamer helper for Phasmophobia evidence tracking, behavior clues, chat guesses, OBS overlays, and contract result scoring.</p>
   <div class=\"actions\"><a class=\"button primary\" href=\"/phasmo/room?room={safe_room}\">Create Room</a><a class=\"button\" href=\"/phasmo/rooms\">Active Rooms</a><a class=\"button\" href=\"/phasmo/leaderboard?room={safe_room}\">Leaderboard</a><a class=\"button\" href=\"/phasmo/streamerbot?room={safe_room}\">Streamer.bot Setup</a><a class=\"button\" href=\"{settings._QUICKSTART_VIDEO_URL}\" target=\"_blank\" rel=\"noopener\" style=\"display:{'inline-block' if settings._QUICKSTART_VIDEO_URL else 'none'}\">Quick Start Video</a></div>
   <p class=\"muted\">Optional room passcodes are 4 digits. Rooms are temporary and expire after 4 hours without updates.</p>
@@ -143,7 +182,8 @@ def phasmo_bug_report(room: str | None = Query(default=None)):
     html_doc = f"""<!doctype html>
 <html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>Bug Reports - Kaizen Phasmo Helper</title><style>{_public_page_style()}</style></head>
 <body><main>
-<section class=\"hero\"><div class=\"brand\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Phasmo Helper</div><h1>Bug Reports</h1></div></div><p>Send corrections, broken commands, confusing behavior, or feature ideas.</p></section>
+{_site_banner_html()}
+<section class=\"hero\"><a class=\"brand brand-link\" href=\"/phasmo\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Phasmo Helper</div><h1>Bug Reports</h1></div></a><p>Send corrections, broken commands, confusing behavior, or feature ideas.</p></section>
 <section class=\"card\"><div class=\"head\"><h2>Fix Request</h2><span class=\"muted\">room: {safe_room}</span></div><div class=\"body\"><form id=\"bugForm\" class=\"form-grid\"><input name=\"name\" placeholder=\"Name / Twitch username\"><input name=\"contact\" placeholder=\"Optional contact info\"><select name=\"category\"><option value=\"bug\">Bug</option><option value=\"feature\">Feature request</option><option value=\"correction\">Correction</option><option value=\"other\">Other</option></select><input name=\"room\" value=\"{safe_room}\" placeholder=\"Room name\"><textarea name=\"message\" required placeholder=\"What happened? What should it have done instead?\"></textarea><button class=\"primary\" type=\"submit\">Send Report</button></form><div id=\"bugStatus\" class=\"status\"></div></div></section>
 {_support_footer(safe_room)}
 </main><script>
@@ -165,7 +205,7 @@ def phasmo_rooms():
         """
     if not cards:
         cards = "<p class='muted'>No active rooms. Rooms expire after 4 hours without updates.</p>"
-    body = f"""<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>Active Rooms - Kaizen Phasmo Helper</title><style>{_public_page_style()}</style></head><body><main><section class=\"hero\"><div class=\"brand\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Phasmo Helper</div><h1>Active Rooms</h1></div></div><p>Rooms disappear after 4 hours without updates so old lobbies do not pile up.</p><div class=\"actions\"><a class=\"button primary\" href=\"/phasmo/room\">Create Room</a><a class=\"button\" href=\"/phasmo\">Home</a></div></section><section class=\"card\"><div class=\"head\"><h2>Lobbies</h2><span class=\"muted\">{len(rooms)} active</span></div><div class=\"body\"><div class=\"room-grid\">{cards}</div></div></section>{_support_footer('default')}</main></body></html>"""
+    body = f"""<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>Active Rooms - Kaizen Phasmo Helper</title><style>{_public_page_style()}</style></head><body><main>{_site_banner_html()}<section class=\"hero\"><a class=\"brand brand-link\" href=\"/phasmo\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Phasmo Helper</div><h1>Active Rooms</h1></div></a><p>Rooms disappear after 4 hours without updates so old lobbies do not pile up.</p><div class=\"actions\"><a class=\"button primary\" href=\"/phasmo/room\">Create Room</a><a class=\"button\" href=\"/phasmo\">Home</a></div></section><section class=\"card\"><div class=\"head\"><h2>Lobbies</h2><span class=\"muted\">{len(rooms)} active</span></div><div class=\"body\"><div class=\"room-grid\">{cards}</div></div></section>{_support_footer('default')}</main></body></html>"""
     return HTMLResponse(body)
 
 
@@ -176,7 +216,7 @@ def _simple_info_page(title: str, body: str, room: str = "default") -> HTMLRespo
     home_href = "/phasmo"
     home_label = "Home"
     mode_label = "active run" if is_ready else "setup needed"
-    html_doc = f"""<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>{title}</title><style>{_public_page_style()}</style></head><body><main><a class=\"hero\" href=\"{home_href}\" style=\"text-decoration:none;color:#f8fafc\"><div class=\"brand\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">room: {safe_room} • {mode_label}</div><h1>{html.escape(title)}</h1></div></div><span class=\"button\" style=\"justify-self:start\">{home_label}</span></a><section class=\"card\"><div class=\"body\">{body}</div></section>{_support_footer(safe_room)}</main></body></html>"""
+    html_doc = f"""<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>{title}</title><style>{_public_page_style()}</style></head><body><main>{_site_banner_html()}<a class=\"hero brand-link\" href=\"{home_href}\" style=\"text-decoration:none;color:#f8fafc\"><div class=\"brand\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">room: {safe_room} • {mode_label}</div><h1>{html.escape(title)}</h1></div></div><span class=\"button\" style=\"justify-self:start\">{home_label}</span></a><section class=\"card\"><div class=\"body\">{body}</div></section>{_support_footer(safe_room)}</main></body></html>"""
     return HTMLResponse(html_doc)
 
 
@@ -233,8 +273,11 @@ def phasmo_acknowledgements(room: str | None = Query(default=None)):
 
 
 @router.get("/phasmo/config")
-def phasmo_config(room: str | None = Query(default=None), token: str | None = Query(default=None)):
+def phasmo_config(room: str | None = Query(default=None), token: str | None = Query(default=None), code: str | None = Query(default=None)):
     safe_room = _room_name(room)
+    gate = _locked_room_gate(safe_room, "/phasmo/config", code)
+    if gate:
+        return gate
     state = read_state(safe_room)
     rows = ""
     config = _read_config()
@@ -276,7 +319,8 @@ input[type=checkbox].global-toggle{{width:52px;height:30px;accent-color:#22c55e}
 </style>
 </head>
 <body><main>
-<section class="hero"><a href="/phasmo" style="text-decoration:none;color:#f8fafc"><div class="brand"><div class="logo">KC</div><div class="brandcopy"><div class="kicker">room: {safe_room}</div><h1>Config</h1></div></div></a><p>Use this page for room/tool behavior. Contract-specific details stay on Round Setup.</p><div class="actions"><a class="button" href="/phasmo/round?room={safe_room}">Round Setup</a><a class="button" href="/phasmo/control?room={safe_room}">Control</a><a class="button" href="/phasmo">Home</a></div></section>
+{_site_banner_html()}
+<section class="hero"><a href="/phasmo" style="text-decoration:none;color:#f8fafc"><div class="brand"><div class="logo">KC</div><div class="brandcopy"><div class="kicker">room: {safe_room}</div><h1>Config</h1></div></div></a><p>Use this page for room/tool behavior. Contract-specific details stay on Round Setup.</p><div class="actions"><a class="button" id="configRoundLink" href="/phasmo/round?room={safe_room}">Round Setup</a><a class="button" id="configControlLink" href="/phasmo/control?room={safe_room}">Control</a><a class="button" href="/phasmo">Home</a></div></section>
 <section class="card"><div class="head"><h2>Display Modes</h2><span class="muted">room-level</span></div><div class="body">
   <div class="switch-row"><span><strong>Control Screen Mode</strong><small>Helper shows next-best-test suggestions. Tracker hides those suggestions and behaves more like a shared evidence board.</small></span><span class="segmented"><label><input type="radio" name="controlMode" value="helper" {mode_checked('controlMode','helper')}><span>Helper</span></label><label><input type="radio" name="controlMode" value="tracker" {mode_checked('controlMode','tracker')}><span>Tracker</span></label></span></div>
   <div class="switch-row"><span><strong>Overlay Mode</strong><small>Helper overlay suggests the next test. Tracker overlay shows simplified game state.</small></span><span class="segmented"><label><input type="radio" name="overlayMode" value="helper" {mode_checked('overlayMode','helper')}><span>Helper</span></label><label><input type="radio" name="overlayMode" value="tracker" {mode_checked('overlayMode','tracker')}><span>Tracker</span></label></span></div>
@@ -292,11 +336,19 @@ input[type=checkbox].global-toggle{{width:52px;height:30px;accent-color:#22c55e}
 </main>
 <script>
 const room='{safe_room}';
-function codeSuffix(){{const key='phasmoRoomCode:'+room; const code=(localStorage.getItem(key)||'').replace(/[^0-9]/g,'').slice(0,4); return code.length===4?'&code='+encodeURIComponent(code):''}}
+const initialCode='{html.escape(str(code or ""))}';
+function cleanCode(raw){{return (raw||'').replace(/[^0-9]/g,'').slice(0,4)}}
+function codeKey(){{return 'phasmoRoomCode:'+room}}
+if(cleanCode(initialCode).length===4)localStorage.setItem(codeKey(),cleanCode(initialCode));
+function codeSuffix(){{const code=cleanCode(localStorage.getItem(codeKey())||initialCode); return code.length===4?'&code='+encodeURIComponent(code):''}}
+function rememberCode(raw){{const code=cleanCode(raw); if(code.length===4)localStorage.setItem(codeKey(),code); return code}}
+function updateConfigLinks(){{document.getElementById('configRoundLink').href='/phasmo/round?room='+encodeURIComponent(room)+codeSuffix();document.getElementById('configControlLink').href='/phasmo/control?room='+encodeURIComponent(room)+codeSuffix();}}
+updateConfigLinks();
 async function saveRoomPatch(patch){{
   const status=document.getElementById('roomStatus'); if(status)status.textContent='Saving...';
-  const r=await fetch('/api/phasmo/state?room='+encodeURIComponent(room)+codeSuffix(),{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(patch)}});
-  if(!r.ok){{if(status){{status.className='status err';status.textContent='Save blocked. If the room has a passcode, open Control once with the code first.';}} return false;}}
+  let r=await fetch('/api/phasmo/state?room='+encodeURIComponent(room)+codeSuffix(),{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(patch)}});
+  if(r.status===403){{const entered=prompt('This room is locked. Enter the 4-digit room passcode.'); if(rememberCode(entered).length===4){{updateConfigLinks(); r=await fetch('/api/phasmo/state?room='+encodeURIComponent(room)+codeSuffix(),{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(patch)}});}}}}
+  if(!r.ok){{if(status){{status.className='status err';status.textContent='Save blocked. The room passcode was not accepted.';}} return false;}}
   if(status){{status.className='status';status.textContent='Saved.';}}
   return true;
 }}
@@ -317,45 +369,56 @@ document.querySelectorAll('[data-key]').forEach(el=>el.addEventListener('change'
 
 
 @router.get("/phasmo/room")
-def phasmo_room_setup():
+def phasmo_room_setup(room: str | None = Query(default=None), code: str | None = Query(default=None)):
+    # Room creation/setup remains available. If the room already exists and is locked, gate it.
+    if room:
+        return _room_gate_or_template(room, code, "/phasmo/room", "room")
     return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "room"))
 
 
 @router.get("/phasmo/setup-room")
-def phasmo_setup_room_alias():
+def phasmo_setup_room_alias(room: str | None = Query(default=None), code: str | None = Query(default=None)):
+    if room:
+        return _room_gate_or_template(room, code, "/phasmo/setup-room", "room")
     return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "room"))
 
 
 @router.get("/phasmo/round")
-def phasmo_round_setup():
-    return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "setup"))
+def phasmo_round_setup(room: str | None = Query(default=None), code: str | None = Query(default=None)):
+    return _room_gate_or_template(room, code, "/phasmo/round", "setup")
 
 
 @router.get("/phasmo/setup")
-def phasmo_setup_alias():
-    return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "setup"))
+def phasmo_setup_alias(room: str | None = Query(default=None), code: str | None = Query(default=None)):
+    return _room_gate_or_template(room, code, "/phasmo/setup", "setup")
 
 
 @router.get("/phasmo/control")
-def phasmo_control(room: str | None = Query(default=None), token: str | None = Query(default=None)):
+def phasmo_control(room: str | None = Query(default=None), code: str | None = Query(default=None), token: str | None = Query(default=None)):
     safe_room = _room_name(room)
+    gate = _locked_room_gate(safe_room, "/phasmo/control", code)
+    if gate:
+        return gate
     state = read_state(safe_room)
     if not state.get("setupComplete"):
-        suffix = f"?room={safe_room}"
+        suffix = f"?room={safe_room}" + (f"&code={code}" if code else "")
         return RedirectResponse(f"/phasmo/round{suffix}")
     return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "control"))
 
 
 @router.get("/phasmo/overlay")
-def phasmo_overlay():
-    return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", "overlay"))
+def phasmo_overlay(room: str | None = Query(default=None), code: str | None = Query(default=None)):
+    return _room_gate_or_template(room, code, "/phasmo/overlay", "overlay")
 
 
 
 
 @router.get("/phasmo/leaderboard")
-def phasmo_leaderboard(room: str | None = Query(default=None), token: str | None = Query(default=None)):
+def phasmo_leaderboard(room: str | None = Query(default=None), code: str | None = Query(default=None), token: str | None = Query(default=None)):
     safe_room = _room_name(room)
+    gate = _locked_room_gate(safe_room, "/phasmo/leaderboard", code)
+    if gate:
+        return gate
     state = read_state(safe_room)
     result = state.get("contractResult") or {}
     confirmed_ghost = result.get("confirmedGhost")
@@ -498,7 +561,7 @@ def phasmo_leaderboard(room: str | None = Query(default=None), token: str | None
       </head>
       <body>
         <main class="app">
-          <a class="brandbar" href="{home_url}" aria-label="{home_label}">
+          <a class="brandbar" href="/phasmo" aria-label="Return to Phasmo Helper home">
             <span class="brandleft"><span class="logo"><span>KC</span></span><span><span class="brandtitle">Kaizen Phasmo Helper</span><br><span class="brandsub">room: {safe_room} • {mode_label}</span></span></span>
             <span class="brandcta">{home_label}</span>
           </a>
