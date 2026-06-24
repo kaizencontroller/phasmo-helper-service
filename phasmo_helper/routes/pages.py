@@ -30,7 +30,7 @@ body{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI
 main{width:min(460px,100vw);padding:10px;margin:0 auto;display:grid;gap:10px}
 .hero,.card{background:linear-gradient(135deg,#172235ee,#0f172aee);border:1px solid #334155;border-radius:18px;box-shadow:0 16px 40px #0007;overflow:hidden}
 .hero{padding:16px;display:grid;gap:12px}
-.brand{display:flex;gap:10px;align-items:center;min-width:0}.logo{width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 30% 20%,#38bdf855,transparent 38%),linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #475569;display:grid;place-items:center;font-weight:950;letter-spacing:-.08em;box-shadow:inset 0 0 22px #ffffff12}.brandcopy{min-width:0;overflow:hidden}.kicker{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}h1{margin:2px 0 0;font-size:28px;line-height:.95;letter-spacing:-.045em}h2{margin:0;font-size:18px}p{color:#cbd5e1;line-height:1.4;margin:0}.muted{color:#94a3b8;font-size:12px}.actions,.support-links{display:flex;gap:7px;flex-wrap:wrap}a.button,button{border:1px solid #475569;background:#0f172a;color:#f8fafc;border-radius:999px;padding:9px 11px;text-decoration:none;font-weight:850;cursor:pointer;font-size:13px}a.button.primary,button.primary{border-color:#22c55e;background:#14532d}.card .head{padding:13px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;gap:8px;align-items:center}.card .body{padding:13px}.room-grid{display:grid;gap:8px}.room-card{border:1px solid #334155;background:#0f172a;border-radius:14px;padding:10px}.room-card strong{display:block}.room-card span{display:block;color:#94a3b8;font-size:12px;margin-top:2px}.room-card p{font-size:13px;margin:8px 0}.room-card div:last-child{display:flex;gap:8px;flex-wrap:wrap}.room-card a,.support-links a{color:#93c5fd;font-size:12px;text-decoration:none}.support-note{font-size:11px;line-height:1.35;color:#94a3b8}.support-footer{border-style:dashed;opacity:.85}input,textarea,select{background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit;width:100%}textarea{min-height:120px}.form-grid{display:grid;grid-template-columns:1fr;gap:10px}.status{color:#93c5fd;font-size:13px;margin-top:8px}.small{font-size:12px;color:#94a3b8}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #334155;padding:8px 5px;text-align:left;vertical-align:top}th{color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}.table-wrap{overflow-x:auto}.locked{color:#fde68a;font-weight:900}code{color:#bae6fd;background:#020617;border:1px solid #334155;border-radius:999px;padding:2px 6px;font-size:12px}ol{color:#cbd5e1;line-height:1.45}li{margin:6px 0}.brand-link{display:block;text-decoration:none;color:inherit;cursor:pointer}.brand-link:hover{border-color:#60a5fa}.site-banner{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:14px;padding:10px 12px;font-weight:850;line-height:1.3}.site-banner .small{color:#fdba74}.error{border:1px solid #ef4444;background:#451a20;color:#fecaca;border-radius:12px;padding:10px;font-size:13px}
+.brand{display:flex;gap:10px;align-items:center;min-width:0}.logo{width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 30% 20%,#38bdf855,transparent 38%),linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #475569;display:grid;place-items:center;font-weight:950;letter-spacing:-.08em;box-shadow:inset 0 0 22px #ffffff12}.brandcopy{min-width:0;overflow:hidden}.kicker{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}h1{margin:2px 0 0;font-size:28px;line-height:.95;letter-spacing:-.045em}h2{margin:0;font-size:18px}p{color:#cbd5e1;line-height:1.45;margin:0 0 10px}.muted{color:#94a3b8;font-size:12px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px}.support-links{display:grid;gap:7px}.support-row{display:flex;gap:9px;flex-wrap:wrap}.support-row.meta{font-size:11px}.support-row.version-row{color:#94a3b8;font-size:11px}.support-row a{color:#93c5fd;text-decoration:none}.content h2{margin:18px 0 8px;font-size:18px}.content h2:first-child{margin-top:0}.content ul,.content ol{margin:8px 0 16px;padding-left:24px}.content p:last-child{margin-bottom:0}.button-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}.static-hero{gap:10px}.static-hero .brand-link{display:flex;gap:10px;align-items:center}.page-title-note{margin-top:2px}a.button,button{border:1px solid #475569;background:#0f172a;color:#f8fafc;border-radius:999px;padding:9px 11px;text-decoration:none;font-weight:850;cursor:pointer;font-size:13px}a.button.primary,button.primary{border-color:#22c55e;background:#14532d}.card .head{padding:13px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;gap:8px;align-items:center}.card .body{padding:13px}.room-grid{display:grid;gap:8px}.room-card{border:1px solid #334155;background:#0f172a;border-radius:14px;padding:10px}.room-card strong{display:block}.room-card span{display:block;color:#94a3b8;font-size:12px;margin-top:2px}.room-card p{font-size:13px;margin:8px 0}.room-card div:last-child{display:flex;gap:8px;flex-wrap:wrap}.room-card a{color:#93c5fd;font-size:12px;text-decoration:none}.support-note{font-size:11px;line-height:1.35;color:#94a3b8}.support-footer{border-style:dashed;opacity:.85}input,textarea,select{background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit;width:100%}textarea{min-height:120px}.form-grid{display:grid;grid-template-columns:1fr;gap:10px}.status{color:#93c5fd;font-size:13px;margin-top:8px}.small{font-size:12px;color:#94a3b8}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #334155;padding:8px 5px;text-align:left;vertical-align:top}th{color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}.table-wrap{overflow-x:auto}.locked{color:#fde68a;font-weight:900}code{color:#bae6fd;background:#020617;border:1px solid #334155;border-radius:999px;padding:2px 6px;font-size:12px}ol{color:#cbd5e1;line-height:1.45}li{margin:6px 0}.brand-link{display:block;text-decoration:none;color:inherit;cursor:pointer}.brand-link:hover{border-color:#60a5fa}.site-banner{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:14px;padding:10px 12px;font-weight:850;line-height:1.3}.site-banner .small{color:#fdba74}.error{border:1px solid #ef4444;background:#451a20;color:#fecaca;border-radius:12px;padding:10px;font-size:13px}
 """
 
 
@@ -72,26 +72,32 @@ def _room_gate_or_template(room: str | None, code: str | None, target_path: str,
 
 def _support_footer(safe_room: str = "default") -> str:
     safe_room = _room_name(safe_room)
+    quick = f'<a href="{settings._QUICKSTART_VIDEO_URL}" target="_blank" rel="noopener">Quick start video</a>' if settings._QUICKSTART_VIDEO_URL else ""
     return f"""
 <section class=\"card support-footer\"><div class=\"body\">
   <div class=\"support-links\">
-    <a href=\"/phasmo/getting-started?room={safe_room}\">Getting started</a>
-    <a href=\"/phasmo/commands?room={safe_room}\">Viewer commands</a>
-    <a href=\"/phasmo/config?room={safe_room}\">Config</a>
-    <a href=\"/phasmo/release-notes?room={safe_room}\">Release notes</a>
-    <a href=\"/phasmo/acknowledgements?room={safe_room}\">Acknowledgements</a>
-    <a href=\"/phasmo/streamerbot?room={safe_room}\">Streamer.bot setup</a>
-    <a href=\"{settings._QUICKSTART_VIDEO_URL}\" target=\"_blank\" rel=\"noopener\" style=\"display:{'inline' if settings._QUICKSTART_VIDEO_URL else 'none'}\">Quick start video</a>
-    <a href=\"https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I\" target=\"_blank\" rel=\"noopener\">User manual & support files</a>
-    <a href=\"https://ko-fi.com/kaizencontroller\" target=\"_blank\" rel=\"noopener\">Support on Ko-fi</a>
-    <a href=\"/phasmo/bug-report?room={safe_room}\">Bug reports</a>
-    <a href=\"/phasmo/privacy?room={safe_room}\">Privacy</a>
-    <a href=\"/phasmo/terms?room={safe_room}\">Terms</a>
+    <div class=\"support-row\">
+      <a href=\"/phasmo/getting-started\">Getting started</a>
+      <a href=\"/phasmo/commands\">Viewer commands</a>
+      <a href=\"/phasmo/release-notes\">Release notes</a>
+    </div>
+    <div class=\"support-row\">
+      <a href=\"/phasmo/streamerbot\">Streamer.bot setup</a>
+      <a href=\"https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I\" target=\"_blank\" rel=\"noopener\">Support files</a>
+      <a href=\"/phasmo/bug-report?room={safe_room}\">Bug reports</a>
+      {quick}
+    </div>
+    <div class=\"support-row meta\">
+      <a href=\"/phasmo/privacy\">Privacy</a>
+      <a href=\"/phasmo/terms\">Terms</a>
+      <a href=\"/phasmo/data-retention\">Data retention</a>
+    </div>
+    <div class=\"support-row version-row\">Version {html.escape(settings._APP_VERSION)}</div>
   </div>
   <div class=\"support-note\">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development.</div>
-  <div class=\"support-note\">Version {html.escape(settings._APP_VERSION)}</div>
 </div></section>
 """
+
 
 
 @router.get("/phasmo")
@@ -200,7 +206,7 @@ def phasmo_getting_started(room: str | None = Query(default=None)):
 </ol>
 <h2>Streamer.bot</h2>
 <p>Streamer.bot setup is a one-time integration. After that, changing rooms should usually only require updating the <code>phasmoRoom</code> variable.</p>
-<p><a class="button" href="/phasmo/streamerbot?room={safe_room}">Streamer.bot setup</a> <a class="button" href="/phasmo/commands?room={safe_room}">Viewer commands</a></p>
+<div class="button-row"><a class="button" href="/phasmo/streamerbot">Streamer.bot setup</a><a class="button" href="/phasmo/commands">Viewer commands</a></div>
 <h2>Public beta expectations</h2>
 <p>This is an early public beta tool. Daily maintenance/update windows may happen while bugs are fixed and the release workflow stabilizes.</p>
 <p class="small">Do not put private information in room names. Room names may be visible on Active Rooms.</p>
@@ -243,7 +249,7 @@ def phasmo_commands(room: str | None = Query(default=None)):
 <tr><td><code>!phasmo room kaizen</code></td><td>Alias for setting the default room.</td></tr>
 </tbody></table>
 <p class="small">For locked rooms, Streamer.bot command calls must include the room code or a future trusted-channel token. This prevents chat command endpoints from bypassing room protection.</p>
-<p><a class="button" href="/phasmo/streamerbot?room={safe_room}">Streamer.bot setup</a></p>
+<div class="button-row"><a class="button" href="/phasmo/streamerbot">Streamer.bot setup</a></div>
 """
     return _simple_info_page("Viewer Commands", body, safe_room)
 
@@ -266,7 +272,7 @@ def phasmo_privacy(room: str | None = Query(default=None)):
 <p>Room names may appear on Active Rooms. Keep room names stream-safe and avoid private information.</p>
 <h2>Support and abuse handling</h2>
 <p>Kaizen Controller may review bug reports, support pings, and room metadata to fix issues, prevent abuse, and keep hosting costs manageable.</p>
-<p><a class="button" href="/phasmo/data-retention?room={safe_room}">Data retention</a> <a class="button" href="/phasmo/terms?room={safe_room}">Terms</a></p>
+<div class="button-row"><a class="button" href="/phasmo/data-retention">Data retention</a><a class="button" href="/phasmo/terms">Terms</a></div>
 """
     return _simple_info_page("Privacy", body, safe_room)
 
@@ -287,7 +293,7 @@ def phasmo_terms(room: str | None = Query(default=None)):
 <p>Kaizen Controller may close, hide, or remove abusive rooms, bug reports, or usage patterns to protect the tool, the community, and hosting costs.</p>
 <h2>No warranty</h2>
 <p>The tool may have bugs, temporary downtime, scheduled maintenance, or data loss during beta. It is provided free for community use.</p>
-<p><a class="button" href="/phasmo/privacy?room={safe_room}">Privacy</a> <a class="button" href="/phasmo/data-retention?room={safe_room}">Data retention</a></p>
+<div class="button-row"><a class="button" href="/phasmo/privacy">Privacy</a><a class="button" href="/phasmo/data-retention">Data retention</a></div>
 """
     return _simple_info_page("Terms", body, safe_room)
 
@@ -309,7 +315,7 @@ def phasmo_data_retention(room: str | None = Query(default=None)):
 <p>Until persistent Railway storage or a database is configured, app data may depend on the current deployment filesystem and should be treated as beta data.</p>
 <h2>Export/import</h2>
 <p>The Dev Admin bug tracker supports JSON export/import so issue history can survive builds and storage changes.</p>
-<p><a class="button" href="/phasmo/privacy?room={safe_room}">Privacy</a> <a class="button" href="/phasmo/terms?room={safe_room}">Terms</a></p>
+<div class="button-row"><a class="button" href="/phasmo/privacy">Privacy</a><a class="button" href="/phasmo/terms">Terms</a></div>
 """
     return _simple_info_page("Data Retention", body, safe_room)
 
@@ -348,13 +354,13 @@ def phasmo_rooms():
 
 
 def _simple_info_page(title: str, body: str, room: str = "default") -> HTMLResponse:
-    safe_room = _room_name(room)
-    state = read_state(safe_room)
-    is_ready = bool(state.get("setupComplete"))
-    home_href = "/phasmo"
-    home_label = "Home"
-    mode_label = "active run" if is_ready else "setup needed"
-    html_doc = f"""<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>{title}</title><style>{_public_page_style()}</style></head><body><main>{_site_banner_html()}<a class=\"hero brand-link\" href=\"{home_href}\" style=\"text-decoration:none;color:#f8fafc\"><div class=\"brand\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">room: {safe_room} • {mode_label}</div><h1>{html.escape(title)}</h1></div></div><span class=\"button\" style=\"justify-self:start\">{home_label}</span></a><section class=\"card\"><div class=\"body\">{body}</div></section>{_support_footer(safe_room)}</main></body></html>"""
+    """Render static/help pages without room status chrome.
+
+    These pages are evergreen docs/policy pages, so they should not imply the
+    visitor is inside a specific active room or setup flow.
+    """
+    safe_room = _room_name(room or "default")
+    html_doc = f"""<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>{html.escape(title)} - Phasmo Helper</title><style>{_public_page_style()}</style></head><body><main>{_site_banner_html()}<section class=\"hero static-hero\"><a class=\"brand-link\" href=\"/phasmo\" aria-label=\"Return to Phasmo Helper home\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Controller Tools</div><h1>{html.escape(title)}</h1><div class=\"muted page-title-note\">Phasmo Helper</div></div></a><div class=\"actions\"><a class=\"button\" href=\"/phasmo\">Home</a></div></section><section class=\"card\"><div class=\"body content\">{body}</div></section>{_support_footer(safe_room)}</main></body></html>"""
     return HTMLResponse(html_doc)
 
 
@@ -363,6 +369,14 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
     body = f"""
 <p class="small">Release notes are updated with each packaged build so testers can see what changed without checking GitHub.</p>
+<h2>v5.5.2 — Static Page Layout and Footer Cleanup</h2>
+<ul>
+  <li><strong>Fixed:</strong> Static help and policy pages no longer show room/session status in their headers.</li>
+  <li><strong>Fixed:</strong> Getting Started and Terms page spacing so buttons no longer collide with the next section.</li>
+  <li><strong>Changed:</strong> Footer links are simplified and grouped for mobile readability.</li>
+  <li><strong>Changed:</strong> Removed duplicate and low-priority footer links from the always-visible footer.</li>
+  <li><strong>Changed:</strong> Default app version updated to <code>v5.5.2</code>.</li>
+</ul>
 <h2>v5.5.1 — Homepage and Release Notes Cleanup</h2>
 <ul>
   <li><strong>Fixed:</strong> Simplified the home page so Create Room is the clear primary action.</li>

@@ -28,3 +28,8 @@ These pages are meant to give new streamers/testers clear expectations without m
 - Secondary navigation stays in footer/support links.
 - Release Notes page includes the v5.5.1 hotfix entry.
 - Footer shows the running app version.
+
+
+## v5.5.2 layout follow-up
+- Static pages use evergreen headers instead of room/session status headers.
+- Footer links were simplified for mobile readability.

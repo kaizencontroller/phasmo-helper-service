@@ -83,9 +83,12 @@
   <div class="panel feedback-panel hidden" id="feedbackPanel"><div class="head"><div><strong>Quick Check</strong><div class="muted">How is the helper working for you?</div></div><button id="dismissFeedback" class="btn-small">Not now</button></div><div class="body"><div class="row"><button class="green" data-feedback="up">👍 Good</button><button class="red" data-feedback="down">👎 Needs work</button></div><div class="muted" id="feedbackStatus" style="margin-top:8px">This pops up occasionally during setup so issues get caught early.</div></div></div>
 
   <div class="panel support-footer" id="supportFooter"><div class="body">
-    <div class="support-links"><a id="configLink" href="/phasmo/config">Config</a><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a><a id="acknowledgementsLink" href="/phasmo/acknowledgements" target="_blank">Acknowledgements</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual & support files</a><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support on Ko-fi</a><a id="streamerBotLink" href="/phasmo/streamerbot">Streamer.bot setup</a><a id="bugReportLink" href="/phasmo/bug-report">Bug reports</a></div>
+    <div class="support-links compact-footer-links">
+      <div class="support-row"><a href="/phasmo/getting-started" target="_blank">Getting started</a><a href="/phasmo/commands" target="_blank">Viewer commands</a><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a></div>
+      <div class="support-row"><a id="streamerBotLink" href="/phasmo/streamerbot" target="_blank">Streamer.bot setup</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">Support files</a><a id="bugReportLink" href="/phasmo/bug-report" target="_blank">Bug reports</a></div>
+      <div class="support-row meta"><a href="/phasmo/privacy" target="_blank">Privacy</a><a href="/phasmo/terms" target="_blank">Terms</a><a href="/phasmo/data-retention" target="_blank">Data retention</a><span>Version <span id="appVersion">loading…</span></span></div>
+    </div>
     <div class="support-note">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development. <span id="footerGhost" class="footer-ghost hidden">👁</span></div>
-    <div class="support-note">Version <span id="appVersion">loading…</span></div>
   </div></div>
   <div class="panel danger-zone" id="jumpscarePanel"><div class="body">
     <button id="jumpscareButton" class="danger-button">Don’t press this button</button>
