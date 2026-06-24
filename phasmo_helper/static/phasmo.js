@@ -1302,6 +1302,22 @@ document.addEventListener('keydown',async(e)=>{
 });
 
 
+
+async function loadAppVersion(){
+  const el=document.getElementById('appVersion');
+  if(!el)return;
+  try{
+    const r=await fetch('/api/phasmo/version');
+    if(!r.ok)throw new Error('version failed');
+    const data=await r.json();
+    const version=data.version||'unknown';
+    const commit=data.commit?` • ${String(data.commit).slice(0,7)}`:'';
+    el.textContent=version+commit;
+  }catch(e){
+    el.textContent='unknown';
+  }
+}
+
 async function loadSiteBanner(){
   const el=document.getElementById('siteBanner'), text=document.getElementById('siteBannerText');
   if(!el||!text)return;
@@ -1331,4 +1347,4 @@ async function pollState(){
   state=next;
   render();
 }
-loadSiteBanner(); getState().then(()=>maybeShowFeedbackPrompt()); setInterval(pollState, (MODE==='overlay'?1000:(MODE==='control'?2000:5000)));
+loadAppVersion(); loadSiteBanner(); getState().then(()=>maybeShowFeedbackPrompt()); setInterval(pollState, (MODE==='overlay'?1000:(MODE==='control'?2000:5000)));

@@ -89,6 +89,7 @@ def _support_footer(safe_room: str = "default") -> str:
     <a href=\"/phasmo/terms?room={safe_room}\">Terms</a>
   </div>
   <div class=\"support-note\">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development.</div>
+  <div class=\"support-note\">Version {html.escape(settings._APP_VERSION)}</div>
 </div></section>
 """
 
@@ -119,7 +120,9 @@ def phasmo_index(room: str | None = Query(default=None)):
 <section class=\"hero\">
   <a class=\"brand brand-link\" href=\"/phasmo\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Controller tools</div><h1>Phasmo Helper</h1></div></a>
   <p>A lightweight group and streamer helper for Phasmophobia evidence tracking, behavior clues, chat guesses, OBS overlays, and contract result scoring.</p>
-  <div class=\"actions\"><a class=\"button primary\" href=\"/phasmo/room?room={safe_room}\">Create Room</a><a class=\"button\" href=\"/phasmo/getting-started?room={safe_room}\">Getting Started</a><a class=\"button\" href=\"/phasmo/commands?room={safe_room}\">Viewer Commands</a><a class=\"button\" href=\"/phasmo/rooms\">Active Rooms</a><a class=\"button\" href=\"/phasmo/leaderboard?room={safe_room}\">Leaderboard</a><a class=\"button\" href=\"/phasmo/streamerbot?room={safe_room}\">Streamer.bot Setup</a><a class=\"button\" href=\"{settings._QUICKSTART_VIDEO_URL}\" target=\"_blank\" rel=\"noopener\" style=\"display:{'inline-block' if settings._QUICKSTART_VIDEO_URL else 'none'}\">Quick Start Video</a></div>
+  <div class=\"actions\"><a class=\"button primary\" href=\"/phasmo/room?room={safe_room}\">Create Room</a></div>
+  <div class=\"small\"><strong>New here?</strong></div>
+  <div class=\"actions\"><a class=\"button\" href=\"/phasmo/getting-started?room={safe_room}\">Getting Started</a><a class=\"button\" href=\"/phasmo/commands?room={safe_room}\">Viewer Commands</a><a class=\"button\" href=\"/phasmo/rooms\">Active Rooms</a><a class=\"button\" href=\"{settings._QUICKSTART_VIDEO_URL}\" target=\"_blank\" rel=\"noopener\" style=\"display:{'inline-block' if settings._QUICKSTART_VIDEO_URL else 'none'}\">Quick Start Video</a></div>
   <p class=\"muted\">Optional room passcodes are 4 digits. Rooms are temporary and expire after 4 hours without updates.</p>
 </section>
 <section class=\"card\"><div class=\"head\"><h2>Active Rooms</h2><a class=\"button\" href=\"/phasmo/rooms\">All</a></div><div class=\"body\"><div class=\"room-grid\">{room_cards}</div></div></section>
@@ -360,6 +363,14 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
     body = f"""
 <p class="small">Release notes are updated with each packaged build so testers can see what changed without checking GitHub.</p>
+<h2>v5.5.1 — Homepage and Release Notes Cleanup</h2>
+<ul>
+  <li><strong>Fixed:</strong> Simplified the home page so Create Room is the clear primary action.</li>
+  <li><strong>Fixed:</strong> Updated the visible Release Notes page with the v5.5 and v5.5.1 entries.</li>
+  <li><strong>Added:</strong> App version now appears in the footer on public/helper pages.</li>
+  <li><strong>Changed:</strong> Secondary links such as Leaderboard, Streamer.bot Setup, Config, Privacy, and Terms stay in footer/support navigation instead of crowding the hero card.</li>
+  <li><strong>Changed:</strong> Default app version updated to <code>v5.5.1</code>.</li>
+</ul>
 <h2>v5.5 — Public Beta Help and Policy Pages</h2>
 <ul>
   <li><strong>Added:</strong> Getting Started page for new streamers and testers.</li>

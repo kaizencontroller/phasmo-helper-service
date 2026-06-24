@@ -1,42 +1,46 @@
-# Phasmo Helper v5.5 — Public Beta Help and Policy Pages
+# Phasmo Helper v5.5.1 — Homepage and Release Notes Cleanup
 
-This staged update is a low-risk public beta polish release. It adds clearer help pages for new users and lightweight policy/retention pages now that the tool is being shared beyond the project owner.
+This hotfix cleans up the v5.5 public-beta help page rollout and makes the live app version visible from the footer.
+
+## Fixed
+
+- Simplified the home page hero section so **Create Room** is the clear primary action.
+- Moved secondary links such as Leaderboard and Streamer.bot Setup out of the hero action cluster and back into support/footer navigation.
+- Updated the visible `/phasmo/release-notes` page with the v5.5 and v5.5.1 entries.
 
 ## Added
 
-- `/phasmo/getting-started` — quick flow for new streamers/testers.
-- `/phasmo/commands` — viewer command guide for guesses, votes, evidence, behaviors, results, and room routing.
-- `/phasmo/privacy` — lightweight privacy note for the public beta.
-- `/phasmo/terms` — basic stream-safe usage expectations and moderation language.
-- `/phasmo/data-retention` — explains temporary rooms, bug tracker exports, and beta persistence limits.
-- Footer links to the new help and policy pages.
-- Home page quick links for Getting Started and Viewer Commands.
+- App version display in the footer on public/helper pages.
+- Runtime app version fetch for the main helper UI footer through `/api/phasmo/version`.
 
 ## Changed
 
-- Default app version is now `v5.5`.
-- Release notes page includes this v5.5 entry.
-- Build package excludes Python cache files so staged release commits stay cleaner.
-
-## Why this update matters
-
-The app is moving from personal/test use toward a public beta. These pages set expectations before more people create rooms, submit reports, and use Streamer.bot integration.
+- Default app version is now `v5.5.1`.
 
 ## Deployment / Staging Instructions
 
-This release is intended to be staged on the `release` branch and deployed by the scheduled maintenance workflow.
+This hotfix should be staged on the `release` branch and deployed by the scheduled maintenance workflow.
+
+If your local `release` branch is currently in a failed rebase, first clean it up:
 
 ```powershell
+git rebase --abort
+git checkout main
+git pull origin main
 git checkout release
-git pull origin release
-# extract this package over the repo
-git status
-git add main.py phasmo_helper PHASMO_FULL_MODULAR_REBUILD_NOTES.md requirements.example.txt .github docs
-git commit -m "Stage Phasmo public beta help pages"
-git push
+git reset --hard origin/main
 ```
 
-Then run a dry-run from GitHub Actions:
+Then extract this package over the repo and stage the hotfix:
+
+```powershell
+git status
+git add main.py phasmo_helper PHASMO_FULL_MODULAR_REBUILD_NOTES.md requirements.example.txt .github docs
+git commit -m "Stage Phasmo homepage and release notes cleanup"
+git push --force-with-lease origin release
+```
+
+Run the scheduled workflow dry-run first:
 
 ```text
 Actions → Scheduled Phasmo Release → Run workflow
@@ -44,14 +48,18 @@ release_branch = release
 dry_run = true
 ```
 
-If the dry-run is clean, the scheduled 9 PM Pacific maintenance workflow can merge `release` into `main` automatically.
+If the dry-run succeeds, run it again with:
+
+```text
+dry_run = false
+```
 
 ## Railway Variables
 
 Update after deployment:
 
 ```text
-PHASMO_APP_VERSION=v5.5
+PHASMO_APP_VERSION=v5.5.1
 ```
 
 Keep existing:
@@ -60,7 +68,3 @@ Keep existing:
 PHASMO_DEV_ADMIN_CODE=<your private admin code>
 PHASMO_OPS_TOKEN=<same token used in GitHub Actions>
 ```
-
-## Notes
-
-This update does not change core gameplay logic, passcode enforcement, or room state behavior. It is primarily public-beta documentation and navigation polish.

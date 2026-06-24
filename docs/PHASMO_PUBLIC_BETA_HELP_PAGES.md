@@ -1,6 +1,6 @@
 # Phasmo Public Beta Help Pages
 
-v5.5 adds lightweight public-facing help and policy pages.
+v5.5 adds lightweight public-facing help and policy pages. v5.5.1 cleans up the homepage layout and adds app version visibility to the footer.
 
 ## Pages
 
@@ -20,3 +20,11 @@ These pages are meant to give new streamers/testers clear expectations without m
 - Convert the viewer command guide into a downloadable one-pager if needed.
 - Add per-streamer command availability notes once command permissions mature.
 - Add a public status link once the top-level Kaizen Controller status page is live.
+
+
+## v5.5.1 cleanup
+
+- Home page hero now keeps Create Room as the primary action.
+- Secondary navigation stays in footer/support links.
+- Release Notes page includes the v5.5.1 hotfix entry.
+- Footer shows the running app version.

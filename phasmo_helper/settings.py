@@ -43,7 +43,7 @@ _SITE_BANNER_FILE = "__global_site_banner.json"
 _ROOM_NAME_BLOCKLIST_EXTRA = os.getenv("PHASMO_ROOM_NAME_BLOCKLIST_EXTRA", "")
 
 # Release / maintenance automation
-_APP_VERSION = os.getenv("PHASMO_APP_VERSION", "v5.5").strip() or "v5.5"
+_APP_VERSION = os.getenv("PHASMO_APP_VERSION", "v5.5.1").strip() or "v5.5.1"
 _BUILD_COMMIT = os.getenv("PHASMO_BUILD_COMMIT", os.getenv("RAILWAY_GIT_COMMIT_SHA", "")).strip()
 _OPS_TOKEN = os.getenv("PHASMO_OPS_TOKEN", "").strip()
 _MAINTENANCE_FILE = "__global_maintenance.json"
