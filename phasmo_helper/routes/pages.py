@@ -75,6 +75,8 @@ def _support_footer(safe_room: str = "default") -> str:
     return f"""
 <section class=\"card support-footer\"><div class=\"body\">
   <div class=\"support-links\">
+    <a href=\"/phasmo/getting-started?room={safe_room}\">Getting started</a>
+    <a href=\"/phasmo/commands?room={safe_room}\">Viewer commands</a>
     <a href=\"/phasmo/config?room={safe_room}\">Config</a>
     <a href=\"/phasmo/release-notes?room={safe_room}\">Release notes</a>
     <a href=\"/phasmo/acknowledgements?room={safe_room}\">Acknowledgements</a>
@@ -83,6 +85,8 @@ def _support_footer(safe_room: str = "default") -> str:
     <a href=\"https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I\" target=\"_blank\" rel=\"noopener\">User manual & support files</a>
     <a href=\"https://ko-fi.com/kaizencontroller\" target=\"_blank\" rel=\"noopener\">Support on Ko-fi</a>
     <a href=\"/phasmo/bug-report?room={safe_room}\">Bug reports</a>
+    <a href=\"/phasmo/privacy?room={safe_room}\">Privacy</a>
+    <a href=\"/phasmo/terms?room={safe_room}\">Terms</a>
   </div>
   <div class=\"support-note\">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development.</div>
 </div></section>
@@ -115,7 +119,7 @@ def phasmo_index(room: str | None = Query(default=None)):
 <section class=\"hero\">
   <a class=\"brand brand-link\" href=\"/phasmo\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Controller tools</div><h1>Phasmo Helper</h1></div></a>
   <p>A lightweight group and streamer helper for Phasmophobia evidence tracking, behavior clues, chat guesses, OBS overlays, and contract result scoring.</p>
-  <div class=\"actions\"><a class=\"button primary\" href=\"/phasmo/room?room={safe_room}\">Create Room</a><a class=\"button\" href=\"/phasmo/rooms\">Active Rooms</a><a class=\"button\" href=\"/phasmo/leaderboard?room={safe_room}\">Leaderboard</a><a class=\"button\" href=\"/phasmo/streamerbot?room={safe_room}\">Streamer.bot Setup</a><a class=\"button\" href=\"{settings._QUICKSTART_VIDEO_URL}\" target=\"_blank\" rel=\"noopener\" style=\"display:{'inline-block' if settings._QUICKSTART_VIDEO_URL else 'none'}\">Quick Start Video</a></div>
+  <div class=\"actions\"><a class=\"button primary\" href=\"/phasmo/room?room={safe_room}\">Create Room</a><a class=\"button\" href=\"/phasmo/getting-started?room={safe_room}\">Getting Started</a><a class=\"button\" href=\"/phasmo/commands?room={safe_room}\">Viewer Commands</a><a class=\"button\" href=\"/phasmo/rooms\">Active Rooms</a><a class=\"button\" href=\"/phasmo/leaderboard?room={safe_room}\">Leaderboard</a><a class=\"button\" href=\"/phasmo/streamerbot?room={safe_room}\">Streamer.bot Setup</a><a class=\"button\" href=\"{settings._QUICKSTART_VIDEO_URL}\" target=\"_blank\" rel=\"noopener\" style=\"display:{'inline-block' if settings._QUICKSTART_VIDEO_URL else 'none'}\">Quick Start Video</a></div>
   <p class=\"muted\">Optional room passcodes are 4 digits. Rooms are temporary and expire after 4 hours without updates.</p>
 </section>
 <section class=\"card\"><div class=\"head\"><h2>Active Rooms</h2><a class=\"button\" href=\"/phasmo/rooms\">All</a></div><div class=\"body\"><div class=\"room-grid\">{room_cards}</div></div></section>
@@ -176,6 +180,137 @@ Content-Type: application/json</pre>
     return _simple_info_page("Streamer.bot Setup", body, safe_room)
 
 
+
+@router.get("/phasmo/getting-started")
+def phasmo_getting_started(room: str | None = Query(default=None)):
+    safe_room = _room_name(room or "kaizen")
+    body = f"""
+<p>Use this as the quick mental model for running a stream/session with Phasmo Helper.</p>
+<h2>Basic flow</h2>
+<ol>
+  <li><strong>Create Room</strong> — choose a stream-safe room name and optional 4-digit passcode.</li>
+  <li><strong>Config</strong> — choose Helper or Tracker behavior for the control screen and overlay.</li>
+  <li><strong>Round Setup</strong> — choose map, difficulty, weather, players, response type, and evidence mode.</li>
+  <li><strong>Control</strong> — track evidence, behaviors, sanity, guesses, votes, and contract result.</li>
+  <li><strong>Overlay</strong> — add the overlay URL to OBS as a browser source.</li>
+  <li><strong>End Session</strong> — close the room when the group is done playing.</li>
+</ol>
+<h2>Streamer.bot</h2>
+<p>Streamer.bot setup is a one-time integration. After that, changing rooms should usually only require updating the <code>phasmoRoom</code> variable.</p>
+<p><a class="button" href="/phasmo/streamerbot?room={safe_room}">Streamer.bot setup</a> <a class="button" href="/phasmo/commands?room={safe_room}">Viewer commands</a></p>
+<h2>Public beta expectations</h2>
+<p>This is an early public beta tool. Daily maintenance/update windows may happen while bugs are fixed and the release workflow stabilizes.</p>
+<p class="small">Do not put private information in room names. Room names may be visible on Active Rooms.</p>
+"""
+    return _simple_info_page("Getting Started", body, safe_room)
+
+
+@router.get("/phasmo/commands")
+def phasmo_commands(room: str | None = Query(default=None)):
+    safe_room = _room_name(room or "kaizen")
+    body = f"""
+<p>Viewer commands let chat participate without cluttering the streamer control screen. Availability can depend on the room config and Streamer.bot setup.</p>
+<h2>Lucky guesses</h2>
+<table><tbody>
+<tr><td><code>!guess Deogen</code></td><td>Make a lucky ghost prediction.</td></tr>
+<tr><td><code>!unguess</code></td><td>Remove your current lucky guess.</td></tr>
+<tr><td><code>!guesses</code></td><td>Show current lucky guesses.</td></tr>
+</tbody></table>
+<h2>Decision votes</h2>
+<table><tbody>
+<tr><td><code>!vote Wraith</code></td><td>Vote when chat is helping the streamer choose.</td></tr>
+<tr><td><code>!unvote</code></td><td>Remove your current vote.</td></tr>
+<tr><td><code>!votes</code></td><td>Show current decision votes.</td></tr>
+</tbody></table>
+<h2>Evidence and behavior helpers</h2>
+<table><tbody>
+<tr><td><code>!ev orbs yes</code></td><td>Mark evidence as confirmed.</td></tr>
+<tr><td><code>!ev freezing no</code></td><td>Mark evidence as ruled out.</td></tr>
+<tr><td><code>!beh 12 yes</code></td><td>Mark a numbered behavior as observed.</td></tr>
+<tr><td><code>!be 12 no</code></td><td>Mark a numbered behavior as ruled out.</td></tr>
+</tbody></table>
+<h2>Round result</h2>
+<table><tbody>
+<tr><td><code>!result Deogen</code></td><td>Confirm the actual ghost after the contract ends and score guesses.</td></tr>
+<tr><td><code>!actual Deogen</code></td><td>Alias for confirming the actual ghost.</td></tr>
+</tbody></table>
+<h2>Streamer/mod setup commands</h2>
+<table><tbody>
+<tr><td><code>!phasmo-room kaizen</code></td><td>Set the remembered default room for the channel/bot profile.</td></tr>
+<tr><td><code>!phasmo room kaizen</code></td><td>Alias for setting the default room.</td></tr>
+</tbody></table>
+<p class="small">For locked rooms, Streamer.bot command calls must include the room code or a future trusted-channel token. This prevents chat command endpoints from bypassing room protection.</p>
+<p><a class="button" href="/phasmo/streamerbot?room={safe_room}">Streamer.bot setup</a></p>
+"""
+    return _simple_info_page("Viewer Commands", body, safe_room)
+
+
+@router.get("/phasmo/privacy")
+def phasmo_privacy(room: str | None = Query(default=None)):
+    safe_room = _room_name(room or "default")
+    body = f"""
+<p>This is a lightweight privacy note for the Phasmo Helper public beta.</p>
+<h2>What the tool may store</h2>
+<ul>
+  <li>Room names, room settings, evidence state, guesses, votes, and contract results.</li>
+  <li>Streamer/channel names when provided for Streamer.bot or support opt-in.</li>
+  <li>Viewer display names submitted through guesses, votes, commands, bug reports, or feedback.</li>
+  <li>Bug reports, contact info entered into the bug form, and internal triage notes.</li>
+</ul>
+<h2>What not to enter</h2>
+<p>Do not enter private personal information, passwords you reuse elsewhere, addresses, payment details, or sensitive information into room names, notes, bug reports, or commands.</p>
+<h2>Public visibility</h2>
+<p>Room names may appear on Active Rooms. Keep room names stream-safe and avoid private information.</p>
+<h2>Support and abuse handling</h2>
+<p>Kaizen Controller may review bug reports, support pings, and room metadata to fix issues, prevent abuse, and keep hosting costs manageable.</p>
+<p><a class="button" href="/phasmo/data-retention?room={safe_room}">Data retention</a> <a class="button" href="/phasmo/terms?room={safe_room}">Terms</a></p>
+"""
+    return _simple_info_page("Privacy", body, safe_room)
+
+
+@router.get("/phasmo/terms")
+def phasmo_terms(room: str | None = Query(default=None)):
+    safe_room = _room_name(room or "default")
+    body = f"""
+<p>Phasmo Helper is a fan-made stream helper and public beta tool provided as-is.</p>
+<h2>Use expectations</h2>
+<ul>
+  <li>Use stream-safe room names and public notes.</li>
+  <li>Do not use slurs, harassment, impersonation, explicit content, URLs, or spam in public room names.</li>
+  <li>Do not attack, scrape, overload, or intentionally disrupt the service.</li>
+  <li>Do not rely on this tool as the source of truth for game outcomes; confirm contract results in-game.</li>
+</ul>
+<h2>Moderation</h2>
+<p>Kaizen Controller may close, hide, or remove abusive rooms, bug reports, or usage patterns to protect the tool, the community, and hosting costs.</p>
+<h2>No warranty</h2>
+<p>The tool may have bugs, temporary downtime, scheduled maintenance, or data loss during beta. It is provided free for community use.</p>
+<p><a class="button" href="/phasmo/privacy?room={safe_room}">Privacy</a> <a class="button" href="/phasmo/data-retention?room={safe_room}">Data retention</a></p>
+"""
+    return _simple_info_page("Terms", body, safe_room)
+
+
+@router.get("/phasmo/data-retention")
+def phasmo_data_retention(room: str | None = Query(default=None)):
+    safe_room = _room_name(room or "default")
+    body = f"""
+<p>These are the intended public-beta retention rules for Phasmo Helper.</p>
+<h2>Current defaults</h2>
+<ul>
+  <li><strong>Inactive open rooms:</strong> expire from Active Rooms after about 4 hours without updates.</li>
+  <li><strong>Closed sessions:</strong> may be kept for a short period to preserve recent results and troubleshooting context.</li>
+  <li><strong>Leaderboards:</strong> may be retained longer so scoring history is useful.</li>
+  <li><strong>Bug reports:</strong> retained until reviewed, fixed, exported, or cleaned up.</li>
+  <li><strong>Support pings:</strong> retained short-term for support and abuse prevention.</li>
+</ul>
+<h2>Persistence note</h2>
+<p>Until persistent Railway storage or a database is configured, app data may depend on the current deployment filesystem and should be treated as beta data.</p>
+<h2>Export/import</h2>
+<p>The Dev Admin bug tracker supports JSON export/import so issue history can survive builds and storage changes.</p>
+<p><a class="button" href="/phasmo/privacy?room={safe_room}">Privacy</a> <a class="button" href="/phasmo/terms?room={safe_room}">Terms</a></p>
+"""
+    return _simple_info_page("Data Retention", body, safe_room)
+
+
 @router.get("/phasmo/bug-report")
 def phasmo_bug_report(room: str | None = Query(default=None)):
     safe_room = _room_name(room or "default")
@@ -225,6 +360,15 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
     body = f"""
 <p class="small">Release notes are updated with each packaged build so testers can see what changed without checking GitHub.</p>
+<h2>v5.5 — Public Beta Help and Policy Pages</h2>
+<ul>
+  <li><strong>Added:</strong> Getting Started page for new streamers and testers.</li>
+  <li><strong>Added:</strong> Viewer Commands page covering guesses, votes, evidence, behavior, result, and room routing commands.</li>
+  <li><strong>Added:</strong> Privacy, Terms, and Data Retention pages for public-beta usage expectations.</li>
+  <li><strong>Changed:</strong> Home page and footer now link to the new user-facing help and policy pages.</li>
+  <li><strong>Changed:</strong> Default app version updated to <code>v5.5</code>.</li>
+  <li><strong>Maintenance:</strong> Build package excludes Python cache files so staged release commits stay cleaner.</li>
+</ul>
 <h2>v5.4.1 — Dev Admin Privacy and Release Setup Cleanup</h2>
 <ul>
   <li><strong>Fixed:</strong> Dev Admin tools now stay hidden until the admin code is accepted.</li>
