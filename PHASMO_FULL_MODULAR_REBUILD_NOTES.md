@@ -1,55 +1,51 @@
-# Phasmo Helper v5.4 — Scheduled Release / Maintenance Automation
+# Phasmo Helper v5.4.1 — Dev Admin Privacy + Release Branch Setup Cleanup
 
-This revision builds on v5.3 and adds the app-side operations layer needed for scheduled maintenance windows and automated release deployment.
+This revision is a small operational hotfix on top of v5.4. It tightens the Dev Admin page and makes the release automation setup clearer.
 
 ## Added
 
-- Protected ops endpoints for GitHub Actions / CI automation:
-  - `GET /api/phasmo/health`
-  - `GET /api/phasmo/version`
-  - `GET /api/phasmo/maintenance`
-  - `POST /api/phasmo/ops/maintenance/start`
-  - `POST /api/phasmo/ops/maintenance/end`
-  - `POST /api/phasmo/ops/banner`
-- `PHASMO_OPS_TOKEN` support for automation-only API access.
-- Persistent maintenance state file in `PHASMO_STATE_DIR`.
-- Dev Admin maintenance panel for local/manual testing of maintenance mode.
-- Scheduled GitHub Actions workflow:
-  - `.github/workflows/scheduled-phasmo-release.yml`
-- Release automation guide:
-  - `docs/PHASMO_RELEASE_AUTOMATION.md`
+- Dev Admin unlock/bootstrap flow:
+  - Admin tools stay hidden until the admin code is accepted.
+  - Banner, maintenance, and tracker data are loaded only after unlock.
+- Dev Admin Maintenance / Release Automation panel:
+  - View current maintenance state.
+  - Manually start maintenance for local/testing.
+  - Manually end maintenance as success or failure.
+- Dev Admin bootstrap endpoint:
+  - `POST /api/phasmo/dev-admin/bootstrap`
+- Updated release notes page with v5.4.1, v5.4, and v5.3 summaries.
 
 ## Changed
 
-- The public orange banner can now be controlled manually from Dev Admin or automatically through ops endpoints.
-- Maintenance mode can make room updates temporarily read-only.
-- Maintenance mode can pause new room creation.
-- Health endpoint checks that the state directory exists and is writable.
+- Dev Admin no longer shows banner, bug tracker, sample data, or maintenance controls before entering a valid admin code.
+- Default app version changed to `v5.4.1`.
+- Release automation docs now clearly explain that the `release` branch must be created and pushed once before GitHub can display it or the workflow can deploy from it.
 
 ## Deployment / Operations
 
-- Use `main` as production.
-- Use `release` as the staged update branch.
-- GitHub Actions can merge `release` into `main` during the scheduled maintenance window.
-- Discord webhook messages can announce:
-  - routine refresh window
-  - maintenance starting
-  - deployment complete
-  - deployment failed
+Create the release branch once after this update is on `main`:
 
-## Acknowledgements Update
+```powershell
+git checkout main
+git pull origin main
+git checkout -b release
+git push -u origin release
+git checkout main
+```
 
-- Acknowledgements page now lists play testers as clickable links.
-- Removed project-owner credit from the acknowledgements list.
-- Added `xmysticalnerissa` to play testers.
+Going forward:
 
-## Required new variables
+- `main` = production branch connected to Railway.
+- `release` = staged update branch waiting for the maintenance window.
+
+## Required / Recommended Variables
 
 In Railway:
 
 ```text
 PHASMO_OPS_TOKEN=<same long random token used in GitHub Actions>
-PHASMO_APP_VERSION=v5.4
+PHASMO_APP_VERSION=v5.4.1
+PHASMO_DEV_ADMIN_CODE=<your private admin code>
 ```
 
 In GitHub Actions secrets:
@@ -62,4 +58,4 @@ DISCORD_WEBHOOK_URL=<Discord webhook URL>
 
 ## Notes
 
-The workflow uses a fast-forward-only merge from `release` to `main`. If the branches diverge, the deployment fails safely instead of trying to auto-resolve conflicts.
+This update does not change gameplay logic. It is primarily a release operations, Dev Admin privacy, and documentation cleanup update.

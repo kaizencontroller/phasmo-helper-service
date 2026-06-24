@@ -9,6 +9,23 @@ This build adds the app-side support and GitHub Actions workflow for scheduled m
 
 Do local testing first. When the update is ready, push it to `release`. The scheduled workflow merges `release` into `main` during the maintenance window.
 
+
+## Create the release branch once
+
+The v5.4 files add the workflow, but GitHub will not show a `release` branch until you create and push it. Do this once after v5.4+ is on `main`:
+
+```powershell
+git checkout main
+git pull origin main
+git checkout -b release
+git push -u origin release
+git checkout main
+```
+
+After that, GitHub should show both `main` and `release` branches. Future staged updates go to `release`; production remains on `main` until the scheduled workflow merges it.
+
+If the scheduled workflow says no release branch exists, run the commands above and then re-run the workflow with `dry_run=true`.
+
 ## GitHub repository secrets
 
 Add these in GitHub → Repository → Settings → Secrets and variables → Actions:
@@ -25,7 +42,7 @@ Add this to the Phasmo Helper Railway service:
 
 Optional:
 
-- `PHASMO_APP_VERSION=v5.4`
+- `PHASMO_APP_VERSION=v5.4.1`
 - `PHASMO_STATE_DIR=/data/phasmo_state` if using a Railway volume
 
 ## New ops endpoints

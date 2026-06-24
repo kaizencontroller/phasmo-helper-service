@@ -224,8 +224,36 @@ def _simple_info_page(title: str, body: str, room: str = "default") -> HTMLRespo
 def phasmo_release_notes(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
     body = f"""
-<p class="small">This page is intentionally simple so updates can be edited directly in <code>main.py</code>.</p>
-<h2>Current Development Notes</h2>
+<p class="small">Release notes are updated with each packaged build so testers can see what changed without checking GitHub.</p>
+<h2>v5.4.1 — Dev Admin Privacy and Release Setup Cleanup</h2>
+<ul>
+  <li><strong>Fixed:</strong> Dev Admin tools now stay hidden until the admin code is accepted.</li>
+  <li><strong>Added:</strong> Dev Admin bootstrap check so banner, maintenance, and tracker data are loaded only after unlock.</li>
+  <li><strong>Added:</strong> Maintenance / Release Automation test controls on the Dev Admin page.</li>
+  <li><strong>Changed:</strong> Release automation docs now call out that the <code>release</code> branch must be created and pushed once before GitHub can show or deploy it.</li>
+  <li><strong>Changed:</strong> Default app version updated to <code>v5.4.1</code>.</li>
+</ul>
+<h2>v5.4 — Scheduled Release / Maintenance Automation</h2>
+<ul>
+  <li><strong>Added:</strong> Protected ops endpoints for GitHub Actions: health, version, maintenance start/end, and banner control.</li>
+  <li><strong>Added:</strong> <code>PHASMO_OPS_TOKEN</code> support for CI/CD automation.</li>
+  <li><strong>Added:</strong> GitHub Actions scheduled release workflow for the 9 PM Pacific maintenance window.</li>
+  <li><strong>Added:</strong> Discord maintenance/deployment notice support through GitHub Secrets.</li>
+  <li><strong>Added:</strong> Maintenance mode can temporarily make the app read-only and pause new room creation.</li>
+  <li><strong>Changed:</strong> Acknowledgements now list play testers as clickable links, with project-owner credit removed from the list.</li>
+</ul>
+<h2>v5.3 — Public Beta Hardening</h2>
+<ul>
+  <li><strong>Fixed:</strong> Locked rooms require passcode access for room pages, reads, writes, and Streamer.bot commands.</li>
+  <li><strong>Added:</strong> End Session / Close Room flow.</li>
+  <li><strong>Added:</strong> Button guardrails for Next Round, Reset Current Round, End Session, and destructive actions.</li>
+  <li><strong>Added:</strong> Room-name validation/content filtering for public Active Rooms.</li>
+  <li><strong>Added:</strong> Dev Admin bug tracker table with triage fields and JSON export/import.</li>
+  <li><strong>Added:</strong> Editable safety-orange public banner.</li>
+  <li><strong>Added:</strong> Overlay remaining-ghost news reel.</li>
+  <li><strong>Fixed:</strong> Header/home link behavior and Round Setup navigation.</li>
+</ul>
+<h2>Earlier Development Notes</h2>
 <ul>
   <li>Added multi-room/session support for parallel groups.</li>
   <li>Added setup fields for room/session name and number of players.</li>
@@ -234,13 +262,8 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
   <li>Moved witnessed model/name clue tracking into Behavior Branches.</li>
   <li>Added separate <span class="badge">!guess</span> and <span class="badge">!vote</span> boards.</li>
   <li>Added numbered behavior entries with <span class="badge">!be # yes/no</span> support.</li>
-  <li>Expanded loading-screen cards with useful investigation tips and archived questionable field notes.</li>
-  <li>Expanded cursed possession helper and location hints.</li>
-  <li>Added a room-aware title bar that links back to Setup or Control based on the current session state.</li>
-  <li>Added the Kaizen Phasmo Helper title bar across Setup, Control, Leaderboard, Release Notes, and Acknowledgements pages.</li>
+  <li>Expanded loading-screen cards, cursed possession helper, and location hints.</li>
 </ul>
-<h2>Contributor Notes</h2>
-<p>Future updates can call out play-testers, correction submissions, map/location corrections, command ideas, and feature requests here.</p>
 <p><a href="/phasmo/acknowledgements?room={safe_room}">View acknowledgements</a></p>
 <p class="small"><a href="/phasmo/config?room={safe_room}">Configuration</a> • <a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual and support files</a></p>
 """
