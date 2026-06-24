@@ -6,6 +6,7 @@ from .. import settings
 from ..services.banner import read_banner, write_banner
 from ..services.dev_admin import clear_sample_data, dev_admin_available, dev_admin_code_ok, load_sample_data
 from ..services.reports import export_bug_tracker, import_bug_tracker, read_bug_issues, update_bug_issue
+from ..services.maintenance import read_maintenance, start_maintenance, end_maintenance
 
 router = APIRouter()
 
@@ -26,6 +27,13 @@ def dev_admin_page():
     level = str(banner.get("level") or "maintenance")
     enabled = "checked" if banner.get("enabled") else ""
     expires_at = str(banner.get("expiresAt") or "")
+    maintenance = read_maintenance()
+    maint_message = str(maintenance.get("message") or "")
+    maint_version = str(maintenance.get("stagedVersion") or "")
+    maint_id = str(maintenance.get("maintenanceId") or "")
+    maint_status = str(maintenance.get("status") or "operational")
+    maint_readonly = "checked" if maintenance.get("readOnly") else ""
+    maint_block = "checked" if maintenance.get("blockNewRooms") else ""
     return HTMLResponse(f"""<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Phasmo Dev Admin</title><style>{_page_style()}</style></head><body><main>
 <section class=\"hero\"><h1>Phasmo Dev Admin</h1><p class=\"muted\">Unlisted pre-launch tools. {local_note}</p><p><a href=\"/phasmo\">Home</a></p></section>
 
@@ -67,6 +75,9 @@ $('clear').onclick=()=>call('/api/phasmo/dev-admin/clear-sample-data');
 $('bannerMessage').oninput=()=>{{$('bannerPreview').textContent=$('bannerMessage').value||'Preview: scheduled maintenance / update notice will appear here.';}};
 $('saveBanner').onclick=()=>call('/api/phasmo/dev-admin/banner',{{enabled:$('bannerEnabled').checked,level:$('bannerLevel').value,message:$('bannerMessage').value,expiresAt:$('bannerExpires').value}});
 $('disableBanner').onclick=()=>{{$('bannerEnabled').checked=false;call('/api/phasmo/dev-admin/banner',{{enabled:false}});}};
+$('startMaintenance').onclick=()=>call('/api/phasmo/dev-admin/maintenance/start',{{stagedVersion:$('maintVersion').value,maintenanceId:$('maintId').value,message:$('maintMessage').value,readOnly:$('maintReadOnly').checked,blockNewRooms:$('maintBlockNew').checked,mode:$('maintReadOnly').checked?'read_only':($('maintBlockNew').checked?'block_new_rooms':'banner')}});
+$('endMaintenance').onclick=()=>call('/api/phasmo/dev-admin/maintenance/end',{{success:true,result:'manual maintenance complete',message:'Maintenance complete.'}});
+$('failMaintenance').onclick=()=>call('/api/phasmo/dev-admin/maintenance/end',{{success:false,result:'manual maintenance marked failed',message:'Maintenance/update did not complete successfully. Manual review may be needed.'}});
 function esc(s){{return String(s??'').replace(/[&<>\"]/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}}[c]));}}
 async function loadIssues(){{
   const data=await call('/api/phasmo/dev-admin/bug-tracker/list');
@@ -153,3 +164,15 @@ async def dev_admin_bug_tracker_export(request: Request):
 async def dev_admin_bug_tracker_import(request: Request):
     body = await _require_code(request)
     return {"ok": True, "result": import_bug_tracker(body.get("payload") or {})}
+
+
+@router.post("/api/phasmo/dev-admin/maintenance/start")
+async def dev_admin_maintenance_start(request: Request):
+    body = await _require_code(request)
+    return {"ok": True, "maintenance": start_maintenance(body, updated_by="dev-admin")}
+
+
+@router.post("/api/phasmo/dev-admin/maintenance/end")
+async def dev_admin_maintenance_end(request: Request):
+    body = await _require_code(request)
+    return {"ok": True, "maintenance": end_maintenance(body, updated_by="dev-admin")}

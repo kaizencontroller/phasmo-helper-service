@@ -1,0 +1,139 @@
+name: Scheduled Phasmo Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_branch:
+        description: "Branch to merge into main during the maintenance window"
+        required: false
+        default: "release"
+      dry_run:
+        description: "Check status and send no deployment push"
+        required: false
+        default: "false"
+  schedule:
+    # Runs at 9 PM America/Los_Angeles in both PDT/PST via runtime timezone guard.
+    - cron: "0 4 * * *"
+    - cron: "0 5 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: phasmo-scheduled-release
+  cancel-in-progress: false
+
+jobs:
+  scheduled-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Run scheduled release
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_BRANCH_INPUT: ${{ github.event.inputs.release_branch }}
+          DRY_RUN_INPUT: ${{ github.event.inputs.dry_run }}
+          PHASMO_BASE_URL: ${{ secrets.PHASMO_BASE_URL }}
+          PHASMO_OPS_TOKEN: ${{ secrets.PHASMO_OPS_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+
+          local_hour="$(TZ=America/Los_Angeles date +%H)"
+          if [[ "$EVENT_NAME" == "schedule" && "$local_hour" != "21" ]]; then
+            echo "Skipping duplicate cron run; local hour is $local_hour, not 21."
+            exit 0
+          fi
+
+          release_branch="${RELEASE_BRANCH_INPUT:-release}"
+          dry_run="${DRY_RUN_INPUT:-false}"
+          maintenance_started="false"
+          release_sha=""
+
+          notify_discord() {
+            local msg="$1"
+            if [[ -n "${DISCORD_WEBHOOK_URL:-}" ]]; then
+              payload=$(python -c 'import json,sys; print(json.dumps({"content": sys.argv[1]}))' "$msg")
+              curl -fsS -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "$payload" >/dev/null
+            else
+              echo "Discord webhook not configured. Message would have been: $msg"
+            fi
+          }
+
+          ops_post() {
+            local path="$1"
+            local payload="$2"
+            if [[ -z "${PHASMO_BASE_URL:-}" || -z "${PHASMO_OPS_TOKEN:-}" ]]; then
+              echo "Ops endpoint skipped because PHASMO_BASE_URL or PHASMO_OPS_TOKEN is missing."
+              return 0
+            fi
+            curl -fsS -X POST "${PHASMO_BASE_URL}${path}" \
+              -H "Authorization: Bearer ${PHASMO_OPS_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "$payload"
+          }
+
+          finish_failure() {
+            local code=$?
+            if [[ "$maintenance_started" == "true" ]]; then
+              ops_post "/api/phasmo/ops/maintenance/end" '{"success":false,"result":"scheduled release failed","message":"Scheduled Phasmo Helper deployment failed. Manual review needed."}' || true
+            fi
+            notify_discord "⚠️ Phasmo Helper scheduled deployment failed. Manual review needed."
+            exit "$code"
+          }
+          trap finish_failure ERR
+
+          git config user.name "kaizen-release-bot"
+          git config user.email "actions@github.com"
+          git fetch origin main
+
+          if ! git ls-remote --exit-code --heads origin "$release_branch" >/dev/null 2>&1; then
+            notify_discord "ℹ️ Phasmo Helper routine maintenance window: no release branch named '$release_branch' is staged. Brief Railway refreshes may occur, but no user-facing update is currently scheduled."
+            exit 0
+          fi
+
+          git fetch origin "$release_branch:refs/remotes/origin/$release_branch"
+          release_sha="$(git rev-parse "origin/$release_branch")"
+
+          if git merge-base --is-ancestor "origin/$release_branch" HEAD; then
+            notify_discord "ℹ️ Phasmo Helper routine maintenance window: '$release_branch' has no new commits beyond main. Brief Railway refreshes may occur, but no user-facing update is currently staged."
+            exit 0
+          fi
+
+          if [[ "$dry_run" == "true" ]]; then
+            notify_discord "🧪 Phasmo Helper dry-run: release branch '$release_branch' is staged at ${release_sha:0:7}. No deploy was pushed."
+            exit 0
+          fi
+
+          notify_discord "🟧 Phasmo Helper maintenance starting. Deploying staged release '${release_branch}' (${release_sha:0:7}). Expected window: 15–30 minutes."
+          ops_post "/api/phasmo/ops/maintenance/start" "{\"status\":\"deploying\",\"mode\":\"read_only\",\"readOnly\":true,\"blockNewRooms\":true,\"stagedVersion\":\"${release_sha:0:7}\",\"deploymentId\":\"${GITHUB_RUN_ID:-manual}\",\"maintenanceId\":\"phasmo-${release_sha:0:7}\",\"message\":\"Scheduled Phasmo Helper update is deploying. The app may briefly refresh or become read-only.\",\"expectedImpact\":\"Brief downtime or read-only behavior may occur while Railway deploys the update.\"}" || true
+          maintenance_started="true"
+
+          git merge --ff-only "origin/$release_branch"
+          git push origin HEAD:main
+
+          if [[ -n "${PHASMO_BASE_URL:-}" ]]; then
+            echo "Waiting for health endpoint..."
+            for i in {1..60}; do
+              if curl -fsS "${PHASMO_BASE_URL}/api/phasmo/health" >/tmp/phasmo_health.json; then
+                cat /tmp/phasmo_health.json
+                break
+              fi
+              sleep 10
+              if [[ "$i" == "60" ]]; then
+                echo "Healthcheck did not pass in time."
+                exit 1
+              fi
+            done
+          fi
+
+          ops_post "/api/phasmo/ops/maintenance/end" "{\"success\":true,\"result\":\"scheduled release complete\",\"message\":\"Phasmo Helper update complete.\",\"deploymentId\":\"${GITHUB_RUN_ID:-manual}\"}" || true
+          maintenance_started="false"
+          notify_discord "✅ Phasmo Helper deployment complete. Release '${release_branch}' (${release_sha:0:7}) is now on main."

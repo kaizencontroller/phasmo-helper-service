@@ -252,20 +252,24 @@ def phasmo_acknowledgements(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
     body = f"""
 <p>This tool exists because people test it, break it, correct it, and suggest better ways to make it useful during real play.</p>
-<h2>Acknowledgements</h2>
+<h2>Play Testers</h2>
 <ul>
-  <li><strong>KaizenController</strong> — project owner, streamer workflow, testing, and design direction.</li>
-  <li><strong><a href="https://twitch.tv/sheikhyabootie" target="_blank" rel="noopener">SheikYaBootie</a></strong> — play-testing, ideas, and chaos validation.</li>
-  <li><strong><a href="https://twitch.tv/imestrellas" target="_blank" rel="noopener">imestrellas</a></strong> — play-testing, stream workflow feedback, and multiplayer use cases.</li>
-  <li><strong><a href="https://twitch.tv/Cybertraz" target="_blank" rel="noopener">Cybertraz</a></strong> — play-testing, corrections, and usability feedback.</li>
+  <li><strong><a href="https://twitch.tv/sheikhyabootie" target="_blank" rel="noopener">SheikYaBootie</a></strong></li>
+  <li><strong><a href="https://twitch.tv/imestrellas" target="_blank" rel="noopener">imestrellas</a></strong></li>
+  <li><strong><a href="https://twitch.tv/Cybertraz" target="_blank" rel="noopener">Cybertraz</a></strong></li>
+  <li><strong><a href="https://www.twitch.tv/xmysticalnerissa" target="_blank" rel="noopener">xmysticalnerissa</a></strong></li>
+</ul>
+<h2>Media / Asset Credits</h2>
+<ul>
   <li><strong><a href="https://www.youtube.com/watch?v=l4SFiMrYplM" target="_blank" rel="noopener">Jumpscare video source / creator</a></strong> — video used for the optional “Don’t press this button” gag.</li>
   <li><a href="https://pixabay.com/illustrations/clown-horror-scary-royalty-free-stock-7280647/" target="_blank" rel="noopener"><strong>DangrafArt / Pixabay</strong></a> — clown image used for the optional “Don’t press this button” gag.</li>
   <li><a href="https://pixabay.com/sound-effects/fuzzy-jumpscare-80560/" target="_blank" rel="noopener"><strong>freesound_community / Pixabay</strong></a> — “Fuzzy Jumpscare” sound effect used for the optional “Don’t press this button” gag.</li>
-  <li><strong>Community contributors</strong> — corrections to cursed possession locations, ghost behavior logic, overlay readability, and command ideas.</li>
 </ul>
+<h2>Community Contributors</h2>
+<p>Thanks to everyone submitting bug reports, cursed possession corrections, ghost behavior notes, overlay readability feedback, and command ideas.</p>
 <h2>Want to Support Development?</h2>
 <p>This helper is happily provided free for the Phasmophobia community. Optional donations help cover hosting and support further development.</p>
-<p><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support KaizenController on Ko-fi</a></p>
+<p><a href="https://ko-fi.com/kaizencontroller" target="_blank" rel="noopener">Support development on Ko-fi</a></p>
 <p><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">User manual and support files</a></p>
 <p class="small"><a href="/phasmo/release-notes?room={safe_room}">View release notes</a></p>
 """

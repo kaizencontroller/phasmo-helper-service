@@ -11,15 +11,86 @@ from ..services.commands import apply_command
 from ..services.leaderboard import _score_contract_result
 from ..services.reports import _bug_report_path, _feedback_path, maybe_record_support_ping
 from ..services.rooms import active_room_summaries, cleanup_inactive_rooms
-from ..services.banner import read_banner
+from ..services.banner import read_banner, write_banner
 from ..services.security import ensure_valid_room_name, passcode_attempt_allowed, record_failed_passcode
+from ..services.maintenance import read_maintenance, start_maintenance, end_maintenance, require_ops_token, state_dir_health, maintenance_write_blocked
 from ..services.streamerbot import get_default_room, get_profile, parse_room_command, set_default_room
 from ..services.state import (
     _auth_ok, _clean_room_code, _new_reset_state, _read_jumpscare_count, _room_code_ok, _room_name, _write_jumpscare_count,
-    public_state, read_state, write_state,
+    public_state, read_state, write_state, _state_path,
 )
 
 router = APIRouter()
+
+
+@router.get("/api/phasmo/health")
+def api_phasmo_health():
+    maint = read_maintenance()
+    state_dir = state_dir_health()
+    ok = bool(state_dir.get("exists") and state_dir.get("writable"))
+    return {
+        "ok": ok,
+        "status": "healthy" if ok else "degraded",
+        "app": "phasmo-helper",
+        "version": settings._APP_VERSION,
+        "commit": settings._BUILD_COMMIT,
+        "maintenance": maint,
+        "stateDir": state_dir,
+        "timestamp": int(time.time() * 1000),
+    }
+
+
+@router.get("/api/phasmo/version")
+def api_phasmo_version():
+    return {
+        "ok": True,
+        "app": "phasmo-helper",
+        "version": settings._APP_VERSION,
+        "commit": settings._BUILD_COMMIT,
+        "railway": {
+            "service": __import__("os").environ.get("RAILWAY_SERVICE_NAME", ""),
+            "environment": __import__("os").environ.get("RAILWAY_ENVIRONMENT_NAME", ""),
+            "publicDomain": __import__("os").environ.get("RAILWAY_PUBLIC_DOMAIN", ""),
+        },
+    }
+
+
+@router.get("/api/phasmo/maintenance")
+def api_phasmo_maintenance():
+    return {"ok": True, "maintenance": read_maintenance()}
+
+
+@router.post("/api/phasmo/ops/maintenance/start")
+async def api_ops_maintenance_start(request: Request, authorization: str | None = Header(default=None), x_phasmo_ops_token: str | None = Header(default=None)):
+    require_ops_token(authorization, x_phasmo_ops_token)
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    return {"ok": True, "maintenance": start_maintenance(body if isinstance(body, dict) else {}, updated_by="github-actions")}
+
+
+@router.post("/api/phasmo/ops/maintenance/end")
+async def api_ops_maintenance_end(request: Request, authorization: str | None = Header(default=None), x_phasmo_ops_token: str | None = Header(default=None)):
+    require_ops_token(authorization, x_phasmo_ops_token)
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    return {"ok": True, "maintenance": end_maintenance(body if isinstance(body, dict) else {}, updated_by="github-actions")}
+
+
+@router.post("/api/phasmo/ops/banner")
+async def api_ops_banner(request: Request, authorization: str | None = Header(default=None), x_phasmo_ops_token: str | None = Header(default=None)):
+    require_ops_token(authorization, x_phasmo_ops_token)
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    if not isinstance(body, dict):
+        body = {}
+    return {"ok": True, "banner": write_banner(body)}
+
 
 @router.post("/api/phasmo/jumpscare")
 def api_jumpscare(room: str | None = Query(default=None)):
@@ -135,6 +206,10 @@ async def api_post_state(
     ensure_valid_room_name(room or "default")
     safe_room = _room_name(room)
     body = await request.json()
+    existing_room = _state_path(safe_room).exists()
+    maintenance_msg = maintenance_write_blocked(existing_room)
+    if maintenance_msg:
+        raise HTTPException(status_code=503, detail=maintenance_msg)
     with settings._STATE_LOCK:
         cleanup_inactive_rooms()
         current = read_state(safe_room)
@@ -319,6 +394,9 @@ def api_get_command(
         state = read_state(safe_room)
         if state.get("roomStatus") == "closed":
             raise HTTPException(status_code=410, detail="room is closed")
+        maintenance_msg = maintenance_write_blocked(_state_path(safe_room).exists())
+        if maintenance_msg:
+            raise HTTPException(status_code=503, detail=maintenance_msg)
         if not _room_code_ok(state, code or ""):
             record_failed_passcode(request, safe_room)
             raise HTTPException(status_code=403, detail="room passcode required")
@@ -376,6 +454,9 @@ async def api_post_command(
         state = read_state(safe_room)
         if state.get("roomStatus") == "closed":
             raise HTTPException(status_code=410, detail="room is closed")
+        maintenance_msg = maintenance_write_blocked(_state_path(safe_room).exists())
+        if maintenance_msg:
+            raise HTTPException(status_code=503, detail=maintenance_msg)
         supplied_code = body.get("roomPasscode") or body.get("roomCode") or body.get("code") or code or ""
         if not _room_code_ok(state, supplied_code):
             record_failed_passcode(request, safe_room)

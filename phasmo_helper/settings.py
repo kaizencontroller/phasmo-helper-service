@@ -41,3 +41,10 @@ _MAX_REQUEST_BYTES = int(os.getenv("PHASMO_MAX_REQUEST_BYTES", "10000"))
 _RATE_LIMIT_FILE = "__global_rate_limit_events.jsonl"
 _SITE_BANNER_FILE = "__global_site_banner.json"
 _ROOM_NAME_BLOCKLIST_EXTRA = os.getenv("PHASMO_ROOM_NAME_BLOCKLIST_EXTRA", "")
+
+# Release / maintenance automation
+_APP_VERSION = os.getenv("PHASMO_APP_VERSION", "v5.4").strip() or "v5.4"
+_BUILD_COMMIT = os.getenv("PHASMO_BUILD_COMMIT", os.getenv("RAILWAY_GIT_COMMIT_SHA", "")).strip()
+_OPS_TOKEN = os.getenv("PHASMO_OPS_TOKEN", "").strip()
+_MAINTENANCE_FILE = "__global_maintenance.json"
+_MAINTENANCE_DEFAULT_WARNING_HOURS = int(os.getenv("PHASMO_MAINTENANCE_WARNING_HOURS", "24"))
