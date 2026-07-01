@@ -104,7 +104,7 @@ def api_jumpscare(room: str | None = Query(default=None)):
         current["jumpscareCount"] = count
         current["jumpscareUntil"] = int(time.time() * 1000) + 8500
         current["jumpscareSeq"] = int(current.get("jumpscareSeq") or 0) + 1
-        write_state(safe_room, current)
+        write_state(safe_room, current, usage_event="jumpscare", usage_source="api", usage_actor="button")
     return {"ok": True, "count": count, "state": public_state(current)}
 
 
@@ -222,24 +222,31 @@ async def api_post_state(
         if not _room_code_ok(current, supplied_code):
             record_failed_passcode(request, safe_room)
             raise HTTPException(status_code=403, detail="room passcode required")
+        usage_event = "room_created" if not existing_room else "state_update"
+        usage_actor = str(body.get("user") or body.get("updatedBy") or "browser")[:120]
+        usage_details = {"keys": ",".join(sorted(str(k) for k in body.keys()))[:300]}
         if body.get("endSession") is True or body.get("closeRoom") is True:
+            usage_event = "end_session"
             current["roomStatus"] = "closed"
             current["closedAt"] = int(time.time() * 1000)
             current["closedBy"] = str(body.get("closedBy") or "control")[:120]
             current["lastCommand"] = "End Session"
             current["lastCommandResult"] = "Room closed. It has been removed from Active Rooms; scored history is preserved."
         elif body.get("reopenRoom") is True:
+            usage_event = "reopen_room"
             current["roomStatus"] = "open"
             current["closedAt"] = 0
             current["closedBy"] = ""
             current["lastCommand"] = "Reopen Room"
             current["lastCommandResult"] = "Room reopened."
         elif body.get("reset") is True:
+            usage_event = "reset_round"
             previous = dict(current)
             current = _new_reset_state(safe_room)
             current["ignoredUsers"] = previous.get("ignoredUsers", []) or []
             current["roomCode"] = previous.get("roomCode", "") or ""
         elif body.get("nextRound") is True:
+            usage_event = "next_round"
             previous = dict(current)
             current = _new_reset_state(safe_room)
             # Preserve reusable setup, but force map/weather back to unknown for the new contract.
@@ -339,10 +346,11 @@ async def api_post_state(
                 result_patch = body.get("contractResult") or {}
                 confirmed = result_patch.get("confirmedGhost")
                 if confirmed:
+                    usage_event = "contract_result"
                     current, score_msg = _score_contract_result(current, str(confirmed), str(result_patch.get("confirmedBy") or "control"))
                     current["lastCommand"] = "Confirm Result"
                     current["lastCommandResult"] = score_msg
-        write_state(safe_room, current)
+        write_state(safe_room, current, usage_event=usage_event, usage_source="api-state", usage_actor=usage_actor, usage_details=usage_details)
     return {"ok": True, "state": public_state(current)}
 
 
@@ -386,7 +394,7 @@ def api_get_command(
             state = read_state(safe_room)
             state["lastCommand"] = cmd_text
             state["lastCommandResult"] = f"Streamer.bot default room set to {safe_room}."
-            write_state(safe_room, state)
+            write_state(safe_room, state, usage_event="streamerbot_room_route", usage_source="streamerbot-get", usage_actor=str(sender), usage_details={"channel": channel_name, "bot": bot_name})
             return {"ok": True, "room": safe_room, "result": f"Phasmo room set to {safe_room}.", "profile": profile, "state": public_state(state)}
         selected_room = room or get_default_room(channel=channel_name, bot_account=bot_name, user=sender) or "default"
         ensure_valid_room_name(str(selected_room))
@@ -412,7 +420,7 @@ def api_get_command(
             channel=channel_name,
             bot_account=bot_name,
         )
-        write_state(safe_room, state)
+        write_state(safe_room, state, usage_event="streamerbot_command", usage_source=str(source), usage_actor=str(user), usage_details={"command": str(command), "channel": channel, "bot": bot_account})
     return {"ok": True, "room": safe_room, "result": result, "supportPing": bool(support_ping), "state": public_state(state)}
 
 
@@ -446,7 +454,7 @@ async def api_post_command(
             state = read_state(requested_room)
             state["lastCommand"] = command
             state["lastCommandResult"] = f"Streamer.bot default room set to {requested_room}."
-            write_state(requested_room, state)
+            write_state(requested_room, state, usage_event="streamerbot_room_route", usage_source="streamerbot-post", usage_actor=str(user), usage_details={"channel": channel, "bot": bot_account})
             return {"ok": True, "room": requested_room, "result": f"Phasmo room set to {requested_room}.", "profile": profile, "state": public_state(state)}
         selected_room = room or body.get("room") or body.get("phasmoRoom") or body.get("roomName") or get_default_room(channel=channel, bot_account=bot_account, user=user) or "default"
         ensure_valid_room_name(str(selected_room))
@@ -474,7 +482,7 @@ async def api_post_command(
             bot_account=bot_account,
             base_url=str(request.base_url).rstrip("/"),
         )
-        write_state(safe_room, state)
+        write_state(safe_room, state, usage_event="streamerbot_command", usage_source=str(source), usage_actor=str(user), usage_details={"command": str(command), "channel": channel, "bot": bot_account})
     return {"ok": True, "room": safe_room, "result": result, "supportPing": bool(support_ping), "state": public_state(state)}
 
 

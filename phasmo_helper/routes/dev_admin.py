@@ -11,13 +11,14 @@ from ..services.banner import read_banner, write_banner
 from ..services.dev_admin import clear_sample_data, dev_admin_available, dev_admin_code_ok, load_sample_data
 from ..services.reports import export_bug_tracker, import_bug_tracker, read_bug_issues, update_bug_issue
 from ..services.maintenance import read_maintenance, start_maintenance, end_maintenance
+from ..services.usage import export_usage, import_usage, usage_csv, usage_summary
 
 router = APIRouter()
 
 
 def _page_style() -> str:
     return """
-body{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI,sans-serif}main{width:min(460px,100vw);padding:10px;margin:0 auto;display:grid;gap:10px}.card,.hero{background:linear-gradient(135deg,#172235ee,#0f172aee);border:1px solid #334155;border-radius:18px;box-shadow:0 16px 40px #0007;overflow:hidden}.hero,.body{padding:14px}.head{padding:14px;border-bottom:1px solid #334155}h1,h2{margin:0}p{color:#cbd5e1;line-height:1.4}.muted{color:#94a3b8;font-size:12px}button,input{box-sizing:border-box;background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit}input{width:100%}button{cursor:pointer;font-weight:900}.orange{background:#432919;border-color:#f97316}.green{background:#14532d;border-color:#22c55e}.red{background:#5b2329;border-color:#ef4444}.row{display:flex;gap:8px;flex-wrap:wrap}.status{font-size:13px;color:#93c5fd;white-space:pre-wrap}a{color:#93c5fd}textarea,select{box-sizing:border-box;background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit;width:100%}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #334155;padding:8px 6px;text-align:left;vertical-align:top}td input,td select{min-width:105px;padding:7px}.site-banner-preview{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:12px;padding:10px;margin-top:8px}.pill{display:inline-block;border:1px solid #334155;border-radius:999px;padding:3px 8px;font-size:11px;color:#cbd5e1}.grid{display:grid;gap:8px}.small{font-size:12px}.filebox{border:1px dashed #334155;border-radius:12px;padding:10px}.hidden{display:none!important}.lock-note{border:1px solid #334155;border-radius:12px;background:#020617;padding:10px;color:#cbd5e1}.danger-note{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:12px;padding:10px;font-size:12px}
+body{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI,sans-serif}main{width:min(460px,100vw);padding:10px;margin:0 auto;display:grid;gap:10px}.card,.hero{background:linear-gradient(135deg,#172235ee,#0f172aee);border:1px solid #334155;border-radius:18px;box-shadow:0 16px 40px #0007;overflow:hidden}.hero,.body{padding:14px}.head{padding:14px;border-bottom:1px solid #334155}h1,h2{margin:0}p{color:#cbd5e1;line-height:1.4}.muted{color:#94a3b8;font-size:12px}button,input{box-sizing:border-box;background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit}input{width:100%}button{cursor:pointer;font-weight:900}.orange{background:#432919;border-color:#f97316}.green{background:#14532d;border-color:#22c55e}.red{background:#5b2329;border-color:#ef4444}.row{display:flex;gap:8px;flex-wrap:wrap}.status{font-size:13px;color:#93c5fd;white-space:pre-wrap}a{color:#93c5fd}textarea,select{box-sizing:border-box;background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit;width:100%}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #334155;padding:8px 6px;text-align:left;vertical-align:top}td input,td select{min-width:105px;padding:7px}.site-banner-preview{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:12px;padding:10px;margin-top:8px}.pill{display:inline-block;border:1px solid #334155;border-radius:999px;padding:3px 8px;font-size:11px;color:#cbd5e1}.grid{display:grid;gap:8px}.small{font-size:12px}.filebox{border:1px dashed #334155;border-radius:12px;padding:10px}.hidden{display:none!important}.lock-note{border:1px solid #334155;border-radius:12px;background:#020617;padding:10px;color:#cbd5e1}.danger-note{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:12px;padding:10px;font-size:12px}.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat-card{border:1px solid #334155;background:#020617;border-radius:12px;padding:10px}.stat-card strong{display:block;font-size:18px}.stat-card span{color:#94a3b8;font-size:11px}.nowrap{white-space:nowrap}
 """
 
 
@@ -63,6 +64,14 @@ def dev_admin_page():
 <div class=\"row\"><button id=\"loadIssues\">Refresh Issues</button><button id=\"exportIssues\">Export JSON</button></div>
 <div class=\"filebox\"><input id=\"importFile\" type=\"file\" accept=\"application/json,.json\"><button id=\"importIssues\">Import JSON</button><p class=\"muted\">Import merges by issue id. Export before importing older files.</p></div>
 <div class=\"table-wrap\"><table><thead><tr><th>ID</th><th>Issue</th><th>Status</th><th>Priority</th><th>Versions</th><th>Save</th></tr></thead><tbody id=\"issueRows\"><tr><td colspan=\"6\" class=\"muted\">Unlock, then click Refresh Issues.</td></tr></tbody></table></div>
+</div></section>
+
+<section class=\"card\"><div class=\"head\"><h2>Room Usage Log</h2></div><div class=\"body grid\">
+<p class=\"muted\">See which rooms are being used, how many rounds were observed/completed, and how long sessions lasted. Export/import this log between builds until persistent storage is configured.</p>
+<div class=\"stat-grid\" id=\"usageStats\"><div class=\"stat-card\"><strong>—</strong><span>rooms</span></div><div class=\"stat-card\"><strong>—</strong><span>rounds</span></div><div class=\"stat-card\"><strong>—</strong><span>completed</span></div><div class=\"stat-card\"><strong>—</strong><span>active hours</span></div></div>
+<div class=\"row\"><button id=\"loadUsage\">Refresh Usage</button><button id=\"exportUsageJson\">Export JSON</button><button id=\"exportUsageCsv\">Export CSV</button></div>
+<div class=\"filebox\"><input id=\"importUsageFile\" type=\"file\" accept=\"application/json,.json\"><button id=\"importUsage\">Import Usage JSON</button><p class=\"muted\">Import merges by room and round id. Export before importing older files.</p></div>
+<div class=\"table-wrap\"><table><thead><tr><th>Room</th><th>Status</th><th>Rounds</th><th>Duration</th><th>Last Seen</th><th>Details</th></tr></thead><tbody id=\"usageRows\"><tr><td colspan=\"6\" class=\"muted\">Unlock, then click Refresh Usage.</td></tr></tbody></table></div>
 </div></section>
 
 <section class=\"card\"><div class=\"head\"><h2>Sample Data</h2></div><div class=\"body\"><div class=\"row\"><button class=\"green\" id=\"load\">Load sample demo data</button><button class=\"red\" id=\"clear\">Clear sample demo data</button></div><p class=\"muted\">Creates demo-helper, demo-tracker, demo-support, demo-closed, and a seeded leaderboard.</p></div></section>
@@ -137,6 +146,35 @@ window.saveIssue=saveIssue;
 $('loadIssues').onclick=loadIssues;
 $('exportIssues').onclick=async()=>{{const data=await call('/api/phasmo/dev-admin/bug-tracker/export'); const blob=new Blob([JSON.stringify(data,null,2)],{{type:'application/json'}}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='phasmo_bug_tracker_export.json'; a.click();}};
 $('importIssues').onclick=async()=>{{const f=$('importFile').files[0]; if(!f) return alert('Choose a JSON export first.'); const payload=JSON.parse(await f.text()); await call('/api/phasmo/dev-admin/bug-tracker/import',{{payload}}); await loadIssues();}};
+function fmtMs(ms){{
+  ms=Number(ms||0); const mins=Math.round(ms/60000);
+  if(mins<60) return mins+'m';
+  const hrs=Math.floor(mins/60); const rem=mins%60;
+  if(hrs<48) return hrs+'h '+rem+'m';
+  const days=Math.floor(hrs/24); return days+'d '+(hrs%24)+'h';
+}}
+function fmtDate(ms){{if(!ms)return '—'; try{{return new Date(Number(ms)).toLocaleString();}}catch(e){{return String(ms)}}}}
+function downloadText(name, text, type){{const blob=new Blob([text],{{type:type||'text/plain'}}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);}}
+async function loadUsage(){{
+  const data=await call('/api/phasmo/dev-admin/usage/list');
+  const totals=data.totals||{{}};
+  $('usageStats').innerHTML=`<div class="stat-card"><strong>${{esc(totals.rooms??0)}}</strong><span>rooms</span></div><div class="stat-card"><strong>${{esc(totals.roundsObserved??0)}}</strong><span>rounds observed</span></div><div class="stat-card"><strong>${{esc(totals.roundsCompleted??0)}}</strong><span>completed rounds</span></div><div class="stat-card"><strong>${{esc(totals.totalActiveHours??0)}}</strong><span>active hours</span></div>`;
+  const rows=$('usageRows'); const rooms=data.rooms||[];
+  if(!rooms.length){{rows.innerHTML='<tr><td colspan="6" class="muted">No usage logged yet.</td></tr>'; return;}}
+  rows.innerHTML=rooms.map(r=>`<tr>
+    <td><b>${{esc(r.room)}}</b><br><span class="muted">${{esc(r.lastMap||'unknown')}} · ${{esc(r.lastDifficulty||'unknown')}}</span></td>
+    <td><span class="pill">${{esc(r.roomStatus||'open')}}</span><br><span class="muted">${{r.roomLocked?'locked':'open access'}}${{r.supportOptIn?' · support ok':''}}</span></td>
+    <td><b>${{esc(r.roundsObserved||0)}}</b> observed<br><span class="muted">${{esc(r.roundsCompleted||0)}} completed · next ${{esc(r.nextRoundCount||0)}}</span></td>
+    <td class="nowrap">${{fmtMs(r.durationMs)}}<br><span class="muted">writes ${{esc(r.writeCount||0)}} · cmds ${{esc(r.commandCount||0)}}</span></td>
+    <td class="nowrap">${{fmtDate(r.lastSeenAt)}}<br><span class="muted">first ${{fmtDate(r.firstSeenAt)}}</span></td>
+    <td><span class="muted">last event: ${{esc(r.lastEvent||'')}}</span><br><span class="muted">channel: ${{esc(r.supportChannel||'—')}}</span></td>
+  </tr>`).join('');
+}}
+$('loadUsage').onclick=loadUsage;
+$('exportUsageJson').onclick=async()=>{{const data=await call('/api/phasmo/dev-admin/usage/export'); downloadText('phasmo_room_usage_export.json', JSON.stringify(data,null,2), 'application/json');}};
+$('exportUsageCsv').onclick=async()=>{{const data=await call('/api/phasmo/dev-admin/usage/export-csv'); downloadText('phasmo_room_usage_export.csv', data.csv||'', 'text/csv');}};
+$('importUsage').onclick=async()=>{{const f=$('importUsageFile').files[0]; if(!f) return alert('Choose a usage JSON export first.'); const payload=JSON.parse(await f.text()); await call('/api/phasmo/dev-admin/usage/import',{{payload}}); await loadUsage();}};
+
 </script></body></html>"""
     return HTMLResponse(html_doc)
 
@@ -214,3 +252,27 @@ async def dev_admin_maintenance_start(request: Request):
 async def dev_admin_maintenance_end(request: Request):
     body = await _require_code(request)
     return {"ok": True, "maintenance": end_maintenance(body, updated_by="dev-admin")}
+
+@router.post("/api/phasmo/dev-admin/usage/list")
+async def dev_admin_usage_list(request: Request):
+    await _require_code(request)
+    return usage_summary()
+
+
+@router.post("/api/phasmo/dev-admin/usage/export")
+async def dev_admin_usage_export(request: Request):
+    await _require_code(request)
+    return export_usage()
+
+
+@router.post("/api/phasmo/dev-admin/usage/export-csv")
+async def dev_admin_usage_export_csv(request: Request):
+    await _require_code(request)
+    return {"ok": True, "csv": usage_csv()}
+
+
+@router.post("/api/phasmo/dev-admin/usage/import")
+async def dev_admin_usage_import(request: Request):
+    body = await _require_code(request)
+    return {"ok": True, "result": import_usage(body.get("payload") or {})}
+

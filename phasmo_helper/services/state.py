@@ -143,7 +143,7 @@ def read_state(room: str) -> Dict[str, Any]:
         return state
 
 
-def write_state(room: str, state: Dict[str, Any]) -> Dict[str, Any]:
+def write_state(room: str, state: Dict[str, Any], usage_event: str = "state_write", usage_source: str = "app", usage_actor: str = "", usage_details: Dict[str, Any] | None = None) -> Dict[str, Any]:
     state["room"] = room
     now_ms = int(time.time() * 1000)
     # Track when a normal 3-evidence round reaches 2 confirmed evidence.
@@ -172,6 +172,12 @@ def write_state(room: str, state: Dict[str, Any]) -> Dict[str, Any]:
     to_save.pop("config", None)
     _state_path(room).write_text(json.dumps(to_save, indent=2, sort_keys=True), encoding="utf-8")
     state["jumpscareCount"] = _read_jumpscare_count()
+    try:
+        from .usage import record_room_activity
+        record_room_activity(room, state, event=usage_event, source=usage_source, actor=usage_actor, details=usage_details)
+    except Exception:
+        # Usage analytics should never break active room state updates.
+        pass
     return state
 
 

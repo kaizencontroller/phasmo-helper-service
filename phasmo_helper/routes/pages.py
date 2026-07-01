@@ -369,6 +369,16 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
     body = f"""
 <p class="small">Release notes are updated with each packaged build so testers can see what changed without checking GitHub.</p>
+
+<h2>v5.6 — Room Usage Log and Session Analytics</h2>
+<ul>
+  <li><strong>Added:</strong> Dev Admin Room Usage Log showing rooms, observed rounds, completed rounds, session duration, last seen time, and command/write activity.</li>
+  <li><strong>Added:</strong> Aggregate room usage tracking across browser updates, Streamer.bot commands, Next Round, Reset Current Round, confirmed contract results, and End Session.</li>
+  <li><strong>Added:</strong> Room usage JSON export/import so usage history can be preserved between builds before persistent storage is configured.</li>
+  <li><strong>Added:</strong> Room usage CSV export for quick analysis in Excel/Sheets.</li>
+  <li><strong>Changed:</strong> State writes now update lightweight operational analytics without storing room passcodes or support contact info.</li>
+  <li><strong>Changed:</strong> Default app version updated to <code>v5.6</code>.</li>
+</ul>
 <h2>v5.5.2 — Static Page Layout and Footer Cleanup</h2>
 <ul>
   <li><strong>Fixed:</strong> Static help and policy pages no longer show room/session status in their headers.</li>
