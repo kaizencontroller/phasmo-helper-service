@@ -8,6 +8,7 @@ let roomCode=cleanRoomCode(params.get('code')||localStorage.getItem(roomCodeKeyF
 if(roomCode.length===4){ localStorage.setItem(roomCodeKeyFor(room), roomCode); }
 const API='/api/phasmo';
 let authPromptActive=false;
+let lastSyncAt=0;
 function storedRoomCodeFor(targetRoom){const key=roomCodeKeyFor(targetRoom); const fallback=normalizeRoomKey(targetRoom)===room?roomCode:''; return cleanRoomCode(localStorage.getItem(key)||fallback||'')}
 function codeSuffixFor(targetRoom=room){const code=storedRoomCodeFor(targetRoom);return code&&code.length===4?'&code='+encodeURIComponent(code):''}
 function codeSuffix(){return codeSuffixFor(room)}
@@ -180,7 +181,9 @@ const B=[{"id":"hantu-temperature-speed","cat":"Movement Speed","label":"Speed c
 let state={evidence:{},behaviors:{},votes:{},responds:'unknown',evidenceMode:'3'}; let expanded={}; let evidenceCollapsed=localStorage.getItem('phasmoEvidenceCollapsed')==='true'; let behaviorCollapsed=localStorage.getItem('phasmoBehaviorCollapsed')==='true'; let cursedCollapsed=localStorage.getItem('phasmoCursedCollapsed')==='true'; let topPanelCollapsed=localStorage.getItem('phasmoTopPanelCollapsed')==='true'; let sanitySaveTimer=null; let setupDirty=false;
 function apiUrl(path){return `${API}${path}?room=${encodeURIComponent(room)}${codeSuffix()}`}
 async function fetchRoomState(targetRoom=room){
-  let r=await fetch(`${API}/state?room=${encodeURIComponent(targetRoom)}${codeSuffixFor(targetRoom)}`);
+  let r;
+  try{r=await fetch(`${API}/state?room=${encodeURIComponent(targetRoom)}${codeSuffixFor(targetRoom)}`);}
+  catch(e){renderConnectionStatus(false);return null;}
   if(r.status===403){
     const ok=await retryWithRoomCode('This room is locked. Enter the 4-digit room passcode to join.',targetRoom);
     if(!ok){location.href='/phasmo/rooms';return null;}
@@ -191,6 +194,11 @@ async function fetchRoomState(targetRoom=room){
     return null;
   }
   if(r.status===410){
+    if(MODE==='room'){
+      lastSyncAt=Date.now();
+      renderConnectionStatus(true);
+      return {...state,roomStatus:'closed',reusingClosedRoom:true};
+    }
     location.href='/phasmo/rooms';
     return null;
   }
@@ -198,7 +206,10 @@ async function fetchRoomState(targetRoom=room){
     showAuthError('Could not load room state. Please try again.');
     return null;
   }
-  return await r.json();
+  const data=await r.json();
+  lastSyncAt=Date.now();
+  renderConnectionStatus(true);
+  return data;
 }
 async function getState(){let next=await fetchRoomState(room);if(!next)return;state=next;if(!shouldHoldSetupRender())render();}
 async function postState(patch){
@@ -233,6 +244,15 @@ function showAuthError(msg){
     let box=document.getElementById(id);
     if(box){box.textContent=msg;box.classList.remove('hidden');}
   });
+}
+function renderConnectionStatus(ok=navigator.onLine){
+  const el=document.getElementById('connectionStatus'); if(!el)return;
+  const online=navigator.onLine!==false;
+  el.classList.toggle('offline',!online||!ok);
+  if(!online){el.textContent='Offline';return;}
+  if(!ok){el.textContent='Reconnecting';return;}
+  const age=lastSyncAt?Math.max(0,Math.round((Date.now()-lastSyncAt)/1000)):0;
+  el.textContent=age<5?'Synced':`Synced ${age}s`;
 }
 function isEditableField(el){return !!(el && ['INPUT','SELECT','TEXTAREA'].includes(el.tagName));}
 function isSetupLikeMode(){return MODE==='room'||MODE==='setup';}
@@ -365,7 +385,7 @@ function renderSetup(){
   const isRoomSetup = MODE==='room';
   const isRoundSetup = MODE==='setup';
   const title=document.getElementById('setupPanelTitle'); if(title)title.textContent=isRoomSetup?'Room / Game Setup':'Round Setup';
-  const help=document.getElementById('setupHelpText'); if(help)help.textContent=isRoomSetup?'Create the shared room and save reusable room settings. Streamer.bot setup is separate and usually only done once.':'Set only the contract details for this round, then open Control.';
+  const help=document.getElementById('setupHelpText'); if(help)help.textContent=isRoomSetup?(state.reusingClosedRoom?'This name belonged to a closed session. Saving creates a fresh room; prior leaderboard and usage history stay preserved.':'Create the shared room and save reusable room settings. Streamer.bot setup is separate and usually only done once.'):'Set only the contract details for this round, then open Control.';
   const saveBtn=document.getElementById('saveSetup'); if(saveBtn)saveBtn.textContent=isRoomSetup?'Save Room & Continue':'Start Round';
   setValueUnlessEditing('setupRoom',room);
   setValueUnlessEditing('setupPlayers',String(state.playerCount||4));
@@ -379,6 +399,11 @@ function renderSetup(){
   setValueUnlessEditing('setupWeather',state.weather||'unknown');
   setValueUnlessEditing('setupResponds',state.responds||'unknown');
   const done=state.setupComplete===true;
+  document.querySelectorAll('#setupProgress [data-step]').forEach(step=>{
+    const key=step.dataset.step;
+    step.classList.toggle('active',(MODE==='room'&&key==='room')||(MODE==='setup'&&key==='round')||(MODE==='control'&&key==='control'));
+    step.classList.toggle('done',(MODE!=='room'&&key==='room')||(MODE==='control'&&key==='round'&&done));
+  });
   const appHome=document.getElementById('appHomeBar');
   if(appHome)appHome.href='/phasmo';
   const appHomeSub=document.getElementById('appHomeSub');
@@ -458,14 +483,14 @@ function renderCursedHelper(){
 function renderControl(){document.getElementById('control').classList.remove('hidden');renderSetup();
  const controlTrackerMode=(state.controlMode||'helper')==='tracker';
  document.querySelector('.next')?.classList.toggle('hidden', controlTrackerMode);
- document.getElementById('topPanel')?.classList.toggle('collapsed', topPanelCollapsed); const topToggle=document.getElementById('toggleTopPanel'); if(topToggle)topToggle.textContent=topPanelCollapsed?'Expand':'Collapse';document.getElementById('roomLabel').textContent=room;document.getElementById('mode').value=state.evidenceMode;let c=candidates();document.getElementById('countBadge').textContent=c.length+' candidates';document.getElementById('summary').textContent=`${E.filter(k=>state.evidence[k]==='yes').length} confirmed`;let r=state.responds||'unknown';document.getElementById('respondsText').textContent=r[0].toUpperCase()+r.slice(1);document.getElementById('respondsChoices').classList.toggle('hidden',r!=='unknown');document.getElementById('respondsHint').textContent=responseLine();
+ document.getElementById('topPanel')?.classList.toggle('collapsed', topPanelCollapsed); const topToggle=document.getElementById('toggleTopPanel'); if(topToggle){topToggle.textContent=topPanelCollapsed?'Expand':'Collapse';topToggle.setAttribute('aria-expanded',String(!topPanelCollapsed));}document.getElementById('roomLabel').textContent=room;document.getElementById('mode').value=state.evidenceMode;let c=candidates();document.getElementById('countBadge').textContent=c.length+' candidates';document.getElementById('summary').textContent=`${E.filter(k=>state.evidence[k]==='yes').length} confirmed`;let r=state.responds||'unknown';document.getElementById('respondsText').textContent=r[0].toUpperCase()+r.slice(1);document.getElementById('respondsChoices').classList.toggle('hidden',r!=='unknown');document.getElementById('respondsHint').textContent=responseLine();
  document.querySelector('.responds-panel')?.classList.toggle('hidden', state.setupComplete===true);
  document.getElementById('evidencePanel')?.classList.toggle('collapsed', evidenceCollapsed);
- const evToggle=document.getElementById('toggleEvidence'); if(evToggle)evToggle.textContent=evidenceCollapsed?'Expand':'Collapse';
+ const evToggle=document.getElementById('toggleEvidence'); if(evToggle){evToggle.textContent=evidenceCollapsed?'Expand':'Collapse';evToggle.setAttribute('aria-expanded',String(!evidenceCollapsed));}
  document.getElementById('behaviorPanel')?.classList.toggle('collapsed', behaviorCollapsed);
- const behaviorToggle=document.getElementById('toggleBehavior'); if(behaviorToggle)behaviorToggle.textContent=behaviorCollapsed?'Expand':'Collapse';
+ const behaviorToggle=document.getElementById('toggleBehavior'); if(behaviorToggle){behaviorToggle.textContent=behaviorCollapsed?'Expand':'Collapse';behaviorToggle.setAttribute('aria-expanded',String(!behaviorCollapsed));}
  document.getElementById('cursedPanel')?.classList.toggle('collapsed', cursedCollapsed);
- const cursedToggle=document.getElementById('toggleCursed'); if(cursedToggle)cursedToggle.textContent=cursedCollapsed?'Expand':'Collapse';
+ const cursedToggle=document.getElementById('toggleCursed'); if(cursedToggle){cursedToggle.textContent=cursedCollapsed?'Expand':'Collapse';cursedToggle.setAttribute('aria-expanded',String(!cursedCollapsed));}
  let nx=nextEv(), nb=nextBehavior(), st=status(); document.getElementById('nextName').textContent=nx?EL[nx.ev]:(nb?'Behavior: '+nb.cat:st.name); document.getElementById('nextWhy').textContent=nx?`${EL[nx.ev]} splits ${nx.y}/${nx.n}.`+(nx.ev==='box'?` ${responseLine()}`:''):(nb?`${nb.label}. Supports: ${nb.up.join(', ')||'context'}${nb.down.length?`; argues against: ${nb.down.join(', ')}`:''}.`:st.text); document.getElementById('confirmNext').disabled=!(nx||nb);document.getElementById('denyNext').disabled=!(nx||nb);document.getElementById('confirmNext').textContent=nx?'Confirm '+EL[nx.ev]:(nb?'Observed':'Confirmed');document.getElementById('denyNext').textContent=nx?'No '+EL[nx.ev]:(nb?'No / False':'No more evidence'); if(nx){document.getElementById('confirmNext').onclick=()=>postState({evidence:{[nx.ev]:'yes'}});document.getElementById('denyNext').onclick=()=>postState({evidence:{[nx.ev]:'no'}})} else if(nb){document.getElementById('confirmNext').onclick=()=>postState({behaviors:{[nb.id]:'observed'}});document.getElementById('denyNext').onclick=()=>postState({behaviors:{[nb.id]:'contradicted'}})}
  renderTimers(); renderTrackers(); renderManualGhosts(); renderContractResult(); renderCursedHelper();
  document.getElementById('evidenceRows').innerHTML=E.map(k=>{let v=state.evidence[k]||'unknown'; let cls=(want)=>`state ${want} ${(want==='unk'?v==='unknown':v===want)?'active':'inactive'}`; return `<div class='evrow'><span class='evname'>${EL[k]}</span><button class='${cls('yes')}' data-ev='${k}' data-val='yes'>✓</button><button class='${cls('unk')}' data-ev='${k}' data-val='unknown'>?</button><button class='${cls('no')}' data-ev='${k}' data-val='no'>×</button></div>`}).join(''); document.querySelectorAll('[data-ev]').forEach(btn=>btn.onclick=()=>postState({evidence:{[btn.dataset.ev]:btn.dataset.val}}));
@@ -1174,7 +1199,7 @@ document.getElementById('saveSetup')?.addEventListener('click',async()=>{
   const passcode=rememberRoomCodeFor(targetRoom,document.getElementById('setupPasscode')?.value||storedRoomCodeFor(targetRoom)||'');
   let patch={};
   if(MODE==='room'){
-    patch={roomPasscode:passcode,supportChannel:document.getElementById('setupSupportChannel')?.value||''};
+    patch={createRoom:true,roomPasscode:passcode,supportChannel:document.getElementById('setupSupportChannel')?.value||''};
   } else {
     patch={setupComplete:true,playerCount:+document.getElementById('setupPlayers').value||4,evidenceMode:document.getElementById('setupEvidenceMode')?.value||'3',map:document.getElementById('setupMap').value,difficulty:document.getElementById('setupDifficulty').value,weather:document.getElementById('setupWeather').value,responds:document.getElementById('setupResponds').value};
   }
@@ -1200,7 +1225,7 @@ document.getElementById('nextRound')?.addEventListener('click',async()=>{
   if((hasGuesses||hasVotes)&&!confirmed){showResultModal();return;}
   await startNextRound();
 });
-document.getElementById('copyOverlay')?.addEventListener('click',()=>navigator.clipboard?.writeText(`${location.origin}/phasmo/overlay?room=${encodeURIComponent(room)}${codeSuffix()}`));
+document.getElementById('copyOverlay')?.addEventListener('click',async()=>{await navigator.clipboard?.writeText(`${location.origin}/phasmo/overlay?room=${encodeURIComponent(room)}${codeSuffix()}`);showEasterToast('Overlay URL copied');});
 document.getElementById('endSession')?.addEventListener('click',async()=>{if(!confirm('End Session closes this room, removes it from Active Rooms, and stops normal edits/commands. Leaderboard history stays saved. Continue?'))return; const ok=await postState({endSession:true,closedBy:'control'}); if(ok) location.href='/phasmo';});
 document.getElementById('confirmActualGhost')?.addEventListener('click',async()=>{const ghost=document.getElementById('actualGhostSelect')?.value||''; if(!ghost){showAuthError('Select the actual ghost before confirming the contract result.');return;} const ok=await postState({contractResult:{confirmedGhost:ghost,confirmedBy:'control'}}); if(ok) await startNextRound();});
 document.getElementById('skipScoringNextRound')?.addEventListener('click',startNextRound);
@@ -1211,6 +1236,22 @@ document.getElementById('toggleTopPanel')?.addEventListener('click',()=>{topPane
 document.getElementById('toggleEvidence')?.addEventListener('click',()=>{evidenceCollapsed=!evidenceCollapsed;localStorage.setItem('phasmoEvidenceCollapsed',evidenceCollapsed);renderControl();});
 document.getElementById('toggleBehavior')?.addEventListener('click',()=>{behaviorCollapsed=!behaviorCollapsed;localStorage.setItem('phasmoBehaviorCollapsed',behaviorCollapsed);renderControl();});
 document.getElementById('toggleCursed')?.addEventListener('click',()=>{cursedCollapsed=!cursedCollapsed;localStorage.setItem('phasmoCursedCollapsed',cursedCollapsed);renderControl();});
+document.getElementById('copyDiagnostics')?.addEventListener('click',async()=>{
+  const details=[
+    `Phasmo Helper ${document.getElementById('appVersion')?.textContent||'unknown'}`,
+    `Room: ${room}`,
+    `Mode: ${MODE}`,
+    `Page: ${location.href}`,
+    `Browser online: ${navigator.onLine}`,
+    `Last sync: ${lastSyncAt?new Date(lastSyncAt).toISOString():'not synced'}`,
+    `State version: ${state.stateVersion||0}`,
+    `Setup complete: ${state.setupComplete===true}`
+  ].join('\n');
+  try{await navigator.clipboard.writeText(details);showEasterToast('Diagnostics copied - no passcode or token included');}
+  catch(e){showEasterToast('Could not copy diagnostics');}
+});
+window.addEventListener('online',()=>renderConnectionStatus(true));
+window.addEventListener('offline',()=>renderConnectionStatus(false));
 function dangerButtonLabel(count){
   if(count>=100)return 'Fine. Touch the haunted button.';
   if(count>=50)return 'You people are the problem.';
@@ -1337,7 +1378,7 @@ async function loadSiteBanner(){
 async function pollState(){
   const holdSetupRender=shouldHoldSetupRender();
   let next=await fetchRoomState(room);
-  if(!next)return;
+  if(!next){renderConnectionStatus(false);return;}
   // Do not auto-redirect away from Round Setup. Streamers may intentionally return here during an active run.
   if(holdSetupRender){
     // Keep remote updates in memory, but do not repaint over local room/round setup edits.
@@ -1347,4 +1388,4 @@ async function pollState(){
   state=next;
   render();
 }
-loadAppVersion(); loadSiteBanner(); getState().then(()=>maybeShowFeedbackPrompt()); setInterval(pollState, (MODE==='overlay'?1000:(MODE==='control'?2000:5000)));
+renderConnectionStatus(false); loadAppVersion(); loadSiteBanner(); getState().then(()=>maybeShowFeedbackPrompt()); setInterval(pollState, (MODE==='overlay'?1000:(MODE==='control'?2000:5000))); setInterval(()=>renderConnectionStatus(true),5000);

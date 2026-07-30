@@ -49,7 +49,7 @@ _SITE_BANNER_FILE = "__global_site_banner.json"
 _ROOM_NAME_BLOCKLIST_EXTRA = os.getenv("PHASMO_ROOM_NAME_BLOCKLIST_EXTRA", "")
 
 # Release / maintenance automation
-_APP_VERSION = os.getenv("PHASMO_APP_VERSION", "v5.6").strip() or "v5.6"
+_APP_VERSION = os.getenv("PHASMO_APP_VERSION", "v5.6.1").strip() or "v5.6.1"
 _BUILD_COMMIT = os.getenv("PHASMO_BUILD_COMMIT", os.getenv("RAILWAY_GIT_COMMIT_SHA", "")).strip()
 _OPS_TOKEN = os.getenv("PHASMO_OPS_TOKEN", "").strip()
 _MAINTENANCE_FILE = "__global_maintenance.json"
@@ -68,6 +68,7 @@ def platform_support_url(*, source_url: str = "") -> str:
             "application_name": "Phasmo Helper",
             "application_version": _APP_VERSION,
             "source_url": source_url,
+            "theme": "phasmo",
         }
     )
     return f"{_PLATFORM_BASE_URL}/support/report?{query}"

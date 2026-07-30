@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "id": "phasmo-helper-dark",
+  "application_id": "phasmo-helper",
+  "mode": "dark",
+  "font_family": "Inter, system-ui, \"Segoe UI\", sans-serif",
+  "tokens": {
+    "background": "#000000",
+    "surface": "#172235",
+    "surface_soft": "#213149",
+    "field": "#0f172a",
+    "text": "#f8fafc",
+    "muted_text": "#94a3b8",
+    "border": "#334155",
+    "primary": "#38bdf8",
+    "accent": "#f97316",
+    "success": "#22c55e",
+    "danger": "#ef4444",
+    "focus": "#38bdf8"
+  },
+  "shape": {
+    "control_radius_px": 10,
+    "card_radius_px": 16
+  },
+  "usage": {
+    "support_theme": "phasmo",
+    "source_stylesheet": "phasmo_helper/static/phasmo.css"
+  }
+}

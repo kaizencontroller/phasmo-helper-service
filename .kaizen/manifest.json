@@ -4,7 +4,7 @@
   "display_name": "Phasmo Helper",
   "kind": "standalone-application",
   "category": "creative",
-  "version": "5.6.0",
+  "version": "5.6.1",
   "lifecycle_stage": "beta",
   "operating_mode": "both",
   "description": "Streamer-facing Phasmophobia helper and automation service.",

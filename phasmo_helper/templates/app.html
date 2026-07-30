@@ -13,7 +13,7 @@
     <span class="homeleft"><span class="homelogo"><span>KC</span></span><span class="hometext"><span class="hometitle">Kaizen Phasmo Helper</span><span class="homesub" id="appHomeSub">loading session…</span></span></span>
     <span class="homecta" id="appHomeCta">Home</span>
   </a>
-  <div class="panel top-panel" id="topPanel"><div class="head"><div><strong>Phasmo Control</strong><div class="muted">shared room: <span id="roomLabel"></span></div></div><div class="row" style="gap:6px"><span class="badge" id="countBadge">0</span><button class="btn-small" id="toggleTopPanel">Collapse</button></div></div>
+  <div class="panel top-panel" id="topPanel"><div class="head"><div><strong>Phasmo Control</strong><div class="muted">shared room: <span id="roomLabel"></span></div></div><div class="row" style="gap:6px"><span class="sync-badge" id="connectionStatus" role="status" aria-live="polite">Connecting</span><span class="badge" id="countBadge">0</span><button class="btn-small" id="toggleTopPanel" aria-expanded="true">Collapse</button></div></div>
     <div class="body">
       <div id="authMessage" class="error hidden"></div>
       <div class="top-summary" id="controlSetupSummary">Setup not completed.</div>
@@ -23,6 +23,7 @@
       <div id="controlCommandStatus" class="muted" style="margin-top:6px"></div>
     </div>
   </div>
+  <div class="setup-progress" id="setupProgress" aria-label="Setup progress"><span data-step="room">1 Room</span><span data-step="round">2 Round</span><span data-step="control">3 Control</span></div>
   <div class="panel" id="setupPanel"><div class="head"><div><strong id="setupPanelTitle">Setup</strong><div class="muted" id="setupSummaryLine">room and round settings</div></div><span class="muted" id="setupStatus">not set</span></div><div class="body stack">
     <div id="setupAuthMessage" class="error hidden"></div>
     <div class="setup-grid room-setup-fields">
@@ -43,7 +44,7 @@
     <div id="setupCommandStatus" class="muted" style="margin-top:6px"></div>
     <div id="awardBanner" class="award-banner hidden"></div>
   </div></div>
-  <div class="panel tracker-panel"><div class="head"><strong>Quick Trackers</strong><span class="muted" id="timerSummary">timers / sanity</span></div><div class="body">
+  <div class="panel tracker-panel" id="trackersPanel"><div class="head"><strong>Quick Trackers</strong><span class="muted" id="timerSummary">timers / sanity</span></div><div class="body">
     <div class="quick-timers">
       <button class="blue" data-timer-cmd="!timer incense start">Incense</button>
       <button class="orange" data-timer-cmd="!timer hunt start">Hunt</button>
@@ -65,7 +66,7 @@
     </div>
   </div></div>
   <div class="panel responds-panel"><div class="body"><div class="spread"><strong>Responds: <span id="respondsText">Unknown</span></strong><button id="changeResponds">Change</button></div><div id="respondsChoices" class="grid3" style="margin-top:8px"><button data-responds="unknown">Unknown</button><button data-responds="everyone">Everyone</button><button data-responds="alone">Alone</button></div><div class="muted" id="respondsHint" style="margin-top:8px"></div></div></div>
-  <div class="panel next"><div class="body"><div class="muted" style="letter-spacing:.12em;font-weight:900">NEXT</div><div class="big" id="nextName">Loading</div><p class="muted" id="nextWhy"></p><div class="grid2"><button class="green" id="confirmNext">Confirm</button><button class="red" id="denyNext">No</button></div></div></div>
+  <div class="panel next" id="nextPanel"><div class="body"><div class="muted" style="letter-spacing:.12em;font-weight:900">NEXT</div><div class="big" id="nextName">Loading</div><p class="muted" id="nextWhy"></p><div class="grid2"><button class="green" id="confirmNext">Confirm</button><button class="red" id="denyNext">No</button></div></div></div>
   <div class="panel action-panel"><div class="body"><div class="row"><button class="blue" id="nextRound">Next Round</button><button class="blue" id="copyOverlay">Copy Overlay URL</button></div><div class="muted" style="margin-top:8px">Next Round keeps this room/session and starts a new contract after optional scoring.</div><details class="danger-details"><summary>Session cleanup / danger zone</summary><div class="row" style="margin-top:8px"><button class="orange" id="reset">Reset Current Round</button><button class="red" id="endSession">End Session / Close Room</button></div><div class="muted" style="margin-top:8px">Reset clears this contract only. End Session closes the room and removes it from Active Rooms; leaderboard history stays saved.</div></details></div></div>
   <div id="resultModal" class="modal hidden"><div class="modal-card"><div class="head"><div><strong>Confirm Contract Result</strong><div class="muted">Score guesses before starting the next round.</div></div><button id="cancelResultModal" class="btn-small">Cancel</button></div><div class="body"><div class="top-summary" id="resultSummary">No confirmed result yet.</div><div class="row"><select id="actualGhostSelect"></select><button class="green" id="confirmActualGhost">Confirm & Start Next Round</button></div><div class="muted" style="margin-top:8px">Use the actual ghost shown in the in-game journal after the contract ends. This protects the leaderboard from bad helper data or incomplete investigations.</div><div class="row" style="margin-top:10px"><button class="grey" id="skipScoringNextRound">Skip Scoring / Void Round</button><a class="badge" id="resultLeaderboardLink" href="#">Leaderboard</a></div></div></div></div>
   <div class="panel evidence-panel" id="evidencePanel"><div class="head"><strong>Evidence Board</strong><button class="btn-small" id="toggleEvidence">Collapse</button></div><div class="body" id="evidenceRows"></div></div>
@@ -77,7 +78,7 @@
     </div>
     <input id="behaviorFilter" placeholder="filter: speed, salt, photo" style="width:100%;margin-bottom:8px"><div id="behaviors"></div></div></div>
   <div class="panel cursed-panel" id="cursedPanel"><div class="head"><div><strong>Cursed Possession Helper</strong><div class="muted" id="cursedMapHint">Select a map in setup for location hints.</div></div><button class="btn-small" id="toggleCursed">Collapse</button></div><div class="body"><div id="cursedRows" class="cursed-grid"></div></div></div>
-  <div class="panel candidates-panel"><div class="head"><strong>Candidates</strong><span class="muted" id="summary"></span></div><div class="body"><div class="ghosts" id="ghosts"></div></div></div>
+  <div class="panel candidates-panel" id="candidatesPanel"><div class="head"><strong>Candidates</strong><span class="muted" id="summary"></span></div><div class="body"><div class="ghosts" id="ghosts"></div></div></div>
   <div class="panel votes-panel compact" id="chatPanel"><div class="head"><strong>Chat</strong><span class="muted" id="chatCounts">Guesses: 0 • Votes: 0</span></div><div class="body"><div id="chatCompact" class="top-summary">No chat input yet.</div><button class="btn-small" id="toggleChatDetails">View details</button><div id="chatDetails" class="hidden" style="margin-top:8px"><div id="ignoredUsersLine" class="muted" style="margin-bottom:8px"></div><div id="votes" class="vote-grid"></div></div></div></div>
 
   <div class="panel feedback-panel hidden" id="feedbackPanel"><div class="head"><div><strong>Quick Check</strong><div class="muted">How is the helper working for you?</div></div><button id="dismissFeedback" class="btn-small">Not now</button></div><div class="body"><div class="row"><button class="green" data-feedback="up">👍 Good</button><button class="red" data-feedback="down">👎 Needs work</button></div><div class="muted" id="feedbackStatus" style="margin-top:8px">This pops up occasionally during setup so issues get caught early.</div></div></div>
@@ -86,10 +87,11 @@
     <div class="support-links compact-footer-links">
       <div class="support-row"><a href="/phasmo/getting-started" target="_blank">Getting started</a><a href="/phasmo/commands" target="_blank">Viewer commands</a><a id="releaseNotesLink" href="/phasmo/release-notes" target="_blank">Release notes</a></div>
       <div class="support-row"><a id="streamerBotLink" href="/phasmo/streamerbot" target="_blank">Streamer.bot setup</a><a href="https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I" target="_blank" rel="noopener">Support files</a><a id="bugReportLink" href="__PLATFORM_SUPPORT_URL__" target="_blank">Bug reports / feature requests</a></div>
-      <div class="support-row meta"><a href="/phasmo/privacy" target="_blank">Privacy</a><a href="/phasmo/terms" target="_blank">Terms</a><a href="/phasmo/data-retention" target="_blank">Data retention</a><span>Version <span id="appVersion">loading…</span></span></div>
+      <div class="support-row meta"><a href="/phasmo/privacy" target="_blank">Privacy</a><a href="/phasmo/terms" target="_blank">Terms</a><a href="/phasmo/data-retention" target="_blank">Data retention</a><button class="footer-action" id="copyDiagnostics" type="button">Copy diagnostics</button><span>Version <span id="appVersion">loading…</span></span></div>
     </div>
     <div class="support-note">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development. <span id="footerGhost" class="footer-ghost hidden">👁</span></div>
   </div></div>
+  <nav class="mobile-nav" aria-label="Control shortcuts"><a href="#nextPanel">Next</a><a href="#trackersPanel">Timers</a><a href="#evidencePanel">Evidence</a><a href="#candidatesPanel">Ghosts</a></nav>
   <div class="panel danger-zone" id="jumpscarePanel"><div class="body">
     <button id="jumpscareButton" class="danger-button">Don’t press this button</button>
     <div id="jumpscareCount" class="danger-count hidden"></div>

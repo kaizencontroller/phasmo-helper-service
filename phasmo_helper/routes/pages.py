@@ -49,7 +49,7 @@ def _locked_room_gate(safe_room: str, target_path: str, code: str | None = None)
     safe_room = _room_name(safe_room)
     state = read_state(safe_room)
     if state.get("roomStatus") == "closed":
-        return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Room Closed</title><style>{_public_page_style()}</style></head><body><main>{_site_banner_html()}<a class="hero brand-link" href="/phasmo"><div class="brand"><div class="logo">KC</div><div class="brandcopy"><div class="kicker">Kaizen Phasmo Helper</div><h1>Room Closed</h1></div></div><p>This room session has ended and is no longer accepting updates.</p></a><section class="card"><div class="body actions"><a class="button primary" href="/phasmo/room">Create Room</a><a class="button" href="/phasmo/rooms">Active Rooms</a></div></section>{_support_footer(safe_room)}</main></body></html>""", status_code=410)
+        return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Room Closed</title><style>{_public_page_style()}</style></head><body><main>{_site_banner_html()}<a class="hero brand-link" href="/phasmo"><div class="brand"><div class="logo">KC</div><div class="brandcopy"><div class="kicker">Kaizen Phasmo Helper</div><h1>Room Closed</h1></div></div><p>This room session has ended and is no longer accepting updates.</p></a><section class="card"><div class="body actions"><a class="button primary" href="/phasmo/room?room={safe_room}">Reuse This Room Name</a><a class="button" href="/phasmo/room">Create Different Room</a><a class="button" href="/phasmo/rooms">Active Rooms</a></div></section>{_support_footer(safe_room)}</main></body></html>""", status_code=410)
     if _room_code_ok(state, code or ""):
         return None
     target = f"{target_path}?room={safe_room}"
@@ -65,6 +65,10 @@ document.getElementById('gateForm').addEventListener('submit',async e=>{{e.preve
 
 def _room_gate_or_template(room: str | None, code: str | None, target_path: str, mode: str) -> HTMLResponse:
     safe_room = _room_name(room or "default")
+    # The creation route may intentionally replace a retained closed session.
+    # Control, round, and overlay routes remain blocked by the normal gate.
+    if mode == "room" and read_state(safe_room).get("roomStatus") == "closed":
+        return HTMLResponse(HTML_TEMPLATE.replace("__MODE__", mode))
     gate = _locked_room_gate(safe_room, target_path, code)
     if gate:
         return gate

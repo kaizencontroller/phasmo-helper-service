@@ -217,14 +217,22 @@ async def api_post_state(
         # Do not use the incoming roomPasscode as the auth value because that field
         # is also how the owner changes or clears the room passcode.
         supplied_code = code or body.get("currentRoomPasscode") or body.get("authRoomPasscode") or body.get("code") or ""
-        if current.get("roomStatus") == "closed" and not body.get("reopenRoom"):
+        recreate_closed_room = current.get("roomStatus") == "closed" and body.get("createRoom") is True
+        if current.get("roomStatus") == "closed" and not body.get("reopenRoom") and not recreate_closed_room:
             raise HTTPException(status_code=410, detail="room is closed")
-        if not _room_code_ok(current, supplied_code):
+        # Closed names are reusable immediately. This starts a fresh session
+        # while global usage and leaderboard history remain application-owned.
+        if not recreate_closed_room and not _room_code_ok(current, supplied_code):
             record_failed_passcode(request, safe_room)
             raise HTTPException(status_code=403, detail="room passcode required")
         usage_event = "room_created" if not existing_room else "state_update"
         usage_actor = str(body.get("user") or body.get("updatedBy") or "browser")[:120]
         usage_details = {"keys": ",".join(sorted(str(k) for k in body.keys()))[:300]}
+        if recreate_closed_room:
+            current = _new_reset_state(safe_room)
+            usage_event = "room_recreated"
+            current["lastCommand"] = "Create Room"
+            current["lastCommandResult"] = "Started a fresh session using a previously closed room name."
         if body.get("endSession") is True or body.get("closeRoom") is True:
             usage_event = "end_session"
             current["roomStatus"] = "closed"
