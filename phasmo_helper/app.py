@@ -39,3 +39,28 @@ app.include_router(pages.router)
 app.include_router(config_api.router)
 app.include_router(api.router)
 app.include_router(dev_admin.router)
+
+
+@app.get("/health", include_in_schema=False)
+def health():
+    return {"status": "healthy", "application": "phasmo-helper"}
+
+
+@app.get("/ready", include_in_schema=False)
+def ready():
+    settings._STATE_DIR.mkdir(parents=True, exist_ok=True)
+    return {
+        "status": "ready",
+        "application": "phasmo-helper",
+        "state_directory": str(settings._STATE_DIR),
+    }
+
+
+@app.get("/version", include_in_schema=False)
+def version():
+    return {
+        "application": "phasmo-helper",
+        "application_version": settings._APP_VERSION,
+        "build_commit": settings._BUILD_COMMIT or None,
+        "platform_support": bool(settings._PLATFORM_BASE_URL),
+    }

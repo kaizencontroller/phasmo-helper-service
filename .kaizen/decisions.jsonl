@@ -1,0 +1,3 @@
+{"timestamp":"2026-07-30","decision":"Keep rooms, commands, Streamer.bot integration, leaderboards, and Phasmophobia analytics application-owned.","reason":"These are domain-specific workflows under the Kaizen Platform ownership contract."}
+{"timestamp":"2026-07-30","decision":"Move the generic bug-report and feature-request receiver to Kaizen Platform Host and consume it by URL contract.","reason":"Support intake is reusable technical infrastructure and can serve applications implemented in different runtimes."}
+{"timestamp":"2026-07-30","decision":"Keep the existing Phasmo report route as a standalone fallback.","reason":"Kaizen applications must remain independently useful when the optional Platform support runtime is unavailable."}

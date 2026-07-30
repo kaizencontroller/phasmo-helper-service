@@ -1,0 +1,17 @@
+{
+  "application_id": "phasmo-helper",
+  "summary": "Public, streamer-facing FastAPI application that can run standalone or use Kaizen Platform support services.",
+  "entry_point": "main:app",
+  "local_port": 8011,
+  "public_routes": ["/", "/phasmo", "/phasmo/*", "/api/phasmo/*", "/health", "/ready", "/version"],
+  "platform_integrations": {
+    "support": "KAIZEN_PLATFORM_URL",
+    "identity": "Not required for public helper routes; administrative routes retain application-owned controls."
+  },
+  "state": {
+    "owner": "phasmo-helper",
+    "environment_variable": "PHASMO_STATE_DIR",
+    "local_default": ".kaizen-data",
+    "hosted_default": "/tmp/phasmo_state"
+  }
+}

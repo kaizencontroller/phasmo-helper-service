@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "id": "phasmo-helper",
+  "display_name": "Phasmo Helper",
+  "kind": "standalone-application",
+  "category": "creative",
+  "version": "5.6.0",
+  "lifecycle_stage": "beta",
+  "operating_mode": "both",
+  "description": "Streamer-facing Phasmophobia helper and automation service.",
+  "root_relative_path": "Applications/Creative/PhasmoHelper",
+  "enabled": true,
+  "deployable": true,
+  "discovery": {
+    "manifest": ".kaizen/manifest.json",
+    "context": ".kaizen/context.json",
+    "decisions": ".kaizen/decisions.jsonl"
+  },
+  "launch": {
+    "type": "file",
+    "command": "run.bat",
+    "working_directory": "."
+  },
+  "health": {
+    "type": "http",
+    "target": "http://127.0.0.1:8011/health"
+  },
+  "urls": {
+    "base": "http://127.0.0.1:8011/phasmo",
+    "health": "http://127.0.0.1:8011/health",
+    "ready": "http://127.0.0.1:8011/ready",
+    "version": "http://127.0.0.1:8011/version"
+  },
+  "authentication": {
+    "required": false,
+    "providers": ["local"],
+    "default_provider": "local",
+    "inherit": false,
+    "allowed_return_origins": [
+      "http://127.0.0.1:8011",
+      "http://localhost:8011"
+    ]
+  },
+  "capabilities": [
+    "streamer-integration",
+    "commands",
+    "rooms",
+    "usage-analytics",
+    "health",
+    "platform-support"
+  ],
+  "requires": ["platform"],
+  "services": {
+    "support": {
+      "provider": "platform",
+      "required": false,
+      "environment_variable": "KAIZEN_PLATFORM_URL"
+    }
+  },
+  "modules": [],
+  "data_scopes": ["phasmo-helper-local"],
+  "export_targets": ["json", "reports"],
+  "deployment": {
+    "strategy": "application-owned",
+    "runtime": "python-fastapi",
+    "generated_dependencies_included": false,
+    "secrets_policy": "Secrets remain in local environment files or deployment-provider configuration and must not be embedded in the manifest."
+  },
+  "display_group": "Applications",
+  "customer_launchable": true,
+  "developer_launchable": true,
+  "auto_start": false,
+  "restart_policy": "on-failure",
+  "sort_order": 1000
+}

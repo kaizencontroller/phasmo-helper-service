@@ -1,5 +1,8 @@
 # Kaizen Phasmophobia Helper - Railway FastAPI Version
 
+Kaizen Platform packaging and the optional shared support runtime are documented
+in `docs/KAIZEN_PLATFORM_MIGRATION.md`.
+
 This is a standalone Railway-ready service for the Phasmophobia evidence/ghost helper.
 
 ## Hosted URLs

@@ -5,7 +5,13 @@ import threading
 from pathlib import Path
 
 _STATE_LOCK = threading.Lock()
-_STATE_DIR = Path(os.getenv("PHASMO_STATE_DIR", "/tmp/phasmo_state"))
+_DEFAULT_STATE_DIR = (
+    "/tmp/phasmo_state"
+    if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("RAILWAY_PROJECT_ID")
+    else str(Path(__file__).resolve().parents[1] / ".kaizen-data")
+)
+_STATE_DIR = Path(os.getenv("PHASMO_STATE_DIR", _DEFAULT_STATE_DIR))
+_PLATFORM_BASE_URL = os.getenv("KAIZEN_PLATFORM_URL", "").strip().rstrip("/")
 _ADMIN_TOKEN = os.getenv("PHASMO_ADMIN_TOKEN", "").strip()
 _ALLOW_BEHAVIOR_COMMANDS = os.getenv("PHASMO_ALLOW_BEHAVIOR_COMMANDS", "true").strip().lower() in {"1", "true", "yes", "on"}
 _JUMPSCARE_FILE = Path(os.getenv("PHASMO_JUMPSCARE_FILE", "jumpscare.mp4"))
@@ -48,3 +54,20 @@ _BUILD_COMMIT = os.getenv("PHASMO_BUILD_COMMIT", os.getenv("RAILWAY_GIT_COMMIT_S
 _OPS_TOKEN = os.getenv("PHASMO_OPS_TOKEN", "").strip()
 _MAINTENANCE_FILE = "__global_maintenance.json"
 _MAINTENANCE_DEFAULT_WARNING_HOURS = int(os.getenv("PHASMO_MAINTENANCE_WARNING_HOURS", "24"))
+
+
+def platform_support_url(*, source_url: str = "") -> str:
+    """Return the shared Platform support form, or the legacy local form."""
+    from urllib.parse import urlencode
+
+    if not _PLATFORM_BASE_URL:
+        return "/phasmo/bug-report"
+    query = urlencode(
+        {
+            "application_id": "phasmo-helper",
+            "application_name": "Phasmo Helper",
+            "application_version": _APP_VERSION,
+            "source_url": source_url,
+        }
+    )
+    return f"{_PLATFORM_BASE_URL}/support/report?{query}"

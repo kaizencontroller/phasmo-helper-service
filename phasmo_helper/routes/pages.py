@@ -73,6 +73,10 @@ def _room_gate_or_template(room: str | None, code: str | None, target_path: str,
 def _support_footer(safe_room: str = "default") -> str:
     safe_room = _room_name(safe_room)
     quick = f'<a href="{settings._QUICKSTART_VIDEO_URL}" target="_blank" rel="noopener">Quick start video</a>' if settings._QUICKSTART_VIDEO_URL else ""
+    support_url = html.escape(
+        settings.platform_support_url(source_url=f"/phasmo/control?room={safe_room}"),
+        quote=True,
+    )
     return f"""
 <section class=\"card support-footer\"><div class=\"body\">
   <div class=\"support-links\">
@@ -84,7 +88,7 @@ def _support_footer(safe_room: str = "default") -> str:
     <div class=\"support-row\">
       <a href=\"/phasmo/streamerbot\">Streamer.bot setup</a>
       <a href=\"https://drive.google.com/drive/folders/1n7jfz7QGnkPUj3fQ715420cKHW96W97I\" target=\"_blank\" rel=\"noopener\">Support files</a>
-      <a href=\"/phasmo/bug-report?room={safe_room}\">Bug reports</a>
+      <a href=\"{support_url}\">Bug reports / feature requests</a>
       {quick}
     </div>
     <div class=\"support-row meta\">
@@ -794,4 +798,3 @@ def phasmo_jumpscare_video():
     if not path.exists() or not path.is_file():
         raise HTTPException(status_code=404, detail="Jumpscare video not found. Add jumpscare.mp4 beside main.py or set PHASMOsettings._JUMPSCARE_FILE / PHASMOsettings._JUMPSCARE_URL.")
     return FileResponse(path)
-
