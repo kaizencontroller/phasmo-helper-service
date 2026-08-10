@@ -1381,6 +1381,13 @@ async function pollState(){
   const holdSetupRender=shouldHoldSetupRender();
   let next=await fetchRoomState(room);
   if(!next){renderConnectionStatus(false);return;}
+  const unchanged=Number(next.stateVersion||0)===Number(state.stateVersion||0) && Number(next.updatedAt||0)===Number(state.updatedAt||0);
+  if(unchanged && MODE!=='overlay'){
+    // Timers and connectivity need a cheap tick; the full evidence/candidate DOM does not.
+    renderTimers();
+    renderConnectionStatus(true);
+    return;
+  }
   // Do not auto-redirect away from Round Setup. Streamers may intentionally return here during an active run.
   if(holdSetupRender){
     // Keep remote updates in memory, but do not repaint over local room/round setup edits.

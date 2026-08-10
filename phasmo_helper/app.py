@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.gzip import GZipMiddleware
 
 from .routes import api, config_api, pages, dev_admin
 from . import settings
@@ -10,6 +11,7 @@ from .services.security import apply_route_rate_limit
 from .content import get_registry
 
 app = FastAPI(title="Kaizen Phasmophobia Helper")
+app.add_middleware(GZipMiddleware, minimum_size=500, compresslevel=5)
 
 @app.middleware("http")
 async def phasmo_safety_middleware(request: Request, call_next):
@@ -30,7 +32,14 @@ async def phasmo_safety_middleware(request: Request, call_next):
         if isinstance(exc, HTTPException):
             return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
         raise
-    return await call_next(request)
+    response = await call_next(request)
+    if request.url.path.startswith("/phasmo/static/"):
+        # Assets have validators from StaticFiles; let repeat visits reuse them.
+        response.headers["Cache-Control"] = "public, max-age=3600, stale-while-revalidate=86400"
+    else:
+        response.headers.setdefault("Cache-Control", "no-cache")
+    response.headers["Server-Timing"] = "app;desc=phasmo-helper"
+    return response
 
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static"

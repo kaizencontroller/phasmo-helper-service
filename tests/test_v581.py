@@ -48,3 +48,10 @@ def test_passcode_gate_has_timeout_and_refresh_guard(tmp_path, monkeypatch):
     assert "AbortController" in response.text
     assert "phasmoGateAttempt:" in response.text
     assert "temporarily unavailable" in response.text
+
+
+def test_static_assets_are_compressed_and_cacheable():
+    response = client.get("/phasmo/static/phasmo.js", headers={"Accept-Encoding": "gzip"})
+    assert response.status_code == 200
+    assert response.headers["content-encoding"] == "gzip"
+    assert "max-age=3600" in response.headers["cache-control"]
