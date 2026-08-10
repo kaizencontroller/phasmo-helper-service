@@ -29,11 +29,22 @@ def root():
 def _public_page_style() -> str:
     return """
 body{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI,sans-serif}
-main{width:min(460px,100%);padding:10px;margin:0 auto;display:grid;gap:10px;box-sizing:border-box}*,*::before,*::after{box-sizing:border-box}
+main{width:min(920px,100%);padding:10px;margin:0 auto;display:grid;gap:10px;box-sizing:border-box}*,*::before,*::after{box-sizing:border-box}
 .hero,.card{background:linear-gradient(135deg,#172235ee,#0f172aee);border:1px solid #334155;border-radius:18px;box-shadow:0 16px 40px #0007;overflow:hidden}
 .hero{padding:16px;display:grid;gap:12px}
 .brand{display:flex;gap:10px;align-items:center;min-width:0}.logo{width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 30% 20%,#38bdf855,transparent 38%),linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #475569;display:grid;place-items:center;font-weight:950;letter-spacing:-.08em;box-shadow:inset 0 0 22px #ffffff12}.brandcopy{min-width:0;overflow:hidden}.kicker{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}h1{margin:2px 0 0;font-size:28px;line-height:.95;letter-spacing:-.045em}h2{margin:0;font-size:18px}p{color:#cbd5e1;line-height:1.45;margin:0 0 10px}.muted{color:#94a3b8;font-size:12px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px}.support-links{display:grid;gap:7px}.support-row{display:flex;gap:9px;flex-wrap:wrap}.support-row.meta{font-size:11px}.support-row.version-row{color:#94a3b8;font-size:11px}.support-row a{color:#93c5fd;text-decoration:none}.content h2{margin:18px 0 8px;font-size:18px}.content h2:first-child{margin-top:0}.content ul,.content ol{margin:8px 0 16px;padding-left:24px}.content p:last-child{margin-bottom:0}.button-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}.static-hero{gap:10px}.static-hero .brand-link{display:flex;gap:10px;align-items:center}.page-title-note{margin-top:2px}a.button,button{border:1px solid #475569;background:#0f172a;color:#f8fafc;border-radius:999px;padding:9px 11px;text-decoration:none;font-weight:850;cursor:pointer;font-size:13px}a.button.primary,button.primary{border-color:#22c55e;background:#14532d}.card .head{padding:13px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;gap:8px;align-items:center}.card .body{padding:13px}.room-grid{display:grid;gap:8px}.room-card{border:1px solid #334155;background:#0f172a;border-radius:14px;padding:10px}.room-card strong{display:block}.room-card span{display:block;color:#94a3b8;font-size:12px;margin-top:2px}.room-card p{font-size:13px;margin:8px 0}.room-card div:last-child{display:flex;gap:8px;flex-wrap:wrap}.room-card a{color:#93c5fd;font-size:12px;text-decoration:none}.support-note{font-size:11px;line-height:1.35;color:#94a3b8}.support-footer{border-style:dashed;opacity:.85}input,textarea,select{background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit;width:100%}textarea{min-height:120px}.form-grid{display:grid;grid-template-columns:1fr;gap:10px}.status{color:#93c5fd;font-size:13px;margin-top:8px}.small{font-size:12px;color:#94a3b8}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #334155;padding:8px 5px;text-align:left;vertical-align:top}th{color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}.table-wrap{overflow-x:auto}.locked{color:#fde68a;font-weight:900}code{color:#bae6fd;background:#020617;border:1px solid #334155;border-radius:999px;padding:2px 6px;font-size:12px}ol{color:#cbd5e1;line-height:1.45}li{margin:6px 0}.brand-link{display:block;text-decoration:none;color:inherit;cursor:pointer}.brand-link:hover{border-color:#60a5fa}.site-banner{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:14px;padding:10px 12px;font-weight:850;line-height:1.3}.site-banner .small{color:#fdba74}.error{border:1px solid #ef4444;background:#451a20;color:#fecaca;border-radius:12px;padding:10px;font-size:13px}
+ .app-nav{position:sticky;top:8px;z-index:20;display:flex;gap:6px;align-items:center;padding:7px;background:#020617e8;border:1px solid #334155;border-radius:16px;backdrop-filter:blur(14px);overflow:auto}.app-nav a{white-space:nowrap;color:#cbd5e1;text-decoration:none;font-size:12px;font-weight:850;padding:7px 9px;border-radius:10px}.app-nav a:hover{background:#1e293b;color:#fff}.app-nav .brandmark{color:#7dd3fc}.livebar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 11px;border:1px solid #334155;border-radius:13px;background:#0f172a;color:#94a3b8;font-size:12px}.livebar strong{color:#86efac}.dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.dash-card{min-height:145px;display:flex;flex-direction:column}.dash-card .body{display:flex;flex-direction:column;flex:1}.dash-card .actions{margin-top:auto}.metric{font-size:30px;font-weight:950;letter-spacing:-.05em}.icon{font-size:20px}.advanced-only{display:none}.advanced .advanced-only{display:block}.mode-toggle{margin-left:auto}@media(max-width:680px){main{width:min(480px,100%)}.dashboard-grid{grid-template-columns:1fr}.app-nav{top:4px}.desktop-label{display:none}}
 """
+
+
+def _app_nav(room: str = "default") -> str:
+    safe_room = _room_name(room)
+    return f"""<nav class="app-nav" aria-label="Phasmo Helper navigation">
+      <a class="brandmark" href="/phasmo">KC Phasmo</a><a href="/phasmo/rooms">Rooms</a>
+      <a href="/phasmo/control?room={safe_room}">Control</a><a href="/phasmo/encyclopedia">Encyclopedia</a>
+      <a href="/phasmo/integrations?room={safe_room}">Integrations</a><a href="/phasmo/export-center?room={safe_room}">Exports</a>
+      <button class="mode-toggle" type="button" onclick="document.body.classList.toggle('advanced');this.textContent=document.body.classList.contains('advanced')?'Basic':'Advanced'">Advanced</button>
+    </nav><div class="livebar"><span><strong>● Live</strong> <span class="desktop-label">Kaizen services ready</span></span><span>App {html.escape(settings._APP_VERSION)} · Game {html.escape(str(get_registry().game_version.get('supportedVersion') or 'unknown'))}</span></div>"""
 
 
 
@@ -59,9 +70,22 @@ def _locked_room_gate(safe_room: str, target_path: str, code: str | None = None)
 const room={safe_room!r}; const target={target!r};
 function key(r){{return 'phasmoRoomCode:'+r}}
 function clean(v){{return (v||'').replace(/[^0-9]/g,'').slice(0,4)}}
-async function tryCode(c,go){{if(clean(c).length!==4)return false; const r=await fetch('/api/phasmo/state?room='+encodeURIComponent(room)+'&code='+encodeURIComponent(clean(c))); if(r.ok){{localStorage.setItem(key(room),clean(c)); if(go) location.href=target+'&code='+encodeURIComponent(clean(c)); return true;}} return false;}}
-(async()=>{{const stored=localStorage.getItem(key(room)); if(stored) await tryCode(stored,true);}})();
-document.getElementById('gateForm').addEventListener('submit',async e=>{{e.preventDefault(); const c=document.getElementById('gateCode').value; const ok=await tryCode(c,true); document.getElementById('gateStatus').textContent=ok?'Opening room…':'Passcode not accepted.';}});
+const status=document.getElementById('gateStatus'), submit=document.querySelector('#gateForm button[type=submit]');
+async function tryCode(c,go){{
+  c=clean(c); if(c.length!==4)return 'invalid';
+  const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),8000);
+  try{{
+    const r=await fetch('/api/phasmo/state?room='+encodeURIComponent(room)+'&code='+encodeURIComponent(c),{{signal:controller.signal,cache:'no-store'}});
+    if(r.ok){{localStorage.setItem(key(room),c);if(go){{status.textContent='Passcode accepted. Opening room…';location.replace(target+'&code='+encodeURIComponent(c));}}return 'ok';}}
+    if(r.status===403){{localStorage.removeItem(key(room));return 'invalid';}}
+    return 'unavailable';
+  }}catch(_){{return 'unavailable';}}finally{{clearTimeout(timer);}}
+}}
+(async()=>{{
+  const stored=localStorage.getItem(key(room)), guard='phasmoGateAttempt:'+room, last=Number(sessionStorage.getItem(guard)||0);
+  if(stored && Date.now()-last>15000){{sessionStorage.setItem(guard,String(Date.now()));status.textContent='Checking saved passcode…';const result=await tryCode(stored,true);if(result==='unavailable')status.textContent='The room service is temporarily unavailable. Your passcode is saved; try again in a moment.';if(result==='invalid')status.textContent='The saved passcode is no longer valid.';}}
+}})();
+document.getElementById('gateForm').addEventListener('submit',async e=>{{e.preventDefault();submit.disabled=true;status.textContent='Checking passcode…';const result=await tryCode(document.getElementById('gateCode').value,true);submit.disabled=false;if(result==='invalid')status.textContent='Passcode not accepted.';if(result==='unavailable')status.textContent='The room service did not respond. Nothing was lost—wait a moment and try again.';}});
 </script></body></html>""", status_code=403)
 
 
@@ -134,6 +158,7 @@ def phasmo_index(room: str | None = Query(default=None)):
 <html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>Kaizen Phasmo Helper</title><style>{_public_page_style()}</style></head>
 <body><main>
 {_site_banner_html()}
+{_app_nav(safe_room)}
 <section class=\"hero\">
   <a class=\"brand brand-link\" href=\"/phasmo\"><div class=\"logo\">KC</div><div class=\"brandcopy\"><div class=\"kicker\">Kaizen Controller tools</div><h1>Phasmo Helper</h1></div></a>
   <p>A lightweight group and streamer helper for Phasmophobia evidence tracking, behavior clues, chat guesses, OBS overlays, and contract result scoring.</p>
@@ -142,7 +167,13 @@ def phasmo_index(room: str | None = Query(default=None)):
   <div class=\"actions\"><a class=\"button\" href=\"/phasmo/getting-started?room={safe_room}\">Getting Started</a><a class=\"button\" href=\"/phasmo/commands?room={safe_room}\">Viewer Commands</a><a class=\"button\" href=\"/phasmo/rooms\">Active Rooms</a><a class=\"button\" href=\"{settings._QUICKSTART_VIDEO_URL}\" target=\"_blank\" rel=\"noopener\" style=\"display:{'inline-block' if settings._QUICKSTART_VIDEO_URL else 'none'}\">Quick Start Video</a></div>
   <p class=\"muted\">Optional room passcodes are 4 digits. Rooms are temporary and expire after 4 hours without updates.</p>
 </section>
-<section class=\"card\"><div class=\"head\"><h2>Active Rooms</h2><a class=\"button\" href=\"/phasmo/rooms\">All</a></div><div class=\"body\"><div class=\"room-grid\">{room_cards}</div></div></section>
+<section class=\"dashboard-grid\">
+  <article class=\"card dash-card\"><div class=\"head\"><h2><span class=\"icon\">⌂</span> Rooms</h2><span class=\"metric\">{len(rooms)}</span></div><div class=\"body\"><p>Create or rejoin a shared investigation.</p><div class=\"actions\"><a class=\"button primary\" href=\"/phasmo/room?room={safe_room}\">New room</a><a class=\"button\" href=\"/phasmo/rooms\">Browse</a></div></div></article>
+  <article class=\"card dash-card\"><div class=\"head\"><h2><span class=\"icon\">☷</span> Field Guide</h2></div><div class=\"body\"><p>Search every ghost, evidence set, strength, weakness, and test.</p><div class=\"actions\"><a class=\"button\" href=\"/phasmo/encyclopedia\">Open encyclopedia</a></div></div></article>
+  <article class=\"card dash-card\"><div class=\"head\"><h2><span class=\"icon\">⚡</span> Stream Setup</h2></div><div class=\"body\"><p>Connect Streamer.bot, review permissions, and copy overlay links.</p><div class=\"actions\"><a class=\"button\" href=\"/phasmo/integrations?room={safe_room}\">Integrations</a></div></div></article>
+  <article class=\"card dash-card advanced-only\"><div class=\"head\"><h2><span class=\"icon\">↧</span> Data Center</h2></div><div class=\"body\"><p>Download backups, analytics, configuration, and diagnostics.</p><div class=\"actions\"><a class=\"button\" href=\"/phasmo/export-center?room={safe_room}\">Export center</a></div></div></article>
+</section>
+<section class=\"card\"><div class=\"head\"><h2>Recent Rooms</h2><a class=\"button\" href=\"/phasmo/rooms\">All rooms</a></div><div class=\"body\"><div class=\"room-grid\">{room_cards}</div></div></section>
 {_support_footer(safe_room)}
 </main></body></html>"""
     return HTMLResponse(html_doc)
@@ -380,6 +411,15 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
     body = f"""
 <p class="small">Release notes are updated with each packaged build so testers can see what changed without checking GitHub.</p>
+
+<h2>v5.8.1 — UX, Integration &amp; Polish</h2>
+<ul>
+  <li><strong>Added:</strong> Shared workspace navigation, live status, responsive dashboard cards, and remembered Basic/Advanced disclosure.</li>
+  <li><strong>Added:</strong> Integration Center with Streamer.bot telemetry, OBS links, and safe room invitations.</li>
+  <li><strong>Added:</strong> Privacy-sanitized Export Center for backups, configuration, analytics, bugs, and release metadata.</li>
+  <li><strong>Added:</strong> Role inheritance, permission explanations, command audit logs, and a plugin-friendly application event bus.</li>
+  <li><strong>Retained:</strong> The Deildegast ghost and Dildegeist search alias from the supported game content registry.</li>
+</ul>
 
 <h2>v5.8 â€” Kaizen Platform Evolution</h2>
 <ul>
@@ -805,6 +845,38 @@ def phasmo_leaderboard(room: str | None = Query(default=None), code: str | None 
     </html>
     """
     return HTMLResponse(html_doc)
+
+@router.get("/phasmo/integrations")
+def phasmo_integrations(room: str | None = Query(default=None)):
+    safe_room = _room_name(room or "default")
+    state = read_state(safe_room)
+    status = state.get("integrationStatus", {})
+    connected = bool(status.get("connected"))
+    body = f"""
+<section class="dashboard-grid">
+ <article class="card dash-card"><div class="head"><h2>Streamer.bot</h2><span class="{'locked' if not connected else 'status'}">{'Connected' if connected else 'Setup needed'}</span></div><div class="body"><p>One command bridge handles guesses, votes, evidence, results, and moderation.</p><div class="actions"><a class="button primary" href="/phasmo/streamerbot?room={safe_room}">Setup guide</a></div></div></article>
+ <article class="card dash-card"><div class="head"><h2>OBS Overlay</h2></div><div class="body"><p>Transparent browser-source view for evidence, candidates, objectives, timers, and chat events.</p><div class="actions"><a class="button" href="/phasmo/overlay?room={safe_room}">Open overlay</a></div></div></article>
+ <article class="card dash-card"><div class="head"><h2>Room Invitation</h2></div><div class="body"><p>Share a direct join link without exposing a room passcode.</p><div class="actions"><button onclick="navigator.clipboard.writeText(location.origin+'/phasmo/control?room={safe_room}');this.textContent='Copied'">Copy invite</button></div></div></article>
+</section>
+<h2>Live integration health</h2><table><tbody><tr><th>Status</th><td>{'Connected' if connected else 'Waiting for first command'}</td></tr><tr><th>Provider</th><td>{html.escape(str(status.get('provider') or 'Streamer.bot'))}</td></tr><tr><th>Last command</th><td>{html.escape(str(status.get('lastCommand') or 'None yet'))}</td></tr><tr><th>Latency</th><td>{html.escape(str(status.get('latencyMs') or 0))} ms</td></tr><tr><th>Errors</th><td>{int(status.get('errors') or 0)}</td></tr></tbody></table>
+"""
+    return _simple_info_page("Integrations", body, safe_room)
+
+
+@router.get("/phasmo/export-center")
+def phasmo_export_center(room: str | None = Query(default=None)):
+    safe_room = _room_name(room or "default")
+    body = f"""<p>Download portable, human-readable data. Room codes and support contact details are excluded.</p>
+<section class="dashboard-grid">
+ {''.join(f'<article class="card dash-card"><div class="head"><h2>{label}</h2></div><div class="body"><p>{description}</p><div class="actions"><a class="button primary" href="/api/phasmo/export-center?scope={scope}">Download JSON</a></div></div></article>' for scope,label,description in [
+ ('complete','Complete backup','Rooms, configuration, analytics, bugs, and release metadata.'),
+ ('configuration','Configuration','Reusable app and permission settings.'),
+ ('analytics','Analytics','Usage and command activity for reporting.'),
+ ('bugs','Bug tracker','Submitted reports and current triage state.'),
+ ('release','Release metadata','Version, game compatibility, and deployment manifest.')])}
+</section><p class="small">For one investigation, use the Timeline page to export JSON, CSV, or Markdown.</p>"""
+    return _simple_info_page("Export Center", body, safe_room)
+
 
 @router.get("/phasmo/encyclopedia")
 def phasmo_encyclopedia(q: str | None = Query(default=None)):

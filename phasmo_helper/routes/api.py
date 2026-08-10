@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import time
 from fastapi import APIRouter, Header, HTTPException, Query, Request
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, Response
 from .. import settings
 from ..core.config import _config_bool
 from ..core.data import EVIDENCE, GHOST_NAMES
@@ -25,6 +25,9 @@ from ..services.chat import StreamerBotProvider
 from ..services.dispatcher import CommandDispatcher
 from ..services.investigations import analytics_from_states, session_summary, summary_csv, summary_markdown
 from ..services.permissions import read_permissions, write_permissions
+from ..services.exports import export_payload, export_zip
+from ..services.chat import ChatIdentity
+from ..services.permissions import PermissionEngine
 
 router = APIRouter()
 
@@ -134,6 +137,44 @@ def api_investigation_analytics():
         except Exception:
             continue
     return {"ok": True, "analytics": analytics_from_states(states)}
+
+
+@router.get("/api/phasmo/status")
+def api_live_status(room: str | None = Query(default=None)):
+    state = read_state(_room_name(room)) if room else {}
+    maintenance = read_maintenance()
+    return {
+        "ok": True, "applicationVersion": settings._APP_VERSION,
+        "gameVersion": get_registry().game_version.get("supportedVersion"), "platformVersion": settings._PLATFORM_VERSION,
+        "railway": "connected" if settings._IS_RAILWAY else "local", "maintenance": maintenance.get("status", "operational"),
+        "lastSync": state.get("updatedAt", 0), "theme": "kaizen-creative-dark", "deploymentProfile": "standalone-or-platform",
+    }
+
+
+@router.get("/api/phasmo/streamerbot/status")
+def api_streamerbot_status(room: str | None = Query(default=None)):
+    safe_room = _room_name(room)
+    state = read_state(safe_room)
+    integration = state.get("integrationStatus", {})
+    recent = state.get("commandAnalytics", [])[-50:]
+    return {"ok": True, "room": safe_room, "integration": integration, "recentCommands": recent, "permissionSummary": read_permissions().get("matrix", {})}
+
+
+@router.get("/api/phasmo/permission-summary")
+def api_permission_summary(user: str = Query(default="viewer"), roles: str = Query(default="viewer")):
+    identity = ChatIdentity(user.lower(), user, "dashboard", {role.strip().lower() for role in roles.split(",") if role.strip()})
+    return {"ok": True, "identity": user, **PermissionEngine().explain(identity)}
+
+
+@router.get("/api/phasmo/export-center")
+def api_export_center(scope: str = Query(default="complete"), format: str = Query(default="json")):
+    try:
+        if format == "zip" or scope == "backup":
+            return Response(export_zip(), media_type="application/zip", headers={"Content-Disposition": 'attachment; filename="phasmo-helper-backup.zip"'})
+        payload = export_payload(scope)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return Response(json.dumps(payload, indent=2, ensure_ascii=False), media_type="application/json", headers={"Content-Disposition": f'attachment; filename="phasmo-{scope}.json"'})
 
 
 @router.get("/api/phasmo/maintenance")
@@ -415,6 +456,8 @@ async def api_post_state(
                     current["huntSanity"] = None
             if "presentation" in body:
                 current["presentation"] = body.get("presentation") if body.get("presentation") in {"unknown", "female", "male"} else "unknown"
+            if "experienceMode" in body and body.get("experienceMode") in {"basic", "advanced"}:
+                current["experienceMode"] = body["experienceMode"]
             if "cursedItems" in body and isinstance(body["cursedItems"], dict):
                 current.setdefault("cursedItems", {})
                 for k, v in body["cursedItems"].items():

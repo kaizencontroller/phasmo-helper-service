@@ -102,6 +102,8 @@ def default_state(room: str = "default") -> Dict[str, Any]:
             "details": {},
         }],
         "commandAnalytics": [],
+        "integrationStatus": {"provider": "streamerbot-twitch", "connected": False, "lastCommand": "", "lastApiCallAt": 0, "commandsProcessed": 0, "errors": 0, "latencyMs": 0, "profile": "Default"},
+        "experienceMode": "basic",
     }
 
 
@@ -132,6 +134,8 @@ def read_state(room: str) -> Dict[str, Any]:
         merged["photos"] = data.get("photos", {}) or {}
         merged["timeline"] = data.get("timeline", []) or default_state(room)["timeline"]
         merged["commandAnalytics"] = data.get("commandAnalytics", []) or []
+        merged["integrationStatus"] = {**default_state(room)["integrationStatus"], **(data.get("integrationStatus", {}) or {})}
+        merged["experienceMode"] = data.get("experienceMode") if data.get("experienceMode") in {"basic", "advanced"} else "basic"
         merged["controlMode"] = data.get("controlMode") if data.get("controlMode") in {"helper", "tracker"} else "helper"
         merged["overlayMode"] = data.get("overlayMode") if data.get("overlayMode") in {"helper", "tracker"} else "helper"
         if not merged.get("map") and data.get("level"):
@@ -179,6 +183,11 @@ def write_state(room: str, state: Dict[str, Any], usage_event: str = "state_writ
     try:
         from .investigations import append_timeline
         append_timeline(state, usage_event, source=usage_source, actor=usage_actor, details=usage_details)
+    except Exception:
+        pass
+    try:
+        from .events import AppEvent, EVENT_NAMES, event_bus
+        event_bus.publish(AppEvent(EVENT_NAMES.get(usage_event, usage_event), room, now_ms, usage_actor, usage_source, usage_details or {}))
     except Exception:
         pass
     try:

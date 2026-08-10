@@ -1391,3 +1391,13 @@ async function pollState(){
   render();
 }
 renderConnectionStatus(false); loadAppVersion(); loadSiteBanner(); getState().then(()=>maybeShowFeedbackPrompt()); setInterval(pollState, (MODE==='overlay'?1000:(MODE==='control'?2000:5000))); setInterval(()=>renderConnectionStatus(true),5000);
+
+// Shared workspace chrome is intentionally independent of the investigation renderer.
+const experienceToggle=document.getElementById('experienceToggle');
+if(experienceToggle){
+  const applyExperience=mode=>{document.body.classList.toggle('experience-advanced',mode==='advanced');experienceToggle.textContent=mode==='advanced'?'Basic':'Advanced';localStorage.setItem('phasmoExperience',mode)};
+  applyExperience(localStorage.getItem('phasmoExperience')||'basic');
+  experienceToggle.addEventListener('click',()=>applyExperience(document.body.classList.contains('experience-advanced')?'basic':'advanced'));
+}
+for(const [id,path] of [['navTimeline','/phasmo/timeline'],['navIntegrations','/phasmo/integrations']]){const el=document.getElementById(id);if(el)el.href=`${path}?room=${encodeURIComponent(room)}`}
+fetch(`/api/phasmo/streamerbot/status?room=${encodeURIComponent(room)}`).then(r=>r.ok?r.json():null).then(data=>{if(!data)return;const status=data.integration||{},el=document.getElementById('workspaceIntegration');if(el)el.textContent=status.connected?`Streamer.bot connected · ${status.latencyMs||0} ms`:'Streamer.bot waiting'}).catch(()=>{});
