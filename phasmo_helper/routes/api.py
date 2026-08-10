@@ -60,6 +60,7 @@ def api_phasmo_version():
         "gameVersion": get_registry().game_version.get("supportedVersion"),
         "contentVersion": get_registry().game_version.get("contentVersion"),
         "platformVersion": settings._PLATFORM_VERSION,
+        "configuredVersion": settings._CONFIGURED_APP_VERSION,
         "railway": {
             "service": __import__("os").environ.get("RAILWAY_SERVICE_NAME", ""),
             "environment": __import__("os").environ.get("RAILWAY_ENVIRONMENT_NAME", ""),
