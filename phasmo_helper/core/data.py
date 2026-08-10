@@ -449,3 +449,32 @@ GHOST_TESTS = {
     "Obambo": ["State timing test: calm/aggressive state alternates after door opens.", "Aggressive hunts earlier and can be shorter."],
     "Dayan": ["Movement test: faster if nearby player moves, slower if nearby player stands still."],
 }
+
+# Runtime compatibility exports. New gameplay content is sourced from the JSON
+# registry while legacy services continue importing the established constants.
+from ..content import get_registry as _get_content_registry
+
+_content = _get_content_registry()
+_evidence_items = _content.items("evidence.json")
+EVIDENCE = [item["id"] for item in _evidence_items]
+EVIDENCE_LABELS = {item["id"]: item["name"] for item in _evidence_items}
+EVIDENCE_ALIASES = {
+    alias: item["id"]
+    for item in _evidence_items
+    for alias in [item["id"], *item.get("aliases", [])]
+}
+_ghost_items = _content.ghosts
+GHOST_NAMES = [item["name"] for item in _ghost_items]
+GHOST_ALIASES = {
+    re.sub(r"[^a-z0-9]", "", alias.lower()): item["name"]
+    for item in _ghost_items
+    for alias in [item["name"], *item.get("aliases", [])]
+}
+_map_items = _content.items("maps.json")
+MAP_ALIASES = {
+    alias.lower(): item["name"]
+    for item in _map_items
+    for alias in [item["id"], item["name"], *item.get("aliases", [])]
+}
+MAP_ALIASES["unknown"] = "unknown"
+GHOST_TESTS["Deildegast"] = "Move many distinct objects outside a hunt, then compare its next hunt speed with an early hunt. It should slow progressively. Evidence: EMF Level 5, Ghost Writing, D.O.T.S."

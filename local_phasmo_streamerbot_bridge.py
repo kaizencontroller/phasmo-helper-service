@@ -289,9 +289,21 @@ def streamerbot_phasmo():
     headers = {"Content-Type": "application/json"}
     if PHASMO_ADMIN_TOKEN:
         headers["X-Phasmo-Token"] = PHASMO_ADMIN_TOKEN
+        headers["Authorization"] = f"Bearer {PHASMO_ADMIN_TOKEN}"
 
     url = f"{RAILWAY_BASE_URL}/api/phasmo/command?room={PHASMO_ROOM}"
-    response = requests.post(url, json={"command": command, "user": user}, headers=headers, timeout=8)
+    forwarded = {
+        "command": command,
+        "user": user,
+        "provider": "streamerbot-twitch",
+        "source": "local-streamerbot-bridge",
+        "isBroadcaster": _truthy(payload.get("isBroadcaster") or payload.get("broadcaster")),
+        "isMod": _truthy(payload.get("isMod") or payload.get("mod")),
+        "isVip": _truthy(payload.get("isVip") or payload.get("vip")),
+        "isSubscriber": _truthy(payload.get("isSubscriber") or payload.get("subscriber")),
+        "isFollower": _truthy(payload.get("isFollower") or payload.get("follower")),
+    }
+    response = requests.post(url, json=forwarded, headers=headers, timeout=8)
     try:
         body = response.json()
     except Exception:

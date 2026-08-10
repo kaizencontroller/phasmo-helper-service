@@ -1,0 +1,11 @@
+{"schemaVersion":1,"items":[
+{"id":"deildegast-moved-items-slow","category":"Movement Speed","label":"Starts extremely fast and slows on later hunts after distinct objects are moved","supports":["deildegast"],"reliability":"high"},
+{"id":"wraith-no-salt","category":"Salt / Ultraviolet","label":"Does not disturb salt","supports":["wraith"],"reliability":"high"},
+{"id":"obake-unique-print","category":"Salt / Ultraviolet","label":"Leaves a unique UV print","supports":["obake"],"reliability":"high"},
+{"id":"phantom-photo-disappear","category":"Manifestation","label":"Disappears when photographed","supports":["phantom"],"reliability":"high"},
+{"id":"oni-no-mist","category":"Manifestation","label":"No mist-form events","supports":["oni"],"reliability":"medium"},
+{"id":"banshee-scream","category":"Sound","label":"Distinct parabolic scream","supports":["banshee"],"reliability":"high"},
+{"id":"deogen-spiritbox-breath","category":"Spirit Box","label":"Heavy breathing response","supports":["deogen"],"reliability":"high"},
+{"id":"goryo-camera-dots","category":"D.O.T.S","label":"D.O.T.S visible only through camera","supports":["goryo"],"reliability":"high"},
+{"id":"mimic-fake-orbs","category":"Special","label":"Ghost Orbs plus normal evidence","supports":["the-mimic"],"reliability":"high"}
+]}

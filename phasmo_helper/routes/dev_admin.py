@@ -12,6 +12,9 @@ from ..services.dev_admin import clear_sample_data, dev_admin_available, dev_adm
 from ..services.reports import export_bug_tracker, import_bug_tracker, read_bug_issues, update_bug_issue
 from ..services.maintenance import read_maintenance, start_maintenance, end_maintenance
 from ..services.usage import export_usage, import_usage, usage_csv, usage_summary
+from ..content import get_registry, reload_registry
+from ..services.permissions import read_permissions, write_permissions
+from ..services.investigations import analytics_from_states
 
 router = APIRouter()
 
@@ -24,6 +27,19 @@ body{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI
 
 def _json(value) -> str:
     return json.dumps(value, ensure_ascii=False)
+
+
+def _investigation_analytics():
+    states = []
+    settings._STATE_DIR.mkdir(parents=True, exist_ok=True)
+    for path in settings._STATE_DIR.glob("*.json"):
+        if path.name.startswith("__global_"):
+            continue
+        try:
+            states.append(json.loads(path.read_text(encoding="utf-8")))
+        except Exception:
+            continue
+    return analytics_from_states(states)
 
 
 @router.get("/phasmo/dev-admin")
@@ -74,6 +90,12 @@ def dev_admin_page():
 <div class=\"table-wrap\"><table><thead><tr><th>Room</th><th>Status</th><th>Rounds</th><th>Duration</th><th>Last Seen</th><th>Details</th></tr></thead><tbody id=\"usageRows\"><tr><td colspan=\"6\" class=\"muted\">Unlock, then click Refresh Usage.</td></tr></tbody></table></div>
 </div></section>
 
+<section class=\"card\"><div class=\"head\"><h2>Content Validation</h2></div><div class=\"body grid\"><p class=\"muted\">Checks IDs, references, evidence, encyclopedia fields, commands, and permissions before activation.</p><pre id=\"contentValidation\" class=\"lock-note\" style=\"white-space:pre-wrap\">Unlock to load.</pre><div class=\"row\"><button id=\"validateContent\">Validate</button><button id=\"reloadContent\" class=\"orange\">Reload Valid Content</button></div></div></section>
+
+<section class=\"card\"><div class=\"head\"><h2>Investigation Analytics</h2></div><div class=\"body grid\"><pre id=\"investigationAnalytics\" class=\"lock-note\" style=\"white-space:pre-wrap\">Unlock to load.</pre><button id=\"loadAnalytics\">Refresh Analytics</button></div></section>
+
+<section class=\"card\"><div class=\"head\"><h2>Permission Groups</h2></div><div class=\"body grid\"><p class=\"muted\">Create, rename, delete, import/export, assign users, and bulk edit groups as JSON.</p><textarea id=\"permissionGroups\" rows=\"12\" spellcheck=\"false\"></textarea><div class=\"row\"><button id=\"saveGroups\" class=\"green\">Save Groups</button><button id=\"exportGroups\">Export</button><input id=\"importGroupsFile\" type=\"file\" accept=\"application/json,.json\"><button id=\"importGroups\">Import</button></div></div></section>
+
 <section class=\"card\"><div class=\"head\"><h2>Sample Data</h2></div><div class=\"body\"><div class=\"row\"><button class=\"green\" id=\"load\">Load sample demo data</button><button class=\"red\" id=\"clear\">Clear sample demo data</button></div><p class=\"muted\">Creates demo-helper, demo-tracker, demo-support, demo-closed, and a seeded leaderboard.</p></div></section>
 </div>
 </main><script>
@@ -106,12 +128,21 @@ function populateBootstrap(data){{
   $('maintMessage').value=maint.message||'Scheduled Phasmo Helper update is deploying. The app may briefly refresh or become read-only.';
   $('maintReadOnly').checked=!!(maint.readOnly ?? true);
   $('maintBlockNew').checked=!!(maint.blockNewRooms ?? true);
+  $('contentValidation').textContent=JSON.stringify(data.contentValidation||{{}},null,2);
+  $('investigationAnalytics').textContent=JSON.stringify(data.investigationAnalytics||{{}},null,2);
+  $('permissionGroups').value=JSON.stringify((data.permissions||{{}}).groups||{{}},null,2);
 }}
 $('unlock').onclick=async()=>{{try{{const data=await call('/api/phasmo/dev-admin/bootstrap'); populateBootstrap(data); setLocked(false);}}catch(e){{setLocked(true);}}}};
 $('lock').onclick=()=>{{$('code').value=''; setLocked(true);}};
 $('code').addEventListener('keydown',e=>{{if(e.key==='Enter')$('unlock').click();}});
 $('load').onclick=()=>call('/api/phasmo/dev-admin/sample-data');
 $('clear').onclick=()=>call('/api/phasmo/dev-admin/clear-sample-data');
+$('validateContent').onclick=async()=>{{$('contentValidation').textContent=JSON.stringify((await call('/api/phasmo/dev-admin/content/validate')).validation,null,2);}};
+$('reloadContent').onclick=async()=>{{$('contentValidation').textContent=JSON.stringify((await call('/api/phasmo/dev-admin/content/reload')).validation,null,2);}};
+$('loadAnalytics').onclick=async()=>{{$('investigationAnalytics').textContent=JSON.stringify((await call('/api/phasmo/dev-admin/investigation-analytics')).analytics,null,2);}};
+$('saveGroups').onclick=async()=>{{const groups=JSON.parse($('permissionGroups').value||'{{}}');await call('/api/phasmo/dev-admin/permissions',{{groups}});}};
+$('exportGroups').onclick=()=>{{const blob=new Blob([$('permissionGroups').value],{{type:'application/json'}});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='phasmo-permission-groups.json';a.click();URL.revokeObjectURL(a.href);}};
+$('importGroups').onclick=async()=>{{const f=$('importGroupsFile').files[0];if(!f)return alert('Choose a JSON file first.');$('permissionGroups').value=JSON.stringify(JSON.parse(await f.text()),null,2);}};
 $('bannerMessage').oninput=()=>{{$('bannerPreview').textContent=$('bannerMessage').value||'Preview: scheduled maintenance / update notice will appear here.';}};
 $('saveBanner').onclick=()=>call('/api/phasmo/dev-admin/banner',{{enabled:$('bannerEnabled').checked,level:$('bannerLevel').value,message:$('bannerMessage').value,expiresAt:$('bannerExpires').value}});
 $('disableBanner').onclick=()=>{{$('bannerEnabled').checked=false;call('/api/phasmo/dev-admin/banner',{{enabled:false}});}};
@@ -193,7 +224,36 @@ async def _require_code(request: Request):
 @router.post("/api/phasmo/dev-admin/bootstrap")
 async def dev_admin_bootstrap(request: Request):
     await _require_code(request)
-    return {"ok": True, "banner": read_banner(), "maintenance": read_maintenance()}
+    return {
+        "ok": True, "banner": read_banner(), "maintenance": read_maintenance(),
+        "contentValidation": get_registry().report(), "permissions": read_permissions(),
+        "investigationAnalytics": _investigation_analytics(),
+    }
+
+
+@router.post("/api/phasmo/dev-admin/content/validate")
+async def dev_admin_content_validate(request: Request):
+    await _require_code(request)
+    return {"ok": True, "validation": get_registry().report()}
+
+
+@router.post("/api/phasmo/dev-admin/content/reload")
+async def dev_admin_content_reload(request: Request):
+    await _require_code(request)
+    candidate = reload_registry()
+    return {"ok": candidate.valid, "validation": candidate.report()}
+
+
+@router.post("/api/phasmo/dev-admin/investigation-analytics")
+async def dev_admin_investigation_analytics(request: Request):
+    await _require_code(request)
+    return {"ok": True, "analytics": _investigation_analytics()}
+
+
+@router.post("/api/phasmo/dev-admin/permissions")
+async def dev_admin_permissions(request: Request):
+    body = await _require_code(request)
+    return {"ok": True, "permissions": write_permissions(body)}
 
 
 @router.post("/api/phasmo/dev-admin/sample-data")
@@ -275,4 +335,3 @@ async def dev_admin_usage_export_csv(request: Request):
 async def dev_admin_usage_import(request: Request):
     body = await _require_code(request)
     return {"ok": True, "result": import_usage(body.get("payload") or {})}
-

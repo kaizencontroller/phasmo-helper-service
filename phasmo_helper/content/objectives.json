@@ -1,0 +1,9 @@
+{"schemaVersion":1,"items":[
+{"id":"identify-ghost","name":"Identify the ghost","category":"primary","track":"boolean"},
+{"id":"emf-photo","name":"Capture an EMF Level 5 photo","category":"photo","track":"count","introduced":"0.18.0.0"},
+{"id":"escape-hunt","name":"Escape the ghost during a hunt","category":"optional","track":"boolean"},
+{"id":"repel-incense","name":"Repel the ghost with incense while it is chasing someone","category":"optional","track":"boolean"},
+{"id":"prevent-hunt-crucifix","name":"Prevent a hunt with a crucifix","category":"optional","track":"boolean"},
+{"id":"motion-sensor","name":"Detect the ghost with a motion sensor","category":"optional","track":"boolean"},
+{"id":"sound-sensor","name":"Detect a paranormal sound with a parabolic microphone","category":"optional","track":"boolean"}
+]}

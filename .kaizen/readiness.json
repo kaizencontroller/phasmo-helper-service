@@ -1,0 +1,5 @@
+{"schema_version":"1.0","checks":[
+  {"id":"content-valid","required":true,"source":"/ready","field":"content.valid"},
+  {"id":"state-writable","required":true,"source":"/api/phasmo/health","field":"stateDir.writable"},
+  {"id":"game-version","required":true,"source":"/version","field":"game_version"}
+]}

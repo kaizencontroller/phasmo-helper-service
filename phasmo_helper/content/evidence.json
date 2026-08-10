@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {"id":"dots","name":"D.O.T.S Projector","aliases":["dot","projector","d.o.t.s"]},
+    {"id":"emf5","name":"EMF Level 5","aliases":["emf","emf-5","emf_5"]},
+    {"id":"freezing","name":"Freezing Temperatures","aliases":["freeze","temps","temp"]},
+    {"id":"orbs","name":"Ghost Orb","aliases":["orb","ghostorb","ghostorbs"]},
+    {"id":"writing","name":"Ghost Writing","aliases":["book"]},
+    {"id":"box","name":"Spirit Box","aliases":["spirit","spiritbox","spirit-box"]},
+    {"id":"uv","name":"Ultraviolet","aliases":["ultraviolet","fingerprints","prints"]}
+  ]
+}

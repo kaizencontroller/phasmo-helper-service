@@ -1,0 +1,5 @@
+{"schema_version":"1.0","default":"standalone","profiles":{
+  "standalone":{"runtime":"python-fastapi","platform_required":false,"state":"local-or-volume"},
+  "railway":{"runtime":"python-fastapi","platform_required":false,"state":"railway-volume","health":"/health"},
+  "kaizen":{"runtime":"python-fastapi","platform_required":true,"support_provider":"platform","state":"application-scope"}
+}}

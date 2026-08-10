@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from .routes import api, config_api, pages, dev_admin
 from . import settings
 from .services.security import apply_route_rate_limit
+from .content import get_registry
 
 app = FastAPI(title="Kaizen Phasmophobia Helper")
 
@@ -43,16 +44,18 @@ app.include_router(dev_admin.router)
 
 @app.get("/health", include_in_schema=False)
 def health():
-    return {"status": "healthy", "application": "phasmo-helper"}
+    registry = get_registry()
+    return {"status": "healthy" if registry.valid else "degraded", "application": "phasmo-helper", "content": registry.report()}
 
 
 @app.get("/ready", include_in_schema=False)
 def ready():
     settings._STATE_DIR.mkdir(parents=True, exist_ok=True)
     return {
-        "status": "ready",
+        "status": "ready" if get_registry().valid else "not-ready",
         "application": "phasmo-helper",
         "state_directory": str(settings._STATE_DIR),
+        "content": get_registry().report(),
     }
 
 
@@ -63,4 +66,7 @@ def version():
         "application_version": settings._APP_VERSION,
         "build_commit": settings._BUILD_COMMIT or None,
         "platform_support": bool(settings._PLATFORM_BASE_URL),
+        "platform_version": settings._PLATFORM_VERSION,
+        "game_version": get_registry().game_version.get("supportedVersion"),
+        "content_version": get_registry().game_version.get("contentVersion"),
     }

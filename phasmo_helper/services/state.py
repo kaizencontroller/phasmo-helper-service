@@ -91,6 +91,17 @@ def default_state(room: str = "default") -> Dict[str, Any]:
         "roomStatus": "open",
         "closedAt": 0,
         "closedBy": "",
+        "objectives": {},
+        "photos": {},
+        "timeline": [{
+            "id": f"evt-{int(time.time() * 1000)}-1",
+            "at": int(time.time() * 1000),
+            "event": "room_created",
+            "source": "app",
+            "actor": "",
+            "details": {},
+        }],
+        "commandAnalytics": [],
     }
 
 
@@ -117,6 +128,10 @@ def read_state(room: str) -> Dict[str, Any]:
         merged["huntSanity"] = data.get("huntSanity")
         merged["presentation"] = data.get("presentation") if data.get("presentation") in {"unknown", "female", "male"} else "unknown"
         merged["cursedItems"] = data.get("cursedItems", {}) or {}
+        merged["objectives"] = data.get("objectives", {}) or {}
+        merged["photos"] = data.get("photos", {}) or {}
+        merged["timeline"] = data.get("timeline", []) or default_state(room)["timeline"]
+        merged["commandAnalytics"] = data.get("commandAnalytics", []) or []
         merged["controlMode"] = data.get("controlMode") if data.get("controlMode") in {"helper", "tracker"} else "helper"
         merged["overlayMode"] = data.get("overlayMode") if data.get("overlayMode") in {"helper", "tracker"} else "helper"
         if not merged.get("map") and data.get("level"):
@@ -161,6 +176,11 @@ def write_state(room: str, state: Dict[str, Any], usage_event: str = "state_writ
         state["evidenceNarrowedAt"] = 0
     state["updatedAt"] = now_ms
     state["lastActiveAt"] = now_ms
+    try:
+        from .investigations import append_timeline
+        append_timeline(state, usage_event, source=usage_source, actor=usage_actor, details=usage_details)
+    except Exception:
+        pass
     try:
         state["stateVersion"] = int(state.get("stateVersion") or 0) + 1
     except Exception:
@@ -282,4 +302,3 @@ def _write_jumpscare_count(count: int) -> int:
     count = max(0, int(count))
     _jumpscare_counter_path().write_text(json.dumps({"count": count}, indent=2), encoding="utf-8")
     return count
-

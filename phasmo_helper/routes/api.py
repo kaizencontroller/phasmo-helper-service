@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import time
 from fastapi import APIRouter, Header, HTTPException, Query, Request
+from fastapi.responses import PlainTextResponse
 from .. import settings
 from ..core.config import _config_bool
 from ..core.data import EVIDENCE, GHOST_NAMES
@@ -19,6 +20,11 @@ from ..services.state import (
     _auth_ok, _clean_room_code, _new_reset_state, _read_jumpscare_count, _room_code_ok, _room_name, _write_jumpscare_count,
     public_state, read_state, write_state, _state_path,
 )
+from ..content import get_registry, reload_registry
+from ..services.chat import StreamerBotProvider
+from ..services.dispatcher import CommandDispatcher
+from ..services.investigations import analytics_from_states, session_summary, summary_csv, summary_markdown
+from ..services.permissions import read_permissions, write_permissions
 
 router = APIRouter()
 
@@ -37,6 +43,7 @@ def api_phasmo_health():
         "maintenance": maint,
         "stateDir": state_dir,
         "timestamp": int(time.time() * 1000),
+        "content": get_registry().report(),
     }
 
 
@@ -47,12 +54,86 @@ def api_phasmo_version():
         "app": "phasmo-helper",
         "version": settings._APP_VERSION,
         "commit": settings._BUILD_COMMIT,
+        "gameVersion": get_registry().game_version.get("supportedVersion"),
+        "contentVersion": get_registry().game_version.get("contentVersion"),
+        "platformVersion": settings._PLATFORM_VERSION,
         "railway": {
             "service": __import__("os").environ.get("RAILWAY_SERVICE_NAME", ""),
             "environment": __import__("os").environ.get("RAILWAY_ENVIRONMENT_NAME", ""),
             "publicDomain": __import__("os").environ.get("RAILWAY_PUBLIC_DOMAIN", ""),
         },
     }
+
+
+@router.get("/api/phasmo/content")
+def api_phasmo_content():
+    return {"ok": True, "content": get_registry().public_payload(), "validation": get_registry().report()}
+
+
+@router.get("/api/phasmo/content/validation")
+def api_content_validation():
+    return {"ok": True, "validation": get_registry().report()}
+
+
+@router.post("/api/phasmo/ops/content/reload")
+def api_content_reload(authorization: str | None = Header(default=None), x_phasmo_ops_token: str | None = Header(default=None)):
+    require_ops_token(authorization, x_phasmo_ops_token)
+    registry = reload_registry()
+    return {"ok": registry.valid, "validation": registry.report()}
+
+
+@router.get("/api/phasmo/permissions")
+def api_permissions():
+    config = read_permissions()
+    return {"ok": True, "roles": config.get("roles", []), "groups": config.get("groups", {}), "matrix": config.get("matrix", {})}
+
+
+@router.post("/api/phasmo/ops/permissions")
+async def api_permissions_write(request: Request, authorization: str | None = Header(default=None), x_phasmo_ops_token: str | None = Header(default=None)):
+    require_ops_token(authorization, x_phasmo_ops_token)
+    body = await request.json()
+    if not isinstance(body, dict):
+        raise HTTPException(status_code=400, detail="permission body must be an object")
+    return {"ok": True, "permissions": write_permissions(body)}
+
+
+@router.get("/api/phasmo/timeline")
+def api_timeline(request: Request, room: str | None = Query(default=None), code: str | None = Query(default=None)):
+    safe_room = _room_name(room)
+    state = read_state(safe_room)
+    if not _room_code_ok(state, code):
+        record_failed_passcode(request, safe_room)
+        raise HTTPException(status_code=403, detail="room passcode required")
+    return {"ok": True, "room": safe_room, "timeline": state.get("timeline", [])}
+
+
+@router.get("/api/phasmo/session-summary")
+def api_session_summary(request: Request, room: str | None = Query(default=None), code: str | None = Query(default=None), format: str = Query(default="json")):
+    safe_room = _room_name(room)
+    state = read_state(safe_room)
+    if not _room_code_ok(state, code):
+        record_failed_passcode(request, safe_room)
+        raise HTTPException(status_code=403, detail="room passcode required")
+    summary = session_summary(state)
+    if format.lower() == "csv":
+        return PlainTextResponse(summary_csv(summary), media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="{safe_room}-summary.csv"'})
+    if format.lower() in {"md", "markdown"}:
+        return PlainTextResponse(summary_markdown(summary), media_type="text/markdown", headers={"Content-Disposition": f'attachment; filename="{safe_room}-summary.md"'})
+    return {"ok": True, "summary": summary}
+
+
+@router.get("/api/phasmo/investigation-analytics")
+def api_investigation_analytics():
+    states = []
+    settings._STATE_DIR.mkdir(parents=True, exist_ok=True)
+    for path in settings._STATE_DIR.glob("*.json"):
+        if path.name.startswith("__global_"):
+            continue
+        try:
+            states.append(json.loads(path.read_text(encoding="utf-8")))
+        except Exception:
+            continue
+    return {"ok": True, "analytics": analytics_from_states(states)}
 
 
 @router.get("/api/phasmo/maintenance")
@@ -340,6 +421,18 @@ async def api_post_state(
                     key = str(k).lower()[:80]
                     if str(v) in {"found", "out", "unknown"}:
                         current["cursedItems"][key] = str(v)
+            if "objectives" in body and isinstance(body["objectives"], dict):
+                valid_objectives = {item["id"] for item in get_registry().items("objectives.json")}
+                current.setdefault("objectives", {})
+                for key, value in body["objectives"].items():
+                    if key in valid_objectives and (isinstance(value, bool) or isinstance(value, int)):
+                        current["objectives"][key] = value
+            if "photos" in body and isinstance(body["photos"], dict):
+                current.setdefault("photos", {})
+                for key, value in body["photos"].items():
+                    safe_key = str(key).strip().lower()[:80]
+                    if safe_key and isinstance(value, (bool, int)):
+                        current["photos"][safe_key] = value
             if "ignoredUsers" in body and isinstance(body["ignoredUsers"], list):
                 current["ignoredUsers"] = sorted({_normal_user(u) for u in body["ignoredUsers"] if str(u).strip()})
             if "supportOptIn" in body:
@@ -416,7 +509,11 @@ def api_get_command(
         if not _room_code_ok(state, code or ""):
             record_failed_passcode(request, safe_room)
             raise HTTPException(status_code=403, detail="room passcode required")
-        state, result = apply_command(state, cmd_text, user=sender)
+        payload = {"command": cmd_text, "user": sender, "channel": channel_name}
+        if str(sender).lower() in {"control", "admin"}:
+            payload["roles"] = ["broadcaster"]
+        dispatched = CommandDispatcher().dispatch(state, StreamerBotProvider().parse(payload))
+        state, result = dispatched.state, dispatched.response
         state["lastCommand"] = cmd_text
         state["lastCommandResult"] = result
         support_ping = maybe_record_support_ping(
@@ -477,7 +574,8 @@ async def api_post_command(
         if not _room_code_ok(state, supplied_code):
             record_failed_passcode(request, safe_room)
             raise HTTPException(status_code=403, detail="room passcode required")
-        state, result = apply_command(state, command, user=user)
+        dispatched = CommandDispatcher().dispatch(state, StreamerBotProvider().parse(body))
+        state, result = dispatched.state, dispatched.response
         state["lastCommand"] = command
         state["lastCommandResult"] = result
         support_ping = maybe_record_support_ping(

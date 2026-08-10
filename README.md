@@ -1,114 +1,61 @@
-# Kaizen Phasmophobia Helper - Railway FastAPI Version
+# Phasmo Helper v5.8
 
-Kaizen Platform packaging and the optional shared support runtime are documented
-in `docs/KAIZEN_PLATFORM_MIGRATION.md`.
+Phasmo Helper is a Kaizen Creative Application and a standalone Railway-ready FastAPI service. It provides evidence elimination, behavior tracking, shared rooms, OBS overlays, chat guessing, leaderboards, investigation history, analytics, and a searchable ghost encyclopedia.
 
-This is a standalone Railway-ready service for the Phasmophobia evidence/ghost helper.
+Supported Phasmophobia version: **0.18.0.1**. This includes the **Deildegast**, the reworked **13 Willow Street**, and the **EMF Level 5 photo** category.
 
-## Hosted URLs
+## Architecture
 
-After deployment:
+- Platform: deployment, configuration, health/readiness, manifests, permissions, integrations, themes, maintenance, and release metadata.
+- Application: investigation state, ghost logic, overlays, rooms, scoring, analytics, and encyclopedia.
+- Content: versioned JSON under `phasmo_helper/content/`.
 
-```text
-https://YOUR-RAILWAY-APP/phasmo/control?room=kaizen
-https://YOUR-RAILWAY-APP/phasmo/overlay?room=kaizen
-```
+The service runs inside Kaizen Controller or independently. `KAIZEN_PLATFORM_URL` enables shared platform support without making standalone startup depend on the platform.
 
-Use `/phasmo/overlay?room=kaizen` as an OBS Browser Source.
-
-## Railway variables
-
-Recommended:
-
-```text
-PHASMO_ADMIN_TOKEN=make-a-random-secret
-PHASMO_STATE_DIR=/tmp/phasmo_state
-PHASMO_ALLOW_BEHAVIOR_COMMANDS=true
-```
-
-`PHASMO_ADMIN_TOKEN` protects POST updates from the local Streamer.bot bridge.
-If you leave it blank, anyone with the API URL could post commands, so use a token.
-
-## Local Streamer.bot bridge
-
-Run locally on the streaming PC:
+## Quick start
 
 ```powershell
-cd "PATH_TO_THIS_FOLDER"
-python -m pip install flask requests
-$env:RAILWAY_BASE_URL="https://YOUR-RAILWAY-APP"
-$env:PHASMO_ROOM="kaizen"
-$env:PHASMO_ADMIN_TOKEN="same-token-as-railway"
-$env:PHASMO_OWNER_USERS="kaizencontroller"
-python local_phasmo_streamerbot_bridge.py
+python -m pip install -r requirements.txt
+python -m uvicorn main:app --host 127.0.0.1 --port 8011
 ```
 
-Health check:
+Open `http://127.0.0.1:8011/phasmo`. See [Setup](docs/SETUP.md) and the [Streamer.bot guide](docs/STREAMERBOT_GUIDE.md).
+
+## Important routes
+
+- `/phasmo` - application home
+- `/phasmo/control?room=kaizen` - investigation control
+- `/phasmo/overlay?room=kaizen` - OBS browser source
+- `/phasmo/encyclopedia` - ghost encyclopedia
+- `/phasmo/timeline?room=kaizen` - investigation replay and exports
+- `/phasmo/dev-admin` - protected developer operations
+- `/health`, `/ready`, `/version` - platform discovery
+- `/api/phasmo/content/validation` - startup/content validation report
+
+## Configuration
+
+Copy `.env.example` into your deployment provider and set secrets there. Do not commit tokens. Production recommendations:
 
 ```text
-http://127.0.0.1:8765/health
+PHASMO_ADMIN_TOKEN=<random integration token>
+PHASMO_OPS_TOKEN=<separate operations token>
+PHASMO_DEV_ADMIN_CODE=<private admin code>
+PHASMO_STATE_DIR=/data/phasmo_state
+PHASMO_APP_VERSION=v5.8.0
+KAIZEN_PLATFORM_VERSION=contract-1.0
 ```
 
-## Streamer.bot Web Request action
+Bearer and legacy `X-Phasmo-Token` headers are supported by the local adapter. Room passcodes remain available for browser-room compatibility.
 
-Create a Web Request action:
+## Content updates
 
-```text
-URL: http://127.0.0.1:8765/streamerbot/phasmo
-Method: POST
-Content-Type: application/json
-```
+Update JSON files, then call `POST /api/phasmo/ops/content/reload` with the Ops token. Invalid candidate content is rejected and the last valid registry remains active. Validation detects duplicate ghost/room IDs, broken references, invalid evidence, missing encyclopedia fields, invalid commands, and permission errors.
 
-Body:
+## Documentation
 
-```json
-{
-  "command": "%rawInput%",
-  "user": "%user%",
-  "isMod": "%isMod%",
-  "isBroadcaster": "%isBroadcaster%"
-}
-```
-
-Command triggers to point at that action:
-
-```text
-!ev
-!evidence
-!responds
-!response
-!mode
-!reset
-!ignore
-!unignore
-!ignored
-!modadd
-!modremove
-!mods
-```
-
-## Command permissions
-
-Normal chatters:
-- `!ev emf yes/no/unknown`
-- `!ev dots yes/no/unknown`
-- `!ev freezing yes/no/unknown`
-- `!ev orb yes/no/unknown`
-- `!ev writing yes/no/unknown`
-- `!ev box yes/no/unknown`
-- `!ev uv yes/no/unknown`
-
-Admins/mods:
-- `!responds alone/everyone/unknown`
-- `!mode 3/2/1/0`
-- `!reset`
-- `!ignore USERNAME`
-- `!unignore USERNAME`
-- `!ignored`
-- `!mods`
-
-Owner/broadcaster:
-- `!modadd USERNAME`
-- `!modremove USERNAME`
-
-KaizenController is included as the default owner if `PHASMO_OWNER_USERS` is not set.
+- [Chat commands](docs/CHAT_COMMANDS.md)
+- [FAQ](docs/FAQ.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Platform contract](docs/KAIZEN_PLATFORM_MIGRATION.md)
+- [Release notes](docs/RELEASE_NOTES.md)
+- [Privacy and retention](docs/PRIVACY.md)

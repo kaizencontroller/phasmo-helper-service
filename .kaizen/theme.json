@@ -1,0 +1,5 @@
+{
+  "schema_version":"1.0","id":"kaizen-creative-dark","name":"Kaizen Creative Dark",
+  "tokens":{"background":"#070b11","surface":"#111923","surface_alt":"#172235","border":"#334155","text":"#f8fafc","muted":"#94a3b8","safety_orange":"#f97316","ghost_blue":"#38bdf8","success":"#22c55e","danger":"#ef4444"},
+  "motion":"minimal","aesthetic":"industrial","avoid":["halloween-novelty","excessive-animation"]
+}

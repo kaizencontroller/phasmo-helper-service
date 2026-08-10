@@ -1,0 +1,13 @@
+{
+  "schema_version":"1.0",
+  "application":"phasmo-helper",
+  "boundary":{
+    "platform":["deployment","configuration","health","readiness","manifests","integrations","permissions","themes","maintenance","release-metadata"],
+    "application":["ghost-logic","evidence","overlays","rooms","gameplay","scoring","analytics","encyclopedia"],
+    "content":["ghosts","maps","rooms","evidence","objectives","behavior-clues","cursed-items","commands"]
+  },
+  "standalone_fallback":true,
+  "health":"/health",
+  "readiness":"/ready",
+  "version":"/version"
+}

@@ -1,0 +1,14 @@
+{"schemaVersion":1,"mapId":"willow","legacyMapNames":["Willow Street House","13 Willow Street"],"items":[
+{"id":"willow-living-room","name":"Living Room","legacyIds":["living-room","foyer"]},
+{"id":"willow-kitchen","name":"Kitchen","legacyIds":["kitchen"]},
+{"id":"willow-dining-room","name":"Dining Room","legacyIds":["dining-room"]},
+{"id":"willow-hallway","name":"Hallway","legacyIds":["hallway"]},
+{"id":"willow-master-bedroom","name":"Master Bedroom","legacyIds":["master-bedroom"]},
+{"id":"willow-blue-bedroom","name":"Blue Bedroom","legacyIds":["blue-bedroom"]},
+{"id":"willow-bathroom","name":"Bathroom","legacyIds":["bathroom"]},
+{"id":"willow-garage","name":"Garage","legacyIds":["garage"]},
+{"id":"willow-laundry-room","name":"Laundry Room","legacyIds":["laundry","utility-room"]},
+{"id":"willow-basement-hallway","name":"Basement Hallway","legacyIds":["basement","basement-hallway"]},
+{"id":"willow-basement-left","name":"Basement Left Storage","legacyIds":["left-storage"]},
+{"id":"willow-basement-right","name":"Basement Right Storage","legacyIds":["right-storage"]}
+]}

@@ -1,0 +1,9 @@
+{"schemaVersion":1,"items":[
+{"name":"evidence","aliases":["ev"],"description":"Set an evidence state","category":"investigation","permission":"evidence.edit","cooldown":1,"help":"!evidence <evidence> <yes|no|unknown>","enabled":true,"hidden":false,"parameters":["evidence","state"]},
+{"name":"ghost","aliases":["select"],"description":"Guess or select a ghost","category":"investigation","permission":"ghost.guess","cooldown":2,"help":"!ghost <name>","enabled":true,"hidden":false,"parameters":["ghost"]},
+{"name":"guess","aliases":[],"description":"Lock in a viewer guess","category":"community","permission":"ghost.guess","cooldown":2,"help":"!guess <ghost>","enabled":true,"hidden":false,"parameters":["ghost"]},
+{"name":"behavior","aliases":["b","beh","observed"],"description":"Log a behavior clue","category":"investigation","permission":"behavior.log","cooldown":1,"help":"!behavior <clue> <yes|no|observed>","enabled":true,"hidden":false,"parameters":["clue","state"]},
+{"name":"actual","aliases":["actualghost","confirmghost","result"],"description":"Confirm the contract ghost","category":"room","permission":"room.close","cooldown":2,"help":"!actual <ghost>","enabled":true,"hidden":false,"parameters":["ghost"]},
+{"name":"reset","aliases":["phasmoreset"],"description":"Reset the current round","category":"room","permission":"room.reset","cooldown":5,"help":"!reset","enabled":true,"hidden":false,"parameters":[]},
+{"name":"reloadcontent","aliases":["contentreload"],"description":"Reload and validate content files","category":"developer","permission":"content.reload","cooldown":10,"help":"!reloadcontent","enabled":true,"hidden":true,"parameters":[]}
+]}

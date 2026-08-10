@@ -15,6 +15,8 @@ from ..services.banner import read_banner
 from ..services.security import validate_room_name
 from ..services.state import _room_name, _room_code_ok, read_state
 from ..templates_loader import HTML_TEMPLATE
+from ..content import get_registry
+from ..services.investigations import session_summary
 
 router = APIRouter()
 
@@ -27,7 +29,7 @@ def root():
 def _public_page_style() -> str:
     return """
 body{margin:0;background:#000;color:#f8fafc;font-family:Inter,system-ui,Segoe UI,sans-serif}
-main{width:min(460px,100vw);padding:10px;margin:0 auto;display:grid;gap:10px}
+main{width:min(460px,100%);padding:10px;margin:0 auto;display:grid;gap:10px;box-sizing:border-box}*,*::before,*::after{box-sizing:border-box}
 .hero,.card{background:linear-gradient(135deg,#172235ee,#0f172aee);border:1px solid #334155;border-radius:18px;box-shadow:0 16px 40px #0007;overflow:hidden}
 .hero{padding:16px;display:grid;gap:12px}
 .brand{display:flex;gap:10px;align-items:center;min-width:0}.logo{width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 30% 20%,#38bdf855,transparent 38%),linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #475569;display:grid;place-items:center;font-weight:950;letter-spacing:-.08em;box-shadow:inset 0 0 22px #ffffff12}.brandcopy{min-width:0;overflow:hidden}.kicker{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;font-weight:900}h1{margin:2px 0 0;font-size:28px;line-height:.95;letter-spacing:-.045em}h2{margin:0;font-size:18px}p{color:#cbd5e1;line-height:1.45;margin:0 0 10px}.muted{color:#94a3b8;font-size:12px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px}.support-links{display:grid;gap:7px}.support-row{display:flex;gap:9px;flex-wrap:wrap}.support-row.meta{font-size:11px}.support-row.version-row{color:#94a3b8;font-size:11px}.support-row a{color:#93c5fd;text-decoration:none}.content h2{margin:18px 0 8px;font-size:18px}.content h2:first-child{margin-top:0}.content ul,.content ol{margin:8px 0 16px;padding-left:24px}.content p:last-child{margin-bottom:0}.button-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}.static-hero{gap:10px}.static-hero .brand-link{display:flex;gap:10px;align-items:center}.page-title-note{margin-top:2px}a.button,button{border:1px solid #475569;background:#0f172a;color:#f8fafc;border-radius:999px;padding:9px 11px;text-decoration:none;font-weight:850;cursor:pointer;font-size:13px}a.button.primary,button.primary{border-color:#22c55e;background:#14532d}.card .head{padding:13px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;gap:8px;align-items:center}.card .body{padding:13px}.room-grid{display:grid;gap:8px}.room-card{border:1px solid #334155;background:#0f172a;border-radius:14px;padding:10px}.room-card strong{display:block}.room-card span{display:block;color:#94a3b8;font-size:12px;margin-top:2px}.room-card p{font-size:13px;margin:8px 0}.room-card div:last-child{display:flex;gap:8px;flex-wrap:wrap}.room-card a{color:#93c5fd;font-size:12px;text-decoration:none}.support-note{font-size:11px;line-height:1.35;color:#94a3b8}.support-footer{border-style:dashed;opacity:.85}input,textarea,select{background:#0f172a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:10px;font:inherit;width:100%}textarea{min-height:120px}.form-grid{display:grid;grid-template-columns:1fr;gap:10px}.status{color:#93c5fd;font-size:13px;margin-top:8px}.small{font-size:12px;color:#94a3b8}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #334155;padding:8px 5px;text-align:left;vertical-align:top}th{color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}.table-wrap{overflow-x:auto}.locked{color:#fde68a;font-weight:900}code{color:#bae6fd;background:#020617;border:1px solid #334155;border-radius:999px;padding:2px 6px;font-size:12px}ol{color:#cbd5e1;line-height:1.45}li{margin:6px 0}.brand-link{display:block;text-decoration:none;color:inherit;cursor:pointer}.brand-link:hover{border-color:#60a5fa}.site-banner{border:1px solid #f97316;background:#432919;color:#fed7aa;border-radius:14px;padding:10px 12px;font-weight:850;line-height:1.3}.site-banner .small{color:#fdba74}.error{border:1px solid #ef4444;background:#451a20;color:#fecaca;border-radius:12px;padding:10px;font-size:13px}
@@ -88,6 +90,7 @@ def _support_footer(safe_room: str = "default") -> str:
       <a href=\"/phasmo/getting-started\">Getting started</a>
       <a href=\"/phasmo/commands\">Viewer commands</a>
       <a href=\"/phasmo/release-notes\">Release notes</a>
+      <a href=\"/phasmo/encyclopedia\">Ghost encyclopedia</a>
     </div>
     <div class=\"support-row\">
       <a href=\"/phasmo/streamerbot\">Streamer.bot setup</a>
@@ -100,7 +103,7 @@ def _support_footer(safe_room: str = "default") -> str:
       <a href=\"/phasmo/terms\">Terms</a>
       <a href=\"/phasmo/data-retention\">Data retention</a>
     </div>
-    <div class=\"support-row version-row\">Version {html.escape(settings._APP_VERSION)}</div>
+    <div class=\"support-row version-row\">App {html.escape(settings._APP_VERSION)} | Game {html.escape(str(get_registry().game_version.get('supportedVersion') or 'unknown'))} | Platform {html.escape(settings._PLATFORM_VERSION)}</div>
   </div>
   <div class=\"support-note\">This helper is happily provided free for the Phasmophobia community. Optional donations help keep hosting covered and support future development.</div>
 </div></section>
@@ -377,6 +380,17 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
     safe_room = _room_name(room)
     body = f"""
 <p class="small">Release notes are updated with each packaged build so testers can see what changed without checking GitHub.</p>
+
+<h2>v5.8 â€” Kaizen Platform Evolution</h2>
+<ul>
+  <li><strong>Added:</strong> Validated JSON content registry for ghosts, maps, Willow rooms, evidence, objectives, behavior clues, cursed items, commands, and supported game version.</li>
+  <li><strong>Added:</strong> Searchable Ghost Encyclopedia sourced entirely from <code>ghosts.json</code>.</li>
+  <li><strong>Added:</strong> Investigation timeline, replay data, and JSON/CSV/Markdown session-summary exports.</li>
+  <li><strong>Added:</strong> Provider-neutral chat adapter, configurable command dispatcher, role permission matrix, custom groups, and expiring user grants.</li>
+  <li><strong>Added:</strong> Dev-facing content validation, investigation analytics, content reload, and permission APIs.</li>
+  <li><strong>Updated:</strong> Full Deildegast support, 13 Willow Street room IDs and legacy aliases, plus EMF Level 5 photo/objective tracking definitions for game v0.18.0.1.</li>
+  <li><strong>Changed:</strong> Health, readiness, version, footer, and platform manifest expose app, platform, game, and content versions.</li>
+</ul>
 
 <h2>v5.6 — Room Usage Log and Session Analytics</h2>
 <ul>
@@ -749,7 +763,7 @@ def phasmo_leaderboard(room: str | None = Query(default=None), code: str | None 
         <title>Phasmo Chat Board</title>
         <style>
           body {{ margin:0; background:#000; color:#f8fafc; font-family:Inter,system-ui,Segoe UI,sans-serif; }}
-          .app {{ width:min(460px,100vw); padding:10px; display:grid; gap:10px; margin:0 auto; }}
+          .app {{ width:min(460px,100%); padding:10px; display:grid; gap:10px; margin:0 auto; }}
           .panel {{ background:#172235ee; border:1px solid #334155; border-radius:16px; overflow:hidden; box-shadow:0 16px 40px #0007; }}
           .head {{ padding:14px; border-bottom:1px solid #334155; display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap; }}
           .body {{ padding:14px; }}
@@ -791,6 +805,49 @@ def phasmo_leaderboard(room: str | None = Query(default=None), code: str | None 
     </html>
     """
     return HTMLResponse(html_doc)
+
+@router.get("/phasmo/encyclopedia")
+def phasmo_encyclopedia(q: str | None = Query(default=None)):
+    query = (q or "").strip().lower()
+    ghosts = get_registry().ghosts
+    if query:
+        ghosts = [ghost for ghost in ghosts if query in " ".join([
+            str(ghost.get("name", "")), str(ghost.get("lore", "")),
+            " ".join(ghost.get("aliases", [])), " ".join(ghost.get("evidence", [])), " ".join(ghost.get("tips", [])),
+        ]).lower()]
+    cards = "".join(f"""
+    <article class="card ghost-entry" data-name="{html.escape(str(ghost.get('name', '')).lower())}">
+      <div class="head"><div><div class="kicker">{' / '.join(html.escape(str(ev)) for ev in ghost.get('evidence', []))}</div><h2>{html.escape(str(ghost.get('name', 'Unknown')))}</h2></div><span class="muted">Hunts: {html.escape(str(ghost.get('huntThreshold', 'unknown')))}</span></div>
+      <div class="body content"><p>{html.escape(str(ghost.get('lore', '')))}</p>
+      <p><strong>Hidden ability:</strong> {html.escape(str(ghost.get('hiddenAbility', 'Unknown')))}</p>
+      <p><strong>Movement:</strong> {html.escape(str(ghost.get('movementSpeed', 'Unknown')))}</p>
+      <h2>Strengths</h2><ul>{''.join(f'<li>{html.escape(str(item))}</li>' for item in ghost.get('strengths', []))}</ul>
+      <h2>Weaknesses</h2><ul>{''.join(f'<li>{html.escape(str(item))}</li>' for item in ghost.get('weaknesses', []))}</ul>
+      <h2>Field tips</h2><ul>{''.join(f'<li>{html.escape(str(item))}</li>' for item in ghost.get('tips', []))}</ul>
+      <h2>Common misconceptions</h2><ul>{''.join(f'<li>{html.escape(str(item))}</li>' for item in ghost.get('misconceptions', []))}</ul></div>
+    </article>""" for ghost in ghosts) or '<section class="card"><div class="body">No ghosts match that search.</div></section>'
+    version = html.escape(str(get_registry().game_version.get("supportedVersion") or "unknown"))
+    return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ghost Encyclopedia</title><style>{_public_page_style()} main{{width:min(760px,100%)}}.ghost-entry h2{{letter-spacing:-.02em}}strong{{color:#f8fafc}}</style></head><body><main>{_site_banner_html()}<a class="hero brand-link" href="/phasmo"><div class="brand"><div class="logo">KC</div><div><div class="kicker">Game {version} | {len(get_registry().ghosts)} registered ghosts</div><h1>Ghost Encyclopedia</h1></div></div><p>Searchable field notes loaded entirely from the v5.8 content registry.</p><form method="get" class="form-grid"><input name="q" value="{html.escape(q or '', quote=True)}" type="search" placeholder="Search ghost, evidence, lore, or tip"><button class="primary">Search</button></form></a>{cards}{_support_footer()}</main></body></html>""")
+
+
+@router.get("/phasmo/timeline")
+def phasmo_timeline(room: str | None = Query(default=None), code: str | None = Query(default=None)):
+    safe_room = _room_name(room or "default")
+    gate = _locked_room_gate(safe_room, "/phasmo/timeline", code)
+    if gate:
+        return gate
+    state = read_state(safe_room)
+    rows = "".join(f"<tr><td>{html.escape(str(item.get('event', 'event')).replace('_', ' ').title())}</td><td>{html.escape(str(item.get('actor') or item.get('source') or 'app'))}</td><td><code>{int(item.get('at') or 0)}</code></td></tr>" for item in reversed(state.get("timeline", [])))
+    summary = session_summary(state)
+    return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Investigation Timeline</title><style>{_public_page_style()} main{{width:min(720px,100%)}}</style></head><body><main><a class="hero brand-link" href="/phasmo/control?room={safe_room}"><div class="kicker">room: {html.escape(safe_room)}</div><h1>Investigation Timeline</h1><p>{summary['roundsPlayed']} round(s) | {summary['timelineEvents']} recorded events</p></a><section class="card"><div class="head"><h2>Replay</h2><div class="actions"><a class="button" href="/api/phasmo/session-summary?room={safe_room}&format=json">JSON</a><a class="button" href="/api/phasmo/session-summary?room={safe_room}&format=csv">CSV</a><a class="button" href="/api/phasmo/session-summary?room={safe_room}&format=markdown">Markdown</a></div></div><div class="body table-wrap"><table><thead><tr><th>Event</th><th>Actor / source</th><th>Timestamp</th></tr></thead><tbody>{rows}</tbody></table></div></section>{_support_footer(safe_room)}</main></body></html>""")
+
+
+@router.get("/phasmo/whats-new")
+def phasmo_whats_new():
+    game = get_registry().game_version
+    features = "".join(f"<li>{html.escape(str(item))}</li>" for item in game.get("features", []))
+    return _simple_info_page("What's New in v5.8", f"<h2>Kaizen Platform Evolution</h2><p>Gameplay content now loads from a validated JSON registry. The release adds the Ghost Encyclopedia, investigation timelines and summaries, configurable commands, role-based permissions, and platform metadata.</p><h2>Supported game update</h2><p>Phasmophobia {html.escape(str(game.get('supportedVersion')))} - {html.escape(str(game.get('updateName')))}</p><ul>{features}</ul><p><a href='/phasmo/encyclopedia'>Open the Ghost Encyclopedia</a></p>")
+
 
 @router.get("/phasmo/jumpscare-video")
 def phasmo_jumpscare_video():
