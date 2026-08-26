@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import time
+import math
 from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any, Dict, Tuple
@@ -76,7 +77,8 @@ def check_rate_limit(key: str, limit: int, seconds: int) -> None:
     while bucket and now - bucket[0] > seconds:
         bucket.popleft()
     if len(bucket) >= limit:
-        raise HTTPException(status_code=429, detail="Too many requests. Please slow down and try again shortly.")
+        retry_after = max(1, math.ceil(seconds - (now - bucket[0]))) if bucket else seconds
+        raise HTTPException(status_code=429, detail="Too many requests. Please slow down and try again shortly.", headers={"Retry-After": str(retry_after)})
     bucket.append(now)
 
 
@@ -88,7 +90,9 @@ def apply_route_rate_limit(request: Request) -> None:
         if method == "POST" and (path.endswith("/bug-report") or path.endswith("/feedback")):
             raise HTTPException(status_code=503, detail="Phasmo Helper is in temporary abuse-protection mode. Nonessential submissions are paused.")
     if path.endswith("/api/phasmo/state") and method == "GET":
-        limit, window = (18, 60) if settings._ABUSE_MODE else ((25, 60) if settings._DEGRADED_MODE else (45, 60))
+        # Control + OBS overlay are commonly open together. Their normal polling
+        # must fit comfortably without weakening write/command limits.
+        limit, window = (30, 60) if settings._ABUSE_MODE else ((60, 60) if settings._DEGRADED_MODE else (120, 60))
         room = request.query_params.get("room") or "default"
         check_rate_limit(f"state-get:{ip}:{room}", limit, window)
     elif path.endswith("/api/phasmo/state") and method == "POST":

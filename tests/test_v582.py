@@ -53,7 +53,7 @@ def test_weather_and_response_condition_are_on_control_step():
     assert "Investigation Conditions" in page.text
     assert "Live Hunt Risk" in page.text
     assert 'id="newRoundModal"' in page.text
-    assert "/phasmo/static/phasmo.js?v=5.8.8-overlay" in page.text
+    assert "/phasmo/static/phasmo.js?v=5.8.9-ratefix" in page.text
     assert 'id="respondsText" style="display:none!important"' in page.text
     assert 'id="layoutToggle"' in page.text
     assert "Highest threshold among remaining candidates." in page.text
@@ -89,3 +89,16 @@ def test_overlay_uses_stable_candidates_and_locked_canvas():
     assert "ghost-reel-track" not in js
     assert "document.body.classList.add('overlay-mode')" in js
     assert "body.overlay-mode{width:560px;height:210px;overflow:hidden" in css
+
+
+def test_state_polling_budget_supports_control_and_overlay_together():
+    room = "v589-poll-budget"
+    responses = [client.get(f"/api/phasmo/state?room={room}") for _ in range(120)]
+    assert all(response.status_code == 200 for response in responses)
+    blocked = client.get(f"/api/phasmo/state?room={room}")
+    assert blocked.status_code == 429
+    assert int(blocked.headers["retry-after"]) >= 1
+    js = client.get("/phasmo/static/phasmo.js").text
+    assert "statePollBlockedUntil" in js
+    assert "r.status===429" in js
+    assert "MODE==='overlay'?2000" in js

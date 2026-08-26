@@ -1,5 +1,11 @@
 # Release Notes
 
+## v5.8.9 - Polling and rate-limit recovery
+
+- Fixed the normal Control + OBS overlay combination exceeding the room-state read limit.
+- Reduced network polling while retaining one-second local overlay rendering for smooth timers.
+- Added `Retry-After` responses and exponential client backoff so a 429 cannot become a request loop.
+
 ## v5.8.8 - Stable overlay refresh
 
 - Replaced the polling-sensitive scrolling candidate ticker with a stable top-candidate strip and remaining count.

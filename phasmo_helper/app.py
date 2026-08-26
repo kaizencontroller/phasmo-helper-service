@@ -30,7 +30,7 @@ async def phasmo_safety_middleware(request: Request, call_next):
         from fastapi import HTTPException
         from fastapi.responses import JSONResponse
         if isinstance(exc, HTTPException):
-            return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+            return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers=exc.headers)
         raise
     response = await call_next(request)
     if request.url.path.startswith("/phasmo/static/"):
