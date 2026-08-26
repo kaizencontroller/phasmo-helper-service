@@ -18,7 +18,7 @@ def test_v581_workspace_pages_and_status():
     assert client.get("/phasmo/integrations?room=test-v581").status_code == 200
     assert client.get("/phasmo/export-center?room=test-v581").status_code == 200
     status = client.get("/api/phasmo/status?room=test-v581").json()
-    assert status["applicationVersion"] == "v5.8.6"
+    assert status["applicationVersion"] == "v5.8.7"
 
 
 def test_export_center_is_downloadable_and_sanitized():

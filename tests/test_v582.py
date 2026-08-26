@@ -53,7 +53,7 @@ def test_weather_and_response_condition_are_on_control_step():
     assert "Investigation Conditions" in page.text
     assert "Live Hunt Risk" in page.text
     assert 'id="newRoundModal"' in page.text
-    assert "/phasmo/static/phasmo.js?v=5.8.6" in page.text
+    assert "/phasmo/static/phasmo.js?v=5.8.7-dashboard" in page.text
     assert 'id="respondsText" style="display:none!important"' in page.text
     assert 'id="layoutToggle"' in page.text
     assert "Highest threshold among remaining candidates." in page.text

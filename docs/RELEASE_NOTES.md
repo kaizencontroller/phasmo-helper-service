@@ -1,5 +1,11 @@
 # Release Notes
 
+## v5.8.7 - Full-screen dashboard hotfix
+
+- Replaced the stretched full-width stack with a centered 1,400px dashboard grid.
+- Paired related Control panels into balanced columns while preserving single-column behavior below 980px.
+- Moved the display switch out of navigation so Low profile keeps every navigation control visible.
+
 ## v5.8.6 - Candidate-based sanity warning
 
 - Hunt Risk now always posts the highest hunt percentage among the remaining candidates, without requiring team sanity entry.

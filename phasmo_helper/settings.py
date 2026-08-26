@@ -50,7 +50,7 @@ _ROOM_NAME_BLOCKLIST_EXTRA = os.getenv("PHASMO_ROOM_NAME_BLOCKLIST_EXTRA", "")
 
 # Release / maintenance automation. The packaged release is the source of
 # truth; keep the configured value visible for diagnosing stale deployment variables.
-_APP_VERSION = "v5.8.6"
+_APP_VERSION = "v5.8.7"
 _CONFIGURED_APP_VERSION = os.getenv("PHASMO_APP_VERSION", "").strip()
 _PLATFORM_VERSION = os.getenv("KAIZEN_PLATFORM_VERSION", "contract-1.0").strip() or "contract-1.0"
 _BUILD_COMMIT = os.getenv("PHASMO_BUILD_COMMIT", os.getenv("RAILWAY_GIT_COMMIT_SHA", "")).strip()
