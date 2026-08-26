@@ -1,5 +1,11 @@
 # Release Notes
 
+## v5.8.8 - Stable overlay refresh
+
+- Replaced the polling-sensitive scrolling candidate ticker with a stable top-candidate strip and remaining count.
+- Locked the overlay document to the existing 560×210 OBS canvas to prevent page scrollbars.
+- Refreshed the overlay card, evidence states, candidate emphasis, notes panel, and visual hierarchy without changing the browser-source URL.
+
 ## v5.8.7 - Full-screen dashboard hotfix
 
 - Replaced the stretched full-width stack with a centered 1,400px dashboard grid.

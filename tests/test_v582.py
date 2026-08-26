@@ -53,7 +53,7 @@ def test_weather_and_response_condition_are_on_control_step():
     assert "Investigation Conditions" in page.text
     assert "Live Hunt Risk" in page.text
     assert 'id="newRoundModal"' in page.text
-    assert "/phasmo/static/phasmo.js?v=5.8.7-dashboard" in page.text
+    assert "/phasmo/static/phasmo.js?v=5.8.8-overlay" in page.text
     assert 'id="respondsText" style="display:none!important"' in page.text
     assert 'id="layoutToggle"' in page.text
     assert "Highest threshold among remaining candidates." in page.text
@@ -80,3 +80,12 @@ def test_next_round_shortcut_resets_and_applies_new_contract_atomically():
     assert state["playerCount"] == 4
     assert state["setupComplete"] is True
     assert state["weather"] == "unknown"
+
+
+def test_overlay_uses_stable_candidates_and_locked_canvas():
+    js = client.get("/phasmo/static/phasmo.js").text
+    css = client.get("/phasmo/static/phasmo.css").text
+    assert "names.slice(0,2)" in js
+    assert "ghost-reel-track" not in js
+    assert "document.body.classList.add('overlay-mode')" in js
+    assert "body.overlay-mode{width:560px;height:210px;overflow:hidden" in css

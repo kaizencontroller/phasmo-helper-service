@@ -333,13 +333,9 @@ function candidateReelHtml(list, confirmed=''){
   const names=confirmed?[confirmed]:(list||[]).map(g=>g.name);
   if(!box)return '';
   if(!names.length){box.className='ov-ghosts static-mode';return '';}
-  if(names.length<=3){
-    box.className='ov-ghosts static-mode';
-    return names.map(name=>`<span class='badge'>${escHtml(name)}</span>`).join('');
-  }
-  box.className='ov-ghosts reel-mode';
-  const chips=names.map(name=>`<span class='badge'>${escHtml(name)}</span>`).join('');
-  return `<div class='ghost-reel'><div class='ghost-reel-track'><span class='ghost-reel-label'>Remaining</span>${chips}<span class='ghost-reel-label'>Remaining</span>${chips}</div></div>`;
+  box.className='ov-ghosts static-mode';
+  const visible=names.slice(0,2), remaining=Math.max(0,names.length-visible.length);
+  return visible.map((name,i)=>`<span class='badge ${i===0?'candidate-lead':''}'>${escHtml(name)}</span>`).join('')+(remaining?`<span class='badge candidate-more'>+${remaining}</span>`:'');
 }
 function populateActualGhostSelect(){let sel=document.getElementById('actualGhostSelect'); if(!sel||sel.dataset.ready==='true')return; sel.innerHTML='<option value="">Select actual ghost…</option>'+G.map(g=>`<option value="${g.name}">${g.name}</option>`).join(''); sel.dataset.ready='true'}
 function renderContractResult(){
@@ -1111,6 +1107,7 @@ function renderTrackerOverlay(){
 }
 
 function renderOverlay(){
+  document.body.classList.add('overlay-mode');
   document.getElementById('overlay').classList.remove('hidden');
   const now=Date.now();
   const panicLayer=document.getElementById('ovPanicTakeover');
