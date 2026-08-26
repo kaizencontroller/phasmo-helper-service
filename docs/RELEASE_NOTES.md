@@ -1,5 +1,11 @@
 # Release Notes
 
+## v5.8.3 - Control flow and live hunt risk
+
+- Moved weather and ghost response settings to Control, where they are learned during the investigation.
+- Added an in-place New Round shortcut requiring only the new map while retaining editable player and difficulty defaults.
+- Added live hunt-risk guidance from current team sanity and the ghosts still in consideration, including special-condition warnings.
+
 ## v5.8.2 - Quality of Life Part 2 compatibility
 
 - Updated supported game metadata to Phasmophobia v0.19.0.0.

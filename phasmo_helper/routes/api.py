@@ -394,6 +394,18 @@ async def api_post_state(
             current["weather"] = "unknown"
             current["lastCommand"] = "Next Round"
             current["lastCommandResult"] = "New round started. Preserved players, difficulty, response, evidence mode, and ignored chatters; cleared map and weather."
+            # Apply the shortcut's next-contract choices in the same transaction.
+            if "map" in body:
+                current["map"] = str(body.get("map") or "unknown")[:120]
+            if "difficulty" in body:
+                current["difficulty"] = str(body.get("difficulty") or "unknown")[:40]
+            if "playerCount" in body:
+                try:
+                    current["playerCount"] = max(1, min(4, int(body.get("playerCount") or 4)))
+                except Exception:
+                    current["playerCount"] = 4
+            if "setupComplete" in body:
+                current["setupComplete"] = bool(body.get("setupComplete"))
         else:
             if "evidence" in body and isinstance(body["evidence"], dict):
                 current["evidence"].update({k: v for k, v in body["evidence"].items() if k in EVIDENCE and v in {"yes", "no", "unknown"}})

@@ -2,6 +2,11 @@ from phasmo_helper.content import get_registry
 from phasmo_helper.core.data import GHOST_ALIASES, MAP_ALIASES
 from phasmo_helper.services.commands import apply_command
 from phasmo_helper.services.state import default_state
+from fastapi.testclient import TestClient
+from phasmo_helper.app import app
+
+
+client = TestClient(app)
 
 
 def test_qol2_registry_and_restricted_maps():
@@ -34,3 +39,40 @@ def test_deildegast_and_willow_rework_remain_valid():
     willow = registry.rooms["willow.json"]
     assert willow["mapId"] == "willow"
     assert any(room["id"] == "willow-laundry-room" and "utility-room" in room["legacyIds"] for room in willow["items"])
+
+
+def test_weather_and_response_condition_are_on_control_step():
+    page = client.get("/phasmo/round?room=conditions-test")
+    assert page.status_code == 200
+    setup_markup = page.text.split('id="setupPanel"', 1)[1].split('class="panel tracker-panel"', 1)[0]
+    assert "Number of Players" in setup_markup
+    assert "Game Level / Difficulty" in setup_markup
+    assert "Weather" not in setup_markup
+    assert "Ghost responds to" not in setup_markup
+    assert 'class="panel control-context-panel"' in page.text
+    assert "Investigation Conditions" in page.text
+    assert "Live Hunt Risk" in page.text
+    assert 'id="newRoundModal"' in page.text
+
+
+def test_next_round_shortcut_resets_and_applies_new_contract_atomically():
+    room = "v582-next-round-test"
+    client.post(
+        f"/api/phasmo/state?room={room}",
+        json={"createRoom": True},
+    )
+    client.post(
+        f"/api/phasmo/state?room={room}",
+        json={"setupComplete": True, "map": "13 Willow Street", "difficulty": "amateur", "playerCount": 2, "weather": "fog"},
+    )
+    response = client.post(
+        f"/api/phasmo/state?room={room}",
+        json={"nextRound": True, "map": "Point Hope Restricted", "difficulty": "professional", "playerCount": 4, "setupComplete": True},
+    )
+    assert response.status_code == 200
+    state = response.json()["state"]
+    assert state["map"] == "Point Hope Restricted"
+    assert state["difficulty"] == "professional"
+    assert state["playerCount"] == 4
+    assert state["setupComplete"] is True
+    assert state["weather"] == "unknown"
