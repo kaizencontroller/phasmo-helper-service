@@ -581,7 +581,7 @@ def api_get_command(
             channel=channel_name,
             bot_account=bot_name,
         )
-        write_state(safe_room, state, usage_event="streamerbot_command", usage_source=str(source), usage_actor=str(user), usage_details={"command": str(command), "channel": channel, "bot": bot_account})
+        write_state(safe_room, state, usage_event="streamerbot_command", usage_source=str(source), usage_actor=str(user), usage_details={"command": str(command), "channel": channel_name, "bot": bot_name})
     return {"ok": True, "room": safe_room, "result": result, "supportPing": bool(support_ping), "state": public_state(state)}
 
 

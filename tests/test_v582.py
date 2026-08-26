@@ -102,3 +102,16 @@ def test_state_polling_budget_supports_control_and_overlay_together():
     assert "statePollBlockedUntil" in js
     assert "r.status===429" in js
     assert "MODE==='overlay'?2000" in js
+
+
+def test_streamerbot_get_command_bridge_returns_success():
+    room = "v589-streamerbot-get"
+    client.post(f"/api/phasmo/state?room={room}", json={"createRoom": True})
+    response = client.get(
+        "/api/phasmo/command",
+        params={"room": room, "user": "bridge-test", "command": "!ev emf5"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["ok"] is True
+    assert payload["state"]["lastCommand"] == "!ev emf5"
