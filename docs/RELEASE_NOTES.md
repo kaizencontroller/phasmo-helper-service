@@ -1,5 +1,10 @@
 # Release Notes
 
+## v5.8.4 - Loading-state hotfix
+
+- Versioned the Control page assets so browsers cannot combine the updated page with an older cached script.
+- Added a temporary compatibility bridge for already-cached v5.8.2 JavaScript.
+
 ## v5.8.3 - Control flow and live hunt risk
 
 - Moved weather and ghost response settings to Control, where they are learned during the investigation.
