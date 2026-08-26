@@ -1426,5 +1426,11 @@ if(experienceToggle){
   applyExperience(localStorage.getItem('phasmoExperience')||'basic');
   experienceToggle.addEventListener('click',()=>applyExperience(document.body.classList.contains('experience-advanced')?'basic':'advanced'));
 }
+const layoutToggle=document.getElementById('layoutToggle');
+if(layoutToggle){
+  const applyLayout=mode=>{const full=mode==='full';document.body.classList.toggle('layout-full',full);layoutToggle.textContent=full?'Low profile':'Full screen';layoutToggle.setAttribute('aria-pressed',String(full));localStorage.setItem('phasmoLayout',full?'full':'compact')};
+  applyLayout(localStorage.getItem('phasmoLayout')||'compact');
+  layoutToggle.addEventListener('click',()=>applyLayout(document.body.classList.contains('layout-full')?'compact':'full'));
+}
 for(const [id,path] of [['navTimeline','/phasmo/timeline'],['navIntegrations','/phasmo/integrations']]){const el=document.getElementById(id);if(el)el.href=`${path}?room=${encodeURIComponent(room)}`}
 fetch(`/api/phasmo/streamerbot/status?room=${encodeURIComponent(room)}`).then(r=>r.ok?r.json():null).then(data=>{if(!data)return;const status=data.integration||{},el=document.getElementById('workspaceIntegration');if(el)el.textContent=status.connected?`Streamer.bot connected · ${status.latencyMs||0} ms`:'Streamer.bot waiting'}).catch(()=>{});

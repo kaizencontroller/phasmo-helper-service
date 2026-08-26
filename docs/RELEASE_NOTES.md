@@ -1,5 +1,10 @@
 # Release Notes
 
+## v5.8.5 - Display mode toggle
+
+- Added a persistent Low profile / Full screen toggle for desktop Control sessions.
+- Full screen uses the available browser width and expands candidate and tracker layouts; narrow screens remain optimized for mobile.
+
 ## v5.8.4 - Loading-state hotfix
 
 - Versioned the Control page assets so browsers cannot combine the updated page with an older cached script.

@@ -53,8 +53,9 @@ def test_weather_and_response_condition_are_on_control_step():
     assert "Investigation Conditions" in page.text
     assert "Live Hunt Risk" in page.text
     assert 'id="newRoundModal"' in page.text
-    assert "/phasmo/static/phasmo.js?v=5.8.4" in page.text
+    assert "/phasmo/static/phasmo.js?v=5.8.5" in page.text
     assert 'id="respondsText" style="display:none!important"' in page.text
+    assert 'id="layoutToggle"' in page.text
 
 
 def test_next_round_shortcut_resets_and_applies_new_contract_atomically():
