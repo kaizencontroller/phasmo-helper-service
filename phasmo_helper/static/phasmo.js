@@ -1437,4 +1437,4 @@ if(layoutToggle){
   layoutToggle.addEventListener('click',()=>applyLayout(document.body.classList.contains('layout-full')?'compact':'full'));
 }
 for(const [id,path] of [['navTimeline','/phasmo/timeline'],['navIntegrations','/phasmo/integrations']]){const el=document.getElementById(id);if(el)el.href=`${path}?room=${encodeURIComponent(room)}`}
-fetch(`/api/phasmo/streamerbot/status?room=${encodeURIComponent(room)}`).then(r=>r.ok?r.json():null).then(data=>{if(!data)return;const status=data.integration||{},el=document.getElementById('workspaceIntegration');if(el)el.textContent=status.connected?`Streamer.bot connected · ${status.latencyMs||0} ms`:'Streamer.bot waiting'}).catch(()=>{});
+fetch(`/api/phasmo/streamerbot/status?room=${encodeURIComponent(room)}`).then(r=>r.ok?r.json():null).then(data=>{if(!data)return;const status=data.integration||{},el=document.getElementById('workspaceIntegration');if(el)el.textContent=status.connected?`Streamer.bot active · ${status.commandsProcessed||0} command${status.commandsProcessed===1?'':'s'}`:'Streamer.bot ready · awaiting command'}).catch(()=>{});

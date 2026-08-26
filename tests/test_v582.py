@@ -53,7 +53,8 @@ def test_weather_and_response_condition_are_on_control_step():
     assert "Investigation Conditions" in page.text
     assert "Live Hunt Risk" in page.text
     assert 'id="newRoundModal"' in page.text
-    assert "/phasmo/static/phasmo.js?v=5.8.10-brandless" in page.text
+    assert "/phasmo/static/phasmo.js?v=5.8.11-status" in page.text
+    assert "Streamer.bot ready · awaiting command" in page.text
     assert 'id="respondsText" style="display:none!important"' in page.text
     assert 'id="layoutToggle"' in page.text
     assert "Highest threshold among remaining candidates." in page.text
@@ -103,6 +104,7 @@ def test_state_polling_budget_supports_control_and_overlay_together():
     assert "statePollBlockedUntil" in js
     assert "r.status===429" in js
     assert "MODE==='overlay'?2000" in js
+    assert "Streamer.bot active" in js
 
 
 def test_streamerbot_get_command_bridge_returns_success():

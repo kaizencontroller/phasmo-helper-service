@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Kaizen Phasmophobia Helper</title>
-<link rel="stylesheet" href="/phasmo/static/phasmo.css?v=5.8.10-brandless" />
+<link rel="stylesheet" href="/phasmo/static/phasmo.css?v=5.8.11-status" />
 </head>
 <body>
 <div id="control" class="app hidden">
@@ -14,7 +14,7 @@
     <span class="homecta" id="appHomeCta">Home</span>
   </a>
   <nav class="workspace-nav" aria-label="Workspace navigation"><a href="/phasmo">Home</a><a href="/phasmo/rooms">Rooms</a><a id="navTimeline" href="/phasmo/timeline">Timeline</a><a href="/phasmo/encyclopedia">Guide</a><a id="navIntegrations" href="/phasmo/integrations">Integrations</a><button id="experienceToggle" type="button">Advanced</button></nav>
-  <div class="workspace-status"><span><b class="status-dot"></b> <span id="workspaceStatusText">Live session</span></span><button id="layoutToggle" type="button" aria-pressed="false">Full screen</button><span id="workspaceIntegration">Streamer.bot waiting</span></div>
+  <div class="workspace-status"><span><b class="status-dot"></b> <span id="workspaceStatusText">Live session</span></span><button id="layoutToggle" type="button" aria-pressed="false">Full screen</button><span id="workspaceIntegration">Streamer.bot ready · awaiting command</span></div>
   <div class="panel top-panel" id="topPanel"><div class="head"><div><strong>Phasmo Control</strong><div class="muted">shared room: <span id="roomLabel"></span></div></div><div class="row" style="gap:6px"><span class="sync-badge" id="connectionStatus" role="status" aria-live="polite">Connecting</span><span class="badge" id="countBadge">0</span><button class="btn-small" id="toggleTopPanel" aria-expanded="true">Collapse</button></div></div>
     <div class="body">
       <div id="authMessage" class="error hidden"></div>
@@ -102,4 +102,4 @@
 </div>
 <div id="overlay" class="overlay hidden"><section class="ov-card" id="ovCard"><div class="ov-top"><div class="ov-kicker" id="ovKicker">Next Best Test</div><div class="ov-ghosts" id="ovGhosts"></div></div><div class="ov-step" id="ovStep">Loading</div><p class="ov-sub" id="ovSub"></p><div class="ov-bottom"><div class="ov-evidence" id="ovEvidence"></div><div class="ov-notes"><div class="ov-notes-title">Notes / Chat</div><div class="ov-note-text" id="ovNotes">No behaviors or guesses.</div></div></div></section><div id="ovPanicTakeover" class="ov-panic-takeover hidden"><div class="ov-panic-kicker">CHAT EVENT</div><div class="ov-panic-title">PANIC DECLARED</div><div class="ov-panic-sub">Remain calm. Or at least narrate the chaos clearly.</div></div><div id="ovJumpscare" class="ov-jumpscare hidden"><video id="ovJumpscareVideo" preload="auto" playsinline src="/phasmo/jumpscare-video"></video><div class="ov-jumpscare-label">button pressed</div></div></div>
 <script>window.PHASMO_MODE='__MODE__';</script>
-<script src="/phasmo/static/phasmo.js?v=5.8.10-brandless"></script></body></html>
+<script src="/phasmo/static/phasmo.js?v=5.8.11-status"></script></body></html>
