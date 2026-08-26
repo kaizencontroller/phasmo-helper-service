@@ -11,7 +11,7 @@ from phasmo_helper.core.data import GHOST_ALIASES, GHOST_NAMES
 from phasmo_helper.services.chat import StreamerBotProvider
 from phasmo_helper.services.dispatcher import CommandDispatcher
 from phasmo_helper.services.investigations import session_summary, summary_csv, summary_markdown
-from phasmo_helper.services.permissions import PermissionEngine, default_permissions
+from phasmo_helper.services.permissions import PermissionEngine, default_permissions, read_permissions
 from phasmo_helper.services.state import default_state
 
 
@@ -34,6 +34,39 @@ def test_permission_dispatcher_denies_viewer_reset_and_allows_mod():
     moderator = provider.parse({"command": "!reset", "user": "mod", "isMod": True})
     allowed = CommandDispatcher(PermissionEngine(default_permissions())).dispatch(state, moderator)
     assert allowed.allowed
+
+
+def test_viewers_can_log_behavior_but_disruptive_controls_stay_restricted():
+    state = default_state("permission-safety")
+    provider = StreamerBotProvider()
+    dispatcher = CommandDispatcher(PermissionEngine(default_permissions()))
+
+    behavior = dispatcher.dispatch(state, provider.parse({"command": "!be 12 yes", "user": "viewer"}))
+    assert behavior.allowed
+    assert behavior.state["behaviors"]["salt-footprints"] == "observed"
+
+    for command in ("!select Wraith", "!notghost Spirit", "!ignore troublemaker", "!nextround"):
+        denied = dispatcher.dispatch(state, provider.parse({"command": command, "user": "viewer"}))
+        assert not denied.allowed, command
+
+    moderator = dispatcher.dispatch(
+        state,
+        provider.parse({"command": "!select Wraith", "user": "mod", "isMod": True}),
+    )
+    assert moderator.allowed
+    assert moderator.state["manualGhosts"]["selected"] == "Wraith"
+
+
+def test_v2_permissions_migrate_to_safe_viewer_defaults(tmp_path, monkeypatch):
+    monkeypatch.setattr(settings, "_STATE_DIR", tmp_path)
+    (tmp_path / "__global_permissions.json").write_text(
+        '{"schemaVersion":2,"matrix":{"behavior.log":["moderator"],"room.reset":["moderator"]}}',
+        encoding="utf-8",
+    )
+    permissions = read_permissions()
+    assert permissions["matrix"]["behavior.log"] == ["viewer"]
+    assert permissions["matrix"]["ghost.override"] == ["moderator"]
+    assert permissions["matrix"]["room.reset"] == ["moderator"]
 
 
 def test_summary_exports():

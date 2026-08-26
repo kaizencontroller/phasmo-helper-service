@@ -16,7 +16,8 @@ ROLE_PARENTS = {
     "vip": ["subscriber"], "moderator": ["vip"], "broadcaster": ["moderator"], "owner": ["broadcaster"],
 }
 DEFAULT_MATRIX = {
-    "evidence.edit": ["viewer"], "ghost.guess": ["viewer"], "behavior.log": ["moderator"],
+    "evidence.edit": ["viewer"], "ghost.guess": ["viewer"], "behavior.log": ["viewer"],
+    "ghost.override": ["moderator"], "ignore.manage": ["moderator"], "room.next_round": ["moderator"],
     "room.create": ["moderator"], "room.close": ["moderator"], "room.reset": ["moderator"],
     "leaderboard.reset": ["broadcaster"], "developer.tools": ["owner"], "maintenance": ["owner"],
     "overlay": ["viewer"], "configuration": ["broadcaster"], "content.reload": ["owner"],
@@ -29,7 +30,7 @@ def _path() -> Path:
 
 
 def default_permissions() -> dict[str, Any]:
-    return {"schemaVersion": 2, "roles": DEFAULT_ROLES, "roleParents": ROLE_PARENTS, "groups": {}, "users": {}, "matrix": DEFAULT_MATRIX}
+    return {"schemaVersion": 3, "roles": DEFAULT_ROLES, "roleParents": ROLE_PARENTS, "groups": {}, "users": {}, "matrix": DEFAULT_MATRIX}
 
 
 def read_permissions() -> dict[str, Any]:
@@ -37,9 +38,17 @@ def read_permissions() -> dict[str, Any]:
     try:
         loaded = json.loads(_path().read_text(encoding="utf-8"))
         if isinstance(loaded, dict):
-            for key in ("roles", "roleParents", "groups", "users", "matrix"):
+            for key in ("roles", "roleParents", "groups", "users"):
                 if key in loaded:
                     data[key] = loaded[key]
+            matrix = dict(DEFAULT_MATRIX)
+            if isinstance(loaded.get("matrix"), dict):
+                matrix.update(loaded["matrix"])
+            # v2 shipped behavior logging as moderator-only. v3 deliberately opens
+            # investigation inputs to viewers while registering disruptive aliases.
+            if int(loaded.get("schemaVersion") or 0) < 3 and matrix.get("behavior.log") == ["moderator"]:
+                matrix["behavior.log"] = ["viewer"]
+            data["matrix"] = matrix
     except Exception:
         pass
     return data
