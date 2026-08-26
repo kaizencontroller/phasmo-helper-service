@@ -282,15 +282,11 @@ function renderHuntRisk(candidateList){
   if(!level||!summary||!detail)return;
   const avg=sanityAverage(), pool=(candidateList||candidates()).filter(g=>!g.fake);
   level.className='risk-badge';
-  if(avg===null||!pool.length){level.classList.add('risk-unknown');level.textContent=avg===null?'Need sanity':'No candidates';summary.textContent=avg===null?'Enter team sanity to estimate hunt risk.':'No real candidates remain to evaluate.';detail.textContent='Special abilities and cursed hunts can bypass normal thresholds.';return;}
-  const normal=pool.filter(g=>avg<=huntRule(g.name).threshold), special=pool.filter(g=>huntRule(g.name).any), earliest=Math.max(...pool.map(g=>huntRule(g.name).threshold));
-  let risk='low', label='Low';
-  if(normal.length){risk='danger';label='Hunt possible';}
-  else if(avg<=earliest+10||special.length){risk='caution';label='Caution';}
-  level.classList.add('risk-'+risk);level.textContent=label;
-  summary.textContent=`Team average ${avg}%. ${normal.length?`${normal.length} remaining candidate${normal.length===1?' is':'s are'} within a normal hunt threshold.`:`Earliest normal threshold among candidates is ${earliest}%.`}`;
-  const normalNames=normal.map(g=>g.name).join(', '), specialNames=special.map(g=>g.name).join(', ');
-  detail.textContent=[normalNames?`Can normally hunt now: ${normalNames}.`:'No remaining candidate is at its normal threshold.',specialNames?`Special-condition risk: ${specialNames}.`:'', 'Cursed hunts can bypass normal thresholds.'].filter(Boolean).join(' ');
+  if(!pool.length){level.classList.add('risk-unknown');level.textContent='No candidates';summary.textContent='No real candidates remain to evaluate.';detail.textContent='Cursed hunts can bypass normal thresholds.';return;}
+  const highest=Math.max(...pool.map(g=>huntRule(g.name).threshold)), highestGhosts=pool.filter(g=>huntRule(g.name).threshold===highest), special=pool.filter(g=>huntRule(g.name).any), normal=avg===null?[]:pool.filter(g=>avg<=huntRule(g.name).threshold);
+  level.classList.add(avg!==null&&normal.length?'risk-danger':'risk-caution');level.textContent=`Up to ${highest}%`;
+  summary.textContent=`Highest remaining hunt threshold: ${highest}% — ${highestGhosts.map(g=>g.name).join(', ')}.${avg!==null?` Team average: ${avg}%.`:''}`;
+  detail.textContent=[avg!==null&&normal.length?`Can normally hunt now: ${normal.map(g=>g.name).join(', ')}.`:'',special.length?`Special-condition risk: ${special.map(g=>g.name).join(', ')}.`:'','Cursed hunts can bypass normal thresholds.'].filter(Boolean).join(' ');
 }
 function status(){let c=candidates(), yes=E.filter(k=>state.evidence[k]==='yes'), mode=+state.evidenceMode, target=mode>0&&yes.length>=mode, mimic=c.some(g=>g.name==='The Mimic'); if(!c.length)return{kind:'conflict',name:'Retest',text:'No ghost matches. Recheck evidence.'}; if(target&&c.length===1)return{kind:'locked',name:`Final ID: ${c[0].name}`,text:'Evidence target reached. Behavior is sanity-check only.'}; if(target&&mimic)return{kind:'mimic',name:'Mimic Check',text:'Evidence target reached, but Mimic remains possible.'}; if(target)return{kind:'locked',name:`Likely: ${c[0].name}`,text:'Evidence target reached. Resolve contradictions only.'}; if(c.length===1)return{kind:'verify',name:`Verify ${c[0].name}`,text:'One candidate remains. Final disconfirming check.'}; return{kind:'open',name:'Investigating',text:'Continue evidence collection.'}}
 function nextEv(){let st=status(); if(['locked','conflict','verify'].includes(st.kind))return null; let c=candidates(), unk=E.filter(e=>state.evidence[e]==='unknown'); if(c.length<=1||!unk.length)return null; return unk.map(ev=>{let y=0,n=0; for(const g of c){let has=g.ev.includes(ev)||(g.name==='The Mimic'&&ev==='orbs'); has?y++:n++} let split=Math.min(y,n), swing=Math.abs(y-n); return{ev,y,n,split,score:split*10-swing-(ev==='box'&&state.responds==='unknown'?2:0)}}).sort((a,b)=>b.score-a.score||b.split-a.split||a.swing-b.swing)[0]}

@@ -1,5 +1,10 @@
 # Release Notes
 
+## v5.8.6 - Candidate-based sanity warning
+
+- Hunt Risk now always posts the highest hunt percentage among the remaining candidates, without requiring team sanity entry.
+- Team sanity, when entered, adds current-hunt context but no longer gates the warning.
+
 ## v5.8.5 - Display mode toggle
 
 - Added a persistent Low profile / Full screen toggle for desktop Control sessions.
