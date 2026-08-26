@@ -168,7 +168,7 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
     if cmd in {"!map", "!level"}:
         value = _match_setup_value(" ".join(parts[1:]), MAP_ALIASES)
         if not value:
-            return state, "Map not recognized. Try !map tanglewood, !map ridgeview, !map willow, !map edgefield, !map nells, !map grafton, !map woodwind, !map point hope, !map bleasdale, !map restricted, !map prison, !map maple, !map brownstone, or !map sunny."
+            return state, "Map not recognized. Try !map willow, !map point-restricted, !map prison-restricted, !map school-restricted, or another map name."
         state["map"] = value
         return state, f"Map set to {value}."
 
@@ -503,4 +503,3 @@ def apply_command(state: Dict[str, Any], command: str, user: str | None = None) 
         return state, f"Behavior {key} set to {value}."
 
     return state, "Command not recognized. Try !map tanglewood, !difficulty professional, !weather fog, !players 4, !setup, !ev emf yes, !behavior 12 yes, !observed 12, !gender male, !sanity 90 85 80 75, !huntat 65, !manifest male, !timer incense start, !ghost not Wraith, !tests Deogen, !guess Deogen, !vote Wraith, or !reset."
-

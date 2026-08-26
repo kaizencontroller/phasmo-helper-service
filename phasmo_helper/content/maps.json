@@ -7,10 +7,13 @@
 {"id":"grafton","name":"Grafton Farmhouse","aliases":["farmhouse"]},
 {"id":"woodwind","name":"Camp Woodwind","aliases":["camp","camp-woodwind"]},
 {"id":"point-hope","name":"Point Hope","aliases":["point","hope","lighthouse"]},
+{"id":"point-hope-restricted","name":"Point Hope Restricted","aliases":["point-restricted","hope-restricted","lighthouse-restricted"],"variantOf":"point-hope","size":"small","revision":"0.19.0.0","notes":"Playable area extends through the Dining Room."},
 {"id":"bleasdale","name":"Bleasdale Farmhouse","aliases":[]},
 {"id":"sunny-restricted","name":"Sunny Meadows Restricted","aliases":["restricted","smr"]},
 {"id":"prison","name":"Prison","aliases":[]},
+{"id":"prison-restricted","name":"Prison Restricted","aliases":["prison-r","restricted-prison"],"variantOf":"prison","size":"small","variantSelection":"random","revision":"0.19.0.0"},
 {"id":"maple","name":"Maple Lodge Campsite","aliases":["maple-lodge","lodge"]},
 {"id":"brownstone","name":"Brownstone High School","aliases":["school","highschool","high-school"]},
+{"id":"brownstone-restricted","name":"Brownstone High School Restricted","aliases":["school-restricted","brownstone-r","restricted-school"],"variantOf":"brownstone","size":"medium","variantSelection":"random","revision":"0.19.0.0"},
 {"id":"sunny","name":"Sunny Meadows Mental Institution","aliases":["sunny-meadows","institution","smm"]}
 ]}

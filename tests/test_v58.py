@@ -53,7 +53,7 @@ def test_http_surfaces(tmp_path: Path, monkeypatch):
     client = TestClient(app)
     assert client.get("/health").status_code == 200
     assert client.get("/ready").json()["content"]["valid"] is True
-    assert client.get("/version").json()["game_version"] == "0.18.0.1"
+    assert client.get("/version").json()["game_version"] == "0.19.0.0"
     assert client.get("/api/phasmo/content/validation").json()["validation"]["counts"]["ghosts"] == 30
     page = client.get("/phasmo/encyclopedia?q=dildegeist")
     assert page.status_code == 200

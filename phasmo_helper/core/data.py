@@ -51,11 +51,14 @@ MAP_ALIASES = {
     "grafton": "Grafton Farmhouse", "farmhouse": "Grafton Farmhouse",
     "woodwind": "Camp Woodwind", "camp": "Camp Woodwind", "camp-woodwind": "Camp Woodwind",
     "point": "Point Hope", "hope": "Point Hope", "point-hope": "Point Hope", "lighthouse": "Point Hope",
+    "point-restricted": "Point Hope Restricted", "hope-restricted": "Point Hope Restricted", "lighthouse-restricted": "Point Hope Restricted",
     "bleasdale": "Bleasdale Farmhouse",
     "restricted": "Sunny Meadows Restricted", "sunny-restricted": "Sunny Meadows Restricted", "sunny-meadows-restricted": "Sunny Meadows Restricted", "smr": "Sunny Meadows Restricted",
     "prison": "Prison",
+    "prison-r": "Prison Restricted", "prison-restricted": "Prison Restricted", "restricted-prison": "Prison Restricted",
     "maple": "Maple Lodge Campsite", "maple-lodge": "Maple Lodge Campsite", "lodge": "Maple Lodge Campsite",
     "brownstone": "Brownstone High School", "school": "Brownstone High School", "highschool": "Brownstone High School", "high-school": "Brownstone High School",
+    "brownstone-r": "Brownstone High School Restricted", "brownstone-restricted": "Brownstone High School Restricted", "school-restricted": "Brownstone High School Restricted", "restricted-school": "Brownstone High School Restricted",
     "sunny": "Sunny Meadows Mental Institution", "sunny-meadows": "Sunny Meadows Mental Institution", "sunny-meadows-mental": "Sunny Meadows Mental Institution", "institution": "Sunny Meadows Mental Institution", "smm": "Sunny Meadows Mental Institution",
 }
 

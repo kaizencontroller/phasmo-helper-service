@@ -1,5 +1,12 @@
 # Release Notes
 
+## v5.8.2 - Quality of Life Part 2 compatibility
+
+- Updated supported game metadata to Phasmophobia v0.19.0.0.
+- Added selectable Restricted variants for Prison, Brownstone High School, and Point Hope, including chat aliases and map guidance.
+- Revalidated the 13 Willow Street rework room registry and Deildegast evidence, behavior, aliases, commands, and encyclopedia content.
+- Documented shared journal selections and duplicate media indicators from the official update.
+
 ## v5.8.1 - UX, Integration & Polish
 
 - Added a responsive workspace navigation and live version/integration status.

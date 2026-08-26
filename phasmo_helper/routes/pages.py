@@ -412,6 +412,13 @@ def phasmo_release_notes(room: str | None = Query(default=None)):
     body = f"""
 <p class="small">Release notes are updated with each packaged build so testers can see what changed without checking GitHub.</p>
 
+<h2>v5.8.2 — Game v0.19 Compatibility</h2>
+<ul>
+  <li><strong>Updated:</strong> Supported game and content metadata for Quality of Life Part 2.</li>
+  <li><strong>Added:</strong> Prison Restricted, Brownstone High School Restricted, and Point Hope Restricted to setup, chat aliases, and map guidance.</li>
+  <li><strong>Validated:</strong> Deildegast evidence/behavior support and the reworked 13 Willow Street room registry remain active.</li>
+</ul>
+
 <h2>v5.8.1 — UX, Integration &amp; Polish</h2>
 <ul>
   <li><strong>Added:</strong> Shared workspace navigation, live status, responsive dashboard cards, and remembered Basic/Advanced disclosure.</li>
@@ -918,7 +925,7 @@ def phasmo_timeline(room: str | None = Query(default=None), code: str | None = Q
 def phasmo_whats_new():
     game = get_registry().game_version
     features = "".join(f"<li>{html.escape(str(item))}</li>" for item in game.get("features", []))
-    return _simple_info_page("What's New in v5.8", f"<h2>Kaizen Platform Evolution</h2><p>Gameplay content now loads from a validated JSON registry. The release adds the Ghost Encyclopedia, investigation timelines and summaries, configurable commands, role-based permissions, and platform metadata.</p><h2>Supported game update</h2><p>Phasmophobia {html.escape(str(game.get('supportedVersion')))} - {html.escape(str(game.get('updateName')))}</p><ul>{features}</ul><p><a href='/phasmo/encyclopedia'>Open the Ghost Encyclopedia</a></p>")
+    return _simple_info_page("What's New in v5.8.2", f"<h2>Quality of Life Part 2 compatibility</h2><p>The helper now supports the new Restricted Prison, Brownstone High School, and Point Hope variants while retaining the Deildegast and reworked Willow Street content.</p><h2>Supported game update</h2><p>Phasmophobia {html.escape(str(game.get('supportedVersion')))} - {html.escape(str(game.get('updateName')))}</p><ul>{features}</ul><p><a href='/phasmo/encyclopedia'>Open the Ghost Encyclopedia</a></p>")
 
 
 @router.get("/phasmo/jumpscare-video")

@@ -6,7 +6,7 @@ No. Streamer.bot is the first `IChatProvider` adapter; command processing is pro
 
 ## Which game build is supported?
 
-Phasmophobia 0.18.0.1. The app includes Deildegast, the Willow Street rework, and EMF Level 5 photo tracking.
+Phasmophobia 0.19.0.0. The app includes Deildegast, the Willow Street rework, EMF Level 5 photo tracking, and the Prison, Brownstone High School, and Point Hope Restricted variants.
 
 ## Why does `Dildegeist` still work in chat?
 

@@ -112,6 +112,10 @@ class ContentRegistry:
         evidence_ids = self._unique_ids("evidence.json", "duplicate_evidence_id")
         ghost_ids = self._unique_ids("ghosts.json", "duplicate_ghost_id")
         map_ids = self._unique_ids("maps.json", "duplicate_map_id")
+        for map_item in self.items("maps.json"):
+            parent = str(map_item.get("variantOf") or "")
+            if parent and parent not in map_ids:
+                self.issues.append(ValidationIssue("error", "broken_reference", f"Map {map_item.get('id')} references unknown parent {parent}", "maps.json"))
         self._unique_ids("objectives.json", "duplicate_objective_id")
         clue_ids = self._unique_ids("behavior_clues.json", "duplicate_behavior_id")
         command_names: set[str] = set()
